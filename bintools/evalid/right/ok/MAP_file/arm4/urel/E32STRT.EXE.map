@@ -1,0 +1,453 @@
+Archive member included       because of file (symbol)
+
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EEXE.LIB(../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/E32/EUSER/EEXE/ARM4/UREL/UC_EXE.o)
+                              (_E32Startup)
+..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o)
+                              (--whole-archive)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00217.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TFindFile::TFindFile(RFs &))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00044.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TFindFile::FindByDir(TDesC16 const &, TDesC16 const &))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00051.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TParseBase::FullName(void) const)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00121.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RFile::Open(RFs &, TDesC16 const &, unsigned int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00138.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RFile::Read(TDes8 &, int) const)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00015.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RFsBase::Close(void))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00018.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RFs::Connect(int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00185.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RFile::Size(int &) const)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00136.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RFile::Read(TDes8 &) const)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00034.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RFs::DriveList(TBuf8<26> &) const)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177h.o)
+                              ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00217.o) (_head___________________EPOC32_RELEASE_ARM4_UREL_EFSRV_LIB)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177t.o)
+                              ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177h.o) (____________________EPOC32_RELEASE_ARM4_UREL_EFSRV_LIB_iname)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01405.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TLocale::TLocale(void))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01282.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TBufBase16::TBufBase16(TDesC16 const &, int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00068.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TDes16::AppendNumFixedWidth(unsigned int, TRadix, int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00251.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TDes16::Copy(TDesC16 const &))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01366.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TPtr8::TPtr8(unsigned char *, int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01074.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TLocale::Set(void) const)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01336.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TCurrencySymbol::TCurrencySymbol(void))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00981.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (User::SetCurrencySymbol(TDesC16 const &))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01283.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TBufBase16::TBufBase16(int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01039.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (UserHal::SetXYInputCalibration(TDigitizerCalibration const &))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00809.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (User::Panic(TDesC16 const &, int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00045.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (User::Alloc(int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01367.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TPtr8::TPtr8(unsigned char *, int, int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00476.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (User::Free(void *))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01431.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TBufBase8::TBufBase8(int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00098.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TDesC8::AtC(int) const)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00099.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (TDesC16::AtC(int) const)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00292.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RProcess::Create(TDesC16 const &, TDesC16 const &, TOwnerType))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00953.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RProcess::Resume(void))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00172.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (RHandleBase::Close(void))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102h.o)
+                              ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01405.o) (_head________________EPOC32_RELEASE_ARM4_UREL_EUSER_LIB)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102t.o)
+                              ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102h.o) (_________________EPOC32_RELEASE_ARM4_UREL_EUSER_LIB_iname)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00001.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (HAL::Get(HALData::TAttribute, int &))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00002.o)
+                              ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o) (HAL::Set(HALData::TAttribute, int))
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301h.o)
+                              ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00001.o) (_head________________EPOC32_RELEASE_ARM4_UREL_HAL_LIB)
+..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301t.o)
+                              ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301h.o) (_________________EPOC32_RELEASE_ARM4_UREL_HAL_LIB_iname)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00400000                __image_base__=0x400000
+                0x00000000                __dll__=0x0
+                0x00001000                __section_alignment__=0x1000
+                0x00000200                __file_alignment__=0x200
+                0x00000004                __major_os_version__=0x4
+                0x00000000                __minor_os_version__=0x0
+                0x00000001                __major_image_version__=0x1
+                0x00000000                __minor_image_version__=0x0
+                0x00000004                __major_subsystem_version__=0x4
+                0x00000000                __minor_subsystem_version__=0x0
+                0x00000003                __subsystem__=0x3
+                0x02000000                __size_of_stack_reserve__=0x2000000
+                0x00001000                __size_of_stack_commit__=0x1000
+                0x00100000                __size_of_heap_reserve__=0x100000
+                0x00001000                __size_of_heap_commit__=0x1000
+                0x00000000                __loader_flags__=0x0
+LOAD ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.exp
+LOAD ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EEXE.LIB
+LOAD ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in
+LOAD ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EGCC.LIB
+LOAD ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB
+LOAD ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB
+LOAD ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB
+
+.text           0x00401000      0x800
+ *(.init)
+ *(.text)
+ .text          0x00401000       0x98 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EEXE.LIB(../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/E32/EUSER/EEXE/ARM4/UREL/UC_EXE.o)
+                0x00401094                atexit
+                0x00401000                _E32Startup
+ .text          0x00401098      0x4e0 ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o)
+                0x004012dc                E32Main(void)
+ .text          0x00401578        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00217.o)
+                0x00401578                TFindFile::TFindFile(RFs &)
+ .text          0x00401584        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00044.o)
+                0x00401584                TFindFile::FindByDir(TDesC16 const &, TDesC16 const &)
+ .text          0x00401590        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00051.o)
+                0x00401590                TParseBase::FullName(void) const
+ .text          0x0040159c        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00121.o)
+                0x0040159c                RFile::Open(RFs &, TDesC16 const &, unsigned int)
+ .text          0x004015a8        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00138.o)
+                0x004015a8                RFile::Read(TDes8 &, int) const
+ .text          0x004015b4        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00015.o)
+                0x004015b4                RFsBase::Close(void)
+ .text          0x004015c0        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00018.o)
+                0x004015c0                RFs::Connect(int)
+ .text          0x004015cc        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00185.o)
+                0x004015cc                RFile::Size(int &) const
+ .text          0x004015d8        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00136.o)
+                0x004015d8                RFile::Read(TDes8 &) const
+ .text          0x004015e4        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00034.o)
+                0x004015e4                RFs::DriveList(TBuf8<26> &) const
+ .text          0x004015f0        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01405.o)
+                0x004015f0                TLocale::TLocale(void)
+ .text          0x004015fc        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01282.o)
+                0x004015fc                TBufBase16::TBufBase16(TDesC16 const &, int)
+ .text          0x00401608        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00068.o)
+                0x00401608                TDes16::AppendNumFixedWidth(unsigned int, TRadix, int)
+ .text          0x00401614        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00251.o)
+                0x00401614                TDes16::Copy(TDesC16 const &)
+ .text          0x00401620        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01366.o)
+                0x00401620                TPtr8::TPtr8(unsigned char *, int)
+ .text          0x0040162c        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01074.o)
+                0x0040162c                TLocale::Set(void) const
+ .text          0x00401638        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01336.o)
+                0x00401638                TCurrencySymbol::TCurrencySymbol(void)
+ .text          0x00401644        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00981.o)
+                0x00401644                User::SetCurrencySymbol(TDesC16 const &)
+ .text          0x00401650        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01283.o)
+                0x00401650                TBufBase16::TBufBase16(int)
+ .text          0x0040165c        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01039.o)
+                0x0040165c                UserHal::SetXYInputCalibration(TDigitizerCalibration const &)
+ .text          0x00401668        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00809.o)
+                0x00401668                User::Panic(TDesC16 const &, int)
+ .text          0x00401674        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00045.o)
+                0x00401674                User::Alloc(int)
+ .text          0x00401680        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01367.o)
+                0x00401680                TPtr8::TPtr8(unsigned char *, int, int)
+ .text          0x0040168c        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00476.o)
+                0x0040168c                User::Free(void *)
+ .text          0x00401698        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01431.o)
+                0x00401698                TBufBase8::TBufBase8(int)
+ .text          0x004016a4        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00098.o)
+                0x004016a4                TDesC8::AtC(int) const
+ .text          0x004016b0        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00099.o)
+                0x004016b0                TDesC16::AtC(int) const
+ .text          0x004016bc        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00292.o)
+                0x004016bc                RProcess::Create(TDesC16 const &, TDesC16 const &, TOwnerType)
+ .text          0x004016c8        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00953.o)
+                0x004016c8                RProcess::Resume(void)
+ .text          0x004016d4        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00172.o)
+                0x004016d4                RHandleBase::Close(void)
+ .text          0x004016e0        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00001.o)
+                0x004016e0                HAL::Get(HALData::TAttribute, int &)
+ .text          0x004016ec        0xc ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00002.o)
+                0x004016ec                HAL::Set(HALData::TAttribute, int)
+ *(SORT(.text$*))
+ *(.glue_7t)
+ *(.glue_7)
+                0x004016f8                ___CTOR_LIST__=.
+                0x004016f8                __CTOR_LIST__=.
+                0x004016f8        0x4 LONG 0xffffffff
+ *(.ctors)
+ *(.ctor)
+                0x004016fc        0x4 LONG 0x0
+                0x00401700                ___DTOR_LIST__=.
+                0x00401700                __DTOR_LIST__=.
+                0x00401700        0x4 LONG 0xffffffff
+ *(.dtors)
+ *(.dtor)
+                0x00401704        0x4 LONG 0x0
+ *(.fini)
+ *(.gcc_exc)
+                0x00401708                etext=.
+ *(.gcc_except_table)
+ *(.rdata)
+ .rdata         0x00401708       0xe0 ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.in(../../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/F32/GROUP/ESTART/ARM4/UREL/ESTART.o)
+ *(SORT(.rdata$*))
+ *(.eh_frame)
+
+.data           0x00402000        0x0
+                0x00402000                __data_start__=.
+ *(.data)
+ *(.data2)
+ *(SORT(.data$*))
+                0x00402000                __data_end__=.
+ *(.data_cygwin_nocopy)
+
+.bss            0x00402000        0x0
+                0x00402000                __bss_start__=.
+ *(.bss)
+ *(COMMON)
+                0x00402000                __bss_end__=.
+
+.edata
+ *(.edata)
+
+/DISCARD/
+ *(.debug$S)
+ *(.debug$T)
+ *(.debug$F)
+ *(.drectve)
+
+.idata          0x00402000      0x400
+ SORT(*)(.idata$2)
+ .idata$2       0x00402000       0x14 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177h.o)
+                0x00402000                _head___________________EPOC32_RELEASE_ARM4_UREL_EFSRV_LIB
+ .idata$2       0x00402014       0x14 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102h.o)
+                0x00402014                _head________________EPOC32_RELEASE_ARM4_UREL_EUSER_LIB
+ .idata$2       0x00402028       0x14 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301h.o)
+                0x00402028                _head________________EPOC32_RELEASE_ARM4_UREL_HAL_LIB
+ SORT(*)(.idata$3)
+ .idata$3       0x0040203c       0x20 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EEXE.LIB(../../../../../EPOC32/BUILD/SRC/BEECH/GENERIC/BASE/E32/EUSER/EEXE/ARM4/UREL/UC_EXE.o)
+                0x0040205c        0x4 LONG 0x0
+                0x00402060        0x4 LONG 0x0
+                0x00402064        0x4 LONG 0x0
+                0x00402068        0x4 LONG 0x0
+                0x0040206c        0x4 LONG 0x0
+ SORT(*)(.idata$4)
+ .idata$4       0x00402070        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177h.o)
+ .idata$4       0x00402074        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00015.o)
+ .idata$4       0x00402078        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00018.o)
+ .idata$4       0x0040207c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00034.o)
+ .idata$4       0x00402080        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00044.o)
+ .idata$4       0x00402084        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00051.o)
+ .idata$4       0x00402088        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00121.o)
+ .idata$4       0x0040208c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00136.o)
+ .idata$4       0x00402090        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00138.o)
+ .idata$4       0x00402094        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00185.o)
+ .idata$4       0x00402098        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00217.o)
+ .idata$4       0x0040209c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177t.o)
+ .idata$4       0x004020a0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102h.o)
+ .idata$4       0x004020a4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00045.o)
+ .idata$4       0x004020a8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00068.o)
+ .idata$4       0x004020ac        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00098.o)
+ .idata$4       0x004020b0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00099.o)
+ .idata$4       0x004020b4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00172.o)
+ .idata$4       0x004020b8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00251.o)
+ .idata$4       0x004020bc        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00292.o)
+ .idata$4       0x004020c0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00476.o)
+ .idata$4       0x004020c4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00809.o)
+ .idata$4       0x004020c8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00953.o)
+ .idata$4       0x004020cc        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00981.o)
+ .idata$4       0x004020d0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01039.o)
+ .idata$4       0x004020d4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01074.o)
+ .idata$4       0x004020d8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01282.o)
+ .idata$4       0x004020dc        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01283.o)
+ .idata$4       0x004020e0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01336.o)
+ .idata$4       0x004020e4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01366.o)
+ .idata$4       0x004020e8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01367.o)
+ .idata$4       0x004020ec        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01405.o)
+ .idata$4       0x004020f0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01431.o)
+ .idata$4       0x004020f4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102t.o)
+ .idata$4       0x004020f8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301h.o)
+ .idata$4       0x004020fc        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00001.o)
+ .idata$4       0x00402100        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00002.o)
+ .idata$4       0x00402104        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301t.o)
+ SORT(*)(.idata$5)
+ .idata$5       0x00402108        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177h.o)
+ .idata$5       0x0040210c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00015.o)
+                0x0040210c                _imp__Close__7RFsBase
+                0x0040210c                RFsBase::__imp_Close(void)
+ .idata$5       0x00402110        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00018.o)
+                0x00402110                _imp__Connect__3RFsi
+                0x00402110                RFs::__imp_Connect(int)
+ .idata$5       0x00402114        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00034.o)
+                0x00402114                RFs::__imp_DriveList(TBuf8<26> &) const
+                0x00402114                _imp__DriveList__C3RFsRt5TBuf81i26
+ .idata$5       0x00402118        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00044.o)
+                0x00402118                _imp__FindByDir__9TFindFileRC7TDesC16T1
+                0x00402118                TFindFile::__imp_FindByDir(TDesC16 const &, TDesC16 const &)
+ .idata$5       0x0040211c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00051.o)
+                0x0040211c                _imp__FullName__C10TParseBase
+                0x0040211c                TParseBase::__imp_FullName(void) const
+ .idata$5       0x00402120        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00121.o)
+                0x00402120                RFile::__imp_Open(RFs &, TDesC16 const &, unsigned int)
+                0x00402120                _imp__Open__5RFileR3RFsRC7TDesC16Ui
+ .idata$5       0x00402124        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00136.o)
+                0x00402124                _imp__Read__C5RFileR5TDes8
+                0x00402124                RFile::__imp_Read(TDes8 &) const
+ .idata$5       0x00402128        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00138.o)
+                0x00402128                _imp__Read__C5RFileR5TDes8i
+                0x00402128                RFile::__imp_Read(TDes8 &, int) const
+ .idata$5       0x0040212c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00185.o)
+                0x0040212c                RFile::__imp_Size(int &) const
+                0x0040212c                _imp__Size__C5RFileRi
+ .idata$5       0x00402130        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00217.o)
+                0x00402130                TFindFile::_imp__(RFs &)
+                0x00402130                __imp___9TFindFileR3RFs
+ .idata$5       0x00402134        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177t.o)
+ .idata$5       0x00402138        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102h.o)
+ .idata$5       0x0040213c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00045.o)
+                0x0040213c                User::__imp_Alloc(int)
+                0x0040213c                _imp__Alloc__4Useri
+ .idata$5       0x00402140        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00068.o)
+                0x00402140                _imp__AppendNumFixedWidth__6TDes16Ui6TRadixi
+                0x00402140                TDes16::__imp_AppendNumFixedWidth(unsigned int, TRadix, int)
+ .idata$5       0x00402144        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00098.o)
+                0x00402144                TDesC8::__imp_AtC(int) const
+                0x00402144                _imp__AtC__C6TDesC8i
+ .idata$5       0x00402148        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00099.o)
+                0x00402148                _imp__AtC__C7TDesC16i
+                0x00402148                TDesC16::__imp_AtC(int) const
+ .idata$5       0x0040214c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00172.o)
+                0x0040214c                RHandleBase::__imp_Close(void)
+                0x0040214c                _imp__Close__11RHandleBase
+ .idata$5       0x00402150        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00251.o)
+                0x00402150                _imp__Copy__6TDes16RC7TDesC16
+                0x00402150                TDes16::__imp_Copy(TDesC16 const &)
+ .idata$5       0x00402154        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00292.o)
+                0x00402154                _imp__Create__8RProcessRC7TDesC16T110TOwnerType
+                0x00402154                RProcess::__imp_Create(TDesC16 const &, TDesC16 const &, TOwnerType)
+ .idata$5       0x00402158        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00476.o)
+                0x00402158                _imp__Free__4UserPv
+                0x00402158                User::__imp_Free(void *)
+ .idata$5       0x0040215c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00809.o)
+                0x0040215c                _imp__Panic__4UserRC7TDesC16i
+                0x0040215c                User::__imp_Panic(TDesC16 const &, int)
+ .idata$5       0x00402160        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00953.o)
+                0x00402160                _imp__Resume__8RProcess
+                0x00402160                RProcess::__imp_Resume(void)
+ .idata$5       0x00402164        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00981.o)
+                0x00402164                _imp__SetCurrencySymbol__4UserRC7TDesC16
+                0x00402164                User::__imp_SetCurrencySymbol(TDesC16 const &)
+ .idata$5       0x00402168        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01039.o)
+                0x00402168                _imp__SetXYInputCalibration__7UserHalRC21TDigitizerCalibration
+                0x00402168                UserHal::__imp_SetXYInputCalibration(TDigitizerCalibration const &)
+ .idata$5       0x0040216c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01074.o)
+                0x0040216c                _imp__Set__C7TLocale
+                0x0040216c                TLocale::__imp_Set(void) const
+ .idata$5       0x00402170        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01282.o)
+                0x00402170                TBufBase16::_imp__(TDesC16 const &, int)
+                0x00402170                __imp___10TBufBase16RC7TDesC16i
+ .idata$5       0x00402174        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01283.o)
+                0x00402174                TBufBase16::_imp__(int)
+                0x00402174                __imp___10TBufBase16i
+ .idata$5       0x00402178        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01336.o)
+                0x00402178                __imp___15TCurrencySymbol
+                0x00402178                TCurrencySymbol::_imp__(void)
+ .idata$5       0x0040217c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01366.o)
+                0x0040217c                TPtr8::_imp__(unsigned char *, int)
+                0x0040217c                __imp___5TPtr8PUci
+ .idata$5       0x00402180        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01367.o)
+                0x00402180                __imp___5TPtr8PUcii
+                0x00402180                TPtr8::_imp__(unsigned char *, int, int)
+ .idata$5       0x00402184        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01405.o)
+                0x00402184                TLocale::_imp__(void)
+                0x00402184                __imp___7TLocale
+ .idata$5       0x00402188        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01431.o)
+                0x00402188                __imp___9TBufBase8i
+                0x00402188                TBufBase8::_imp__(int)
+ .idata$5       0x0040218c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102t.o)
+ .idata$5       0x00402190        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301h.o)
+ .idata$5       0x00402194        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00001.o)
+                0x00402194                HAL::__imp_Get(HALData::TAttribute, int &)
+                0x00402194                _imp__Get__3HALQ27HALData10TAttributeRi
+ .idata$5       0x00402198        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00002.o)
+                0x00402198                _imp__Set__3HALQ27HALData10TAttributei
+                0x00402198                HAL::__imp_Set(HALData::TAttribute, int)
+ .idata$5       0x0040219c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301t.o)
+ SORT(*)(.idata$6)
+ SORT(*)(.idata$7)
+ .idata$7       0x004021a0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00015.o)
+ .idata$7       0x004021a4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00018.o)
+ .idata$7       0x004021a8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00034.o)
+ .idata$7       0x004021ac        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00044.o)
+ .idata$7       0x004021b0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00051.o)
+ .idata$7       0x004021b4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00121.o)
+ .idata$7       0x004021b8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00136.o)
+ .idata$7       0x004021bc        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00138.o)
+ .idata$7       0x004021c0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00185.o)
+ .idata$7       0x004021c4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177s_00217.o)
+ .idata$7       0x004021c8       0x14 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EFSRV.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1177t.o)
+                0x004021c8                ____________________EPOC32_RELEASE_ARM4_UREL_EFSRV_LIB_iname
+ .idata$7       0x004021dc        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00045.o)
+ .idata$7       0x004021e0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00068.o)
+ .idata$7       0x004021e4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00098.o)
+ .idata$7       0x004021e8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00099.o)
+ .idata$7       0x004021ec        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00172.o)
+ .idata$7       0x004021f0        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00251.o)
+ .idata$7       0x004021f4        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00292.o)
+ .idata$7       0x004021f8        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00476.o)
+ .idata$7       0x004021fc        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00809.o)
+ .idata$7       0x00402200        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00953.o)
+ .idata$7       0x00402204        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_00981.o)
+ .idata$7       0x00402208        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01039.o)
+ .idata$7       0x0040220c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01074.o)
+ .idata$7       0x00402210        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01282.o)
+ .idata$7       0x00402214        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01283.o)
+ .idata$7       0x00402218        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01336.o)
+ .idata$7       0x0040221c        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01366.o)
+ .idata$7       0x00402220        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01367.o)
+ .idata$7       0x00402224        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01405.o)
+ .idata$7       0x00402228        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102s_01431.o)
+ .idata$7       0x0040222c       0x14 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1102t.o)
+                0x0040222c                _________________EPOC32_RELEASE_ARM4_UREL_EUSER_LIB_iname
+ .idata$7       0x00402240        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00001.o)
+ .idata$7       0x00402244        0x4 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301s_00002.o)
+ .idata$7       0x00402248       0x14 ..\..\..\..\..\..\EPOC32\RELEASE\ARM4\UREL\HAL.LIB(C:/DOCUME~1/SIBUIL~1/LOCALS~1/Temp/d1301t.o)
+                0x00402248                _________________EPOC32_RELEASE_ARM4_UREL_HAL_LIB_iname
+
+.CRT
+ *(SORT(.CRT$*))
+
+.endjunk        0x00403000        0x0
+                0x00403000                end=.
+                0x00403000                _end=.
+                0x00403000                __end__=.
+
+.reloc          0x00403000      0x200
+ *(.reloc)
+ .reloc         0x00403000       0x60 ..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.exp
+
+.rsrc
+ *(.rsrc)
+ *(SORT(.rsrc$*))
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+OUTPUT(..\..\..\..\..\..\EPOC32\BUILD\SRC\BEECH\GENERIC\BASE\F32\GROUP\ESTART\ARM4\UREL\E32STRT.EXE epoc-pei-arm-little)

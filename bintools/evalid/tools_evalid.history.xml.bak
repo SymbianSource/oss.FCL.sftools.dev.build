@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+
+ Contributors:
+
+ Description: 
+
+ -->
+<relnotes name="EVALID">
+  <purpose>
+  </purpose>
+
+  <defect number="DEF120580" title="EVALID : x86 static library comparisons sometimes fail when they shouldn't" revision="007">
+     EVALID : x86 static library comparisons sometimes fail when they shouldn't
+  </defect>
+
+  <defect number="DEF119569" title="EVALID incorrectly passes different WINSCW binaries after recent 'nm' change" revision="006">
+    EVALID incorrectly passes different WINSCW binaries after recent "nm" change  
+  </defect>
+
+  <defect number="DEF114373" title="EVALID should use OBJDUMP instead of DUMPBIN" revision="005">
+    EVALID should use OBJDUMP instead of DUMPBIN 
+  </defect>
+
+  <defect number="DEF114371" title="EVALID should be using ELF2E32 instead of PETRAN" revision="004">
+    EVALID should be using ELF2E32 instead of PETRAN
+  </defect>
+
+  <defect number="DEF096631" title="EVALID doesn't process -f listfile option correctly." revision="003">
+    EVALID doesn't process -f listfile option correctly
+  </defect>
+
+  <defect number="DEF099894" title="EVALID does not ignore all debug-related info in ELF files" revision="002">
+    EVALID does not ignore all debug-related info in ELF files
+  </defect>
+
+  <defect number="DEF099893" title="EVALID does not recognise some modern E32 Image files" revision="001">
+    EVALID does not recognise some modern E32 Image files
+  </defect>
+</relnotes>

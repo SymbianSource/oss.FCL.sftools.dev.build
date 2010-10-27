@@ -136,7 +136,8 @@
 	<xsl:variable name="linked" select="document(@href,.)/*"/>
 	<xsl:for-each select="$linked">
 		<xsl:apply-templates select="//*[(self::component or self::collection or self::package or self::layer) and @href]" mode="scan-for-namespaces"/>
-		<xsl:for-each select="//namespace::* | @id-namespace">
+		<xsl:for-each select="//namespace::*[.!='http://www.w3.org/XML/1998/namespace'] | @id-namespace">
+			<!-- ignore XML namespace -->
 			<xsl:value-of select="concat(name(),' ',.,'&#xa;')"/>
 		</xsl:for-each>
 	</xsl:for-each>
@@ -466,7 +467,7 @@
 	<xsl:variable name="prefix" select="name($namespaces[.=$ns])"/>
 	<xsl:attribute name="{name()}">
 	<xsl:choose>
-		<xsl:when test="$prefix = 'id-namespace' or  (not($namespaces[name()='id-namespace']) and $ns=$defaultns)"/> <!-- it's the default namespace, no prefix -->
+		<xsl:when test="$prefix = 'id-namespace' or $namespaces[name()='id-namespace']=$ns or  (not($namespaces[name()='id-namespace']) and $ns=$defaultns)"/> <!-- it's the default namespace, no prefix -->
 		<xsl:when test="$prefix='' and contains(.,':')">
 			<!-- complex: copy id and copy namespace (namespace should be copied already)-->
 			<xsl:value-of select="."/>

@@ -1,0 +1,294 @@
+Archive member included       because of file (symbol)
+
+..\..\..\EPOC32\RELEASE\ARM4\UREL\EDLL.LIB(../../EPOC32/BUILD/BASE/E32/EUSER/EDLL/ARM4/UREL/UP_DLL.o)
+                              (_E32Dll)
+..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o)
+                              (--whole-archive)
+..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDDLL.o)
+                              (--whole-archive)
+..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_01283.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (TBufBase16::TBufBase16(int))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00769.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (Time::NullTTime(void))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00251.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (TDes16::Copy(TDesC16 const &))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216h.o)
+                              ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_01283.o) (_head_______EPOC32_RELEASE_ARM4_UREL_EUSER_LIB)
+..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216t.o)
+                              ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216h.o) (________EPOC32_RELEASE_ARM4_UREL_EUSER_LIB_iname)
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00366.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (RReadStream::ReadUint16L(void))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00350.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (RReadStream::ReadInt8L(void))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00349.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (RReadStream::ReadInt32L(void))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00252.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (InternalizeL(TInt64 &, RReadStream &))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00251.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (InternalizeL(TDes16 &, RReadStream &))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00348.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (RReadStream::ReadInt16L(void))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00460.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (RWriteStream::WriteUint16L(unsigned int))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00444.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (RWriteStream::WriteInt8L(int))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00443.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (RWriteStream::WriteInt32L(long))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00190.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (ExternalizeL(TInt64, RWriteStream &))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00195.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (ExternalizeL(TDesC16 const &, RWriteStream &))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00442.o)
+                              ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o) (RWriteStream::WriteInt16L(int))
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091h.o)
+                              ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00366.o) (_head__________EPOC32_RELEASE_ARM4_UREL_ESTOR_LIB)
+..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091t.o)
+                              ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091h.o) (___________EPOC32_RELEASE_ARM4_UREL_ESTOR_LIB_iname)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x10000000                __image_base__=0x10000000
+                0x00000001                __dll__=0x1
+                0x00001000                __section_alignment__=0x1000
+                0x00000200                __file_alignment__=0x200
+                0x00000004                __major_os_version__=0x4
+                0x00000000                __minor_os_version__=0x0
+                0x00000001                __major_image_version__=0x1
+                0x00000000                __minor_image_version__=0x0
+                0x00000004                __major_subsystem_version__=0x4
+                0x00000000                __minor_subsystem_version__=0x0
+                0x00000003                __subsystem__=0x3
+                0x02000000                __size_of_stack_reserve__=0x2000000
+                0x00001000                __size_of_stack_commit__=0x1000
+                0x00100000                __size_of_heap_reserve__=0x100000
+                0x00001000                __size_of_heap_commit__=0x1000
+                0x00000000                __loader_flags__=0x0
+LOAD ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.exp
+LOAD ..\..\..\EPOC32\RELEASE\ARM4\UREL\EDLL.LIB
+LOAD ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in
+LOAD ..\..\..\EPOC32\RELEASE\ARM4\UREL\EDLLSTUB.LIB
+LOAD ..\..\..\EPOC32\RELEASE\ARM4\UREL\EGCC.LIB
+LOAD ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB
+LOAD ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB
+
+.text           0x10001000      0x400
+ *(.init)
+ *(.text)
+ .text          0x10001000        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EDLL.LIB(../../EPOC32/BUILD/BASE/E32/EUSER/EDLL/ARM4/UREL/UP_DLL.o)
+                0x10001000                _E32Dll
+ .text          0x10001004      0x318 ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o)
+                0x10001048                TASShdAlarm::InternalizeL(RReadStream &)
+                0x10001264                TASShdAlarm::Reset(void)
+                0x10001004                TASShdAlarm::TASShdAlarm(void)
+                0x10001174                TASShdAlarm::ExternalizeL(RWriteStream &) const
+ .text          0x1000131c        0x8 ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDDLL.o)
+                0x1000131c                E32Dll(TDllReason)
+ .text          0x10001324        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_01283.o)
+                0x10001324                TBufBase16::TBufBase16(int)
+ .text          0x10001330        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00769.o)
+                0x10001330                Time::NullTTime(void)
+ .text          0x1000133c        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00251.o)
+                0x1000133c                TDes16::Copy(TDesC16 const &)
+ .text          0x10001348        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00366.o)
+                0x10001348                RReadStream::ReadUint16L(void)
+ .text          0x10001354        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00350.o)
+                0x10001354                RReadStream::ReadInt8L(void)
+ .text          0x10001360        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00349.o)
+                0x10001360                RReadStream::ReadInt32L(void)
+ .text          0x1000136c        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00252.o)
+                0x1000136c                InternalizeL(TInt64 &, RReadStream &)
+ .text          0x10001378        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00251.o)
+                0x10001378                InternalizeL(TDes16 &, RReadStream &)
+ .text          0x10001384        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00348.o)
+                0x10001384                RReadStream::ReadInt16L(void)
+ .text          0x10001390        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00460.o)
+                0x10001390                RWriteStream::WriteUint16L(unsigned int)
+ .text          0x1000139c        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00444.o)
+                0x1000139c                RWriteStream::WriteInt8L(int)
+ .text          0x100013a8        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00443.o)
+                0x100013a8                RWriteStream::WriteInt32L(long)
+ .text          0x100013b4        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00190.o)
+                0x100013b4                ExternalizeL(TInt64, RWriteStream &)
+ .text          0x100013c0        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00195.o)
+                0x100013c0                ExternalizeL(TDesC16 const &, RWriteStream &)
+ .text          0x100013cc        0xc ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00442.o)
+                0x100013cc                RWriteStream::WriteInt16L(int)
+ *(SORT(.text$*))
+ *(.glue_7t)
+ *(.glue_7)
+                0x100013d8                ___CTOR_LIST__=.
+                0x100013d8                __CTOR_LIST__=.
+                0x100013d8        0x4 LONG 0xffffffff
+ *(.ctors)
+ *(.ctor)
+                0x100013dc        0x4 LONG 0x0
+                0x100013e0                ___DTOR_LIST__=.
+                0x100013e0                __DTOR_LIST__=.
+                0x100013e0        0x4 LONG 0xffffffff
+ *(.dtors)
+ *(.dtor)
+                0x100013e4        0x4 LONG 0x0
+ *(.fini)
+ *(.gcc_exc)
+                0x100013e8                etext=.
+ *(.gcc_except_table)
+ *(.rdata)
+ .rdata         0x100013e8        0x8 ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.in(../../../EPOC32/BUILD/APP-SERVICES/ALARMSERVER/GROUP/ALARMSHARED/ARM4/UREL/ASSHDALARM.o)
+ *(SORT(.rdata$*))
+ *(.eh_frame)
+
+.data           0x10002000        0x0
+                0x10002000                __data_start__=.
+ *(.data)
+ *(.data2)
+ *(SORT(.data$*))
+                0x10002000                __data_end__=.
+ *(.data_cygwin_nocopy)
+
+.bss            0x10002000        0x0
+                0x10002000                __bss_start__=.
+ *(.bss)
+ *(COMMON)
+                0x10002000                __bss_end__=.
+
+.edata          0x10002000      0x200
+ *(.edata)
+ .edata         0x10002000       0x60 ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.exp
+
+/DISCARD/
+ *(.debug$S)
+ *(.debug$T)
+ *(.debug$F)
+ *(.drectve)
+
+.idata          0x10003000      0x200
+ SORT(*)(.idata$2)
+ .idata$2       0x10003000       0x14 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091h.o)
+                0x10003000                _head__________EPOC32_RELEASE_ARM4_UREL_ESTOR_LIB
+ .idata$2       0x10003014       0x14 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216h.o)
+                0x10003014                _head_______EPOC32_RELEASE_ARM4_UREL_EUSER_LIB
+ SORT(*)(.idata$3)
+                0x10003028        0x4 LONG 0x0
+                0x1000302c        0x4 LONG 0x0
+                0x10003030        0x4 LONG 0x0
+                0x10003034        0x4 LONG 0x0
+                0x10003038        0x4 LONG 0x0
+ SORT(*)(.idata$4)
+ .idata$4       0x1000303c        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091h.o)
+ .idata$4       0x10003040        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00190.o)
+ .idata$4       0x10003044        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00195.o)
+ .idata$4       0x10003048        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00251.o)
+ .idata$4       0x1000304c        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00252.o)
+ .idata$4       0x10003050        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00348.o)
+ .idata$4       0x10003054        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00349.o)
+ .idata$4       0x10003058        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00350.o)
+ .idata$4       0x1000305c        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00366.o)
+ .idata$4       0x10003060        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00442.o)
+ .idata$4       0x10003064        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00443.o)
+ .idata$4       0x10003068        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00444.o)
+ .idata$4       0x1000306c        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00460.o)
+ .idata$4       0x10003070        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091t.o)
+ .idata$4       0x10003074        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216h.o)
+ .idata$4       0x10003078        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00251.o)
+ .idata$4       0x1000307c        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00769.o)
+ .idata$4       0x10003080        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_01283.o)
+ .idata$4       0x10003084        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216t.o)
+ SORT(*)(.idata$5)
+ .idata$5       0x10003088        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091h.o)
+ .idata$5       0x1000308c        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00190.o)
+                0x1000308c                _imp__ExternalizeL__FG6TInt64R12RWriteStream
+                0x1000308c                __imp_ExternalizeL(TInt64, RWriteStream &)
+ .idata$5       0x10003090        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00195.o)
+                0x10003090                _imp__ExternalizeL__FRC7TDesC16R12RWriteStream
+                0x10003090                __imp_ExternalizeL(TDesC16 const &, RWriteStream &)
+ .idata$5       0x10003094        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00251.o)
+                0x10003094                _imp__InternalizeL__FR6TDes16R11RReadStream
+                0x10003094                __imp_InternalizeL(TDes16 &, RReadStream &)
+ .idata$5       0x10003098        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00252.o)
+                0x10003098                __imp_InternalizeL(TInt64 &, RReadStream &)
+                0x10003098                _imp__InternalizeL__FR6TInt64R11RReadStream
+ .idata$5       0x1000309c        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00348.o)
+                0x1000309c                _imp__ReadInt16L__11RReadStream
+                0x1000309c                RReadStream::__imp_ReadInt16L(void)
+ .idata$5       0x100030a0        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00349.o)
+                0x100030a0                _imp__ReadInt32L__11RReadStream
+                0x100030a0                RReadStream::__imp_ReadInt32L(void)
+ .idata$5       0x100030a4        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00350.o)
+                0x100030a4                _imp__ReadInt8L__11RReadStream
+                0x100030a4                RReadStream::__imp_ReadInt8L(void)
+ .idata$5       0x100030a8        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00366.o)
+                0x100030a8                _imp__ReadUint16L__11RReadStream
+                0x100030a8                RReadStream::__imp_ReadUint16L(void)
+ .idata$5       0x100030ac        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00442.o)
+                0x100030ac                _imp__WriteInt16L__12RWriteStreami
+                0x100030ac                RWriteStream::__imp_WriteInt16L(int)
+ .idata$5       0x100030b0        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00443.o)
+                0x100030b0                _imp__WriteInt32L__12RWriteStreaml
+                0x100030b0                RWriteStream::__imp_WriteInt32L(long)
+ .idata$5       0x100030b4        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00444.o)
+                0x100030b4                _imp__WriteInt8L__12RWriteStreami
+                0x100030b4                RWriteStream::__imp_WriteInt8L(int)
+ .idata$5       0x100030b8        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00460.o)
+                0x100030b8                _imp__WriteUint16L__12RWriteStreamUi
+                0x100030b8                RWriteStream::__imp_WriteUint16L(unsigned int)
+ .idata$5       0x100030bc        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091t.o)
+ .idata$5       0x100030c0        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216h.o)
+ .idata$5       0x100030c4        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00251.o)
+                0x100030c4                _imp__Copy__6TDes16RC7TDesC16
+                0x100030c4                TDes16::__imp_Copy(TDesC16 const &)
+ .idata$5       0x100030c8        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00769.o)
+                0x100030c8                _imp__NullTTime__4Time
+                0x100030c8                Time::__imp_NullTTime(void)
+ .idata$5       0x100030cc        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_01283.o)
+                0x100030cc                TBufBase16::_imp__(int)
+                0x100030cc                __imp___10TBufBase16i
+ .idata$5       0x100030d0        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216t.o)
+ SORT(*)(.idata$6)
+ SORT(*)(.idata$7)
+ .idata$7       0x100030d4        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00190.o)
+ .idata$7       0x100030d8        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00195.o)
+ .idata$7       0x100030dc        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00251.o)
+ .idata$7       0x100030e0        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00252.o)
+ .idata$7       0x100030e4        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00348.o)
+ .idata$7       0x100030e8        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00349.o)
+ .idata$7       0x100030ec        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00350.o)
+ .idata$7       0x100030f0        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00366.o)
+ .idata$7       0x100030f4        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00442.o)
+ .idata$7       0x100030f8        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00443.o)
+ .idata$7       0x100030fc        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00444.o)
+ .idata$7       0x10003100        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091s_00460.o)
+ .idata$7       0x10003104       0x14 ..\..\..\EPOC32\RELEASE\ARM4\UREL\ESTOR.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d2091t.o)
+                0x10003104                ___________EPOC32_RELEASE_ARM4_UREL_ESTOR_LIB_iname
+ .idata$7       0x10003118        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00251.o)
+ .idata$7       0x1000311c        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_00769.o)
+ .idata$7       0x10003120        0x4 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216s_01283.o)
+ .idata$7       0x10003124       0x14 ..\..\..\EPOC32\RELEASE\ARM4\UREL\EUSER.LIB(C:/WINNT/Profiles/RMBUIL~1/LOCALS~1/Temp/d1216t.o)
+                0x10003124                ________EPOC32_RELEASE_ARM4_UREL_EUSER_LIB_iname
+
+.CRT
+ *(SORT(.CRT$*))
+
+.endjunk        0x10004000        0x0
+                0x10004000                end=.
+                0x10004000                _end=.
+                0x10004000                __end__=.
+
+.reloc          0x10004000      0x200
+ *(.reloc)
+ .reloc         0x10004000       0x28 ..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.exp
+
+.rsrc
+ *(.rsrc)
+ *(SORT(.rsrc$*))
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+OUTPUT(..\..\..\EPOC32\BUILD\APP-SERVICES\ALARMSERVER\GROUP\ALARMSHARED\ARM4\UREL\ALARMSHARED.DLL epoc-pei-arm-little)

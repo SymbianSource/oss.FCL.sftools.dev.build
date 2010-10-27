@@ -231,7 +231,7 @@ sub IdentifyFileType {
     }
   }
 
-  if ($typeBuf =~ /^!<arch>\x0A(.{48}([0-9 ]{9}).\x60\x0A(......))/s) {
+  if ($typeBuf =~ /^!<arch>\x0A(.{48}([0-9 ]{9})\x60\x0A(......))/s) {
     # library - could be MARM or WINS
 
     $typeBuf = $1;

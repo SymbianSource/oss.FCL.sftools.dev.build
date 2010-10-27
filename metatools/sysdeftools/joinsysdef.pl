@@ -276,19 +276,25 @@ sub walk
 		}
 	elsif($tag eq 'unit')
 		{
-		foreach my $atr ('bldFile','mrp','base','proFile')
+		foreach my $atr ('bldFile','mrp','base')
 			{
 			my $link= $node->getAttribute($atr);
 			if($link && !($link=~/^\//))
 				{
 				$link= &abspath(File::Basename::dirname($file)."/$link");
-				foreach my $a (keys %rootmap) {
+				foreach my $a (sort {length($b) - length($a)} keys(%rootmap)) {
 					$link=~s,^$a,$rootmap{$a},ie;
 				}
 				# remove leading ./  which is used to indicate that paths should remain relative
 				$link=~s,^\./([^/]),$1,; 
+				# remove windows drive letter -- only allow paths on the same drive. Use root attribuite to build across drives / filesystems
+				$link=~s,^[a-z]:/,/,i;	
 				$node->setAttribute($atr,$link);
 				}
+			}
+		if(scalar @{$node->getChildNodes()} && $maxschema=~/^3\.0/)
+			{
+			die "Error: Fatal syntax error in $file. Unit elements must be empty in schema $maxschema.\n";
 			}
 		}
 	elsif($tag eq 'meta')
@@ -488,7 +494,7 @@ sub fixIDs
 	{
 	# translate the ID to use the root doc's namespaces 
 	my $node = shift;
-	foreach my $id ('id','before')
+	foreach my $id ('id','before','replace')
 		{
 		&fixID($node,$id);
 		}
