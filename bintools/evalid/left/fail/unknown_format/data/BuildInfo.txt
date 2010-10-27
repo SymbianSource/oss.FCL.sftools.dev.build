@@ -1,3 +1,0 @@
-DeviceFamily               100 
-DeviceFamilyRev            0x700 
-ManufacturerSoftwareBuild  02223 

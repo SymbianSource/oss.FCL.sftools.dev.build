@@ -8,16 +8,21 @@
             <component filter="build_SFPhase1" id="rcomp" name="Resource Compiler" >
                 <unit bldFile="bintools/rcomp/group" mrp="bintools/rcomp/group/rcomp.mrp"/>
             </component>
-            <component filter="build_SFPhase1" id="checklib" name="checklib" >
+            <component filter="build_SFPhase1" id="checklib" name="Checklib" >
                 <unit bldFile="bintools/checklib/group" mrp="bintools/checklib/group/checklib.mrp"/>
             </component>
-            <component filter="build_SFPhase1" id="elftools" name="elftools" >
+            <component filter="build_SFPhase1" id="elftools" name="ELF Tools" >
                 <unit bldFile="bintools/elftools/group" mrp="bintools/elftools/group/elftools.mrp"/>
             </component>
         </collection>
         <collection id="srctools" level="middleware" name="Source Tools">
-            <component filter="build_SFPhase1" id="tranasm" name="tranasm" >
+            <component filter="build_SFPhase1" id="tranasm" name="Translate ASM">
                 <unit bldFile="srctools/tranasm/group" mrp="srctools/tranasm/group/tranasm.mrp"/>
+            </component>
+        </collection>
+        <collection id="metatools" level="middleware" name="Metadata Tools">
+            <component filter="build_SFPhase1" id="sysdeftools" name="System Definition Tools" introduced="^1">
+                <unit base="metatools/sysdeftools"/>
             </component>
         </collection>
         <collection id="e32tools" level="middleware" name="E32 Tools">

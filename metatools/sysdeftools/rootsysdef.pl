@@ -252,10 +252,6 @@ sub abspath
 	my  ($name,$path) = fileparse($_[0]);
 	if($path eq '' && $name eq '') {return};
 	$path=~tr,\\,/,;
-	if ($path eq './')
-		{
-		return abs_path('.').$name;
-		}
 	if( -e $path)
 		{
 		return abs_path($path)."/$name";

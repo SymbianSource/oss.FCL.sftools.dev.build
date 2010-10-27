@@ -63,10 +63,6 @@ PRJ_EXPORTS
 ../joinsysdef.bat		/epoc32/tools/sysdeftools/joinsysdef.bat
 ../rootsysdef.bat		/epoc32/tools/sysdeftools/rootsysdef.bat
 
-unixperlcmd		/epoc32/tools/sysdeftools/checklinks
-unixperlcmd		/epoc32/tools/sysdeftools/joinsysdef
-unixperlcmd		/epoc32/tools/sysdeftools/rootsysdef
-
 // Xalan-calling .bat/unix files (identical, can export from single file)
 ../joinandparesysdef.bat		/epoc32/tools/sysdeftools/joinandparesysdef.bat
 ../filtering.bat		/epoc32/tools/sysdeftools/filtering.bat

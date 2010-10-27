@@ -1,7 +1,4 @@
- <!DOCTYPE XSLT  [
-      <!ENTITY AZ  "ABCDEFGHIJKLMNOPQRSTUVWXYZ">
-      <!ENTITY az  "abcdefghijklmnopqrstuvwxyz">
- ]><xsl:stylesheet  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 <!--Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 	All rights reserved.
 	This component and the accompanying materials are made available
@@ -23,7 +20,6 @@
 		<xsl:apply-templates select="document(/model/sysdef/@href)| SystemDefinition" mode="ids"/>
 	</xsl:variable>
 
-	<xsl:variable name="sf-ns">http://www.symbian.org/system-definition</xsl:variable>
  
 <xsl:template match="/model" priority="-1">
 	<xsl:apply-templates select="." mode="check"/>
@@ -65,7 +61,7 @@
 	<xsl:param name="filename" select="$Filename"/>
 <xsl:call-template name="Section">
 	<xsl:with-param name="text">System Definition: <xsl:value-of select="*/@name"/></xsl:with-param>
-	<xsl:with-param name="sub"><xsl:value-of select="(string-length($all-ids) - string-length(translate($all-ids,' ','')) - 1) div 2 "/> items</xsl:with-param>
+	<xsl:with-param name="sub"><xsl:value-of select="(string-length($all-ids) - string-length(translate($all-ids,' ',''))) div 2 "/> items</xsl:with-param>
 </xsl:call-template>
 	<xsl:apply-templates select="*">
 		<xsl:with-param name="filename" select="$filename"/>
@@ -75,10 +71,9 @@
 <xsl:template match="/SystemDefinition[starts-with(@schema,'3.0.')] | systemModel">
 	<xsl:param name="filename"  select="$Filename"/>
 		
-<xsl:if test="descendant::unit and not(self::systemModel)">
+<xsl:if test="//unit">
 <xsl:call-template name="Section">
 	<xsl:with-param name="text"><xsl:value-of select="translate(substring(name(*),1,1),'clp','CLP')"/><xsl:value-of select="substring(name(*),2)"/> Definition: <xsl:value-of select="*/@name"/></xsl:with-param>
-	<xsl:with-param name="id"><xsl:value-of select="*/@id"/></xsl:with-param>
 	<xsl:with-param name="sub"><xsl:value-of select="count(//unit)"/> unit<xsl:if test="count(//unit)!=1">s</xsl:if></xsl:with-param>
 </xsl:call-template>
 </xsl:if>
@@ -88,11 +83,6 @@
 	<xsl:apply-templates select="*">
 		<xsl:with-param name="filename" select="$filename"/>
 	</xsl:apply-templates>
-	<xsl:for-each select="//text()[normalize-space(.)!='']">
-		<xsl:if test="not(ancestor::meta)">
-			<xsl:call-template name="Error"><xsl:with-param name="text">Text content not valid in <xsl:value-of select="name(..)"/> (<xsl:value-of select="normalize-space(.)"/>)</xsl:with-param></xsl:call-template>
-		</xsl:if>
-	</xsl:for-each>
 </xsl:template>
 
 
@@ -100,81 +90,11 @@
 	<xsl:call-template name="Error"><xsl:with-param name="text">Attribute <xsl:value-of select="name()"/>="<xsl:value-of select="."/>" is not valid for <xsl:value-of select="name(..)"/></xsl:with-param></xsl:call-template>
 </xsl:template>
 
-<xsl:template match="@before|package/@span|layer/@span|collection/@level|package/@level|package/@levels|layer/@levels" mode="valid"/> <!-- really should check syntax -->
+<xsl:template match="@before|@id|package/@span|layer/@span|collection/@level|package/@level|package/@levels|layer/@levels" mode="valid"/> <!-- really should check syntax -->
 
-<xsl:template match="@href|@id|@filter|package/@version|unit/@version|unit/@prebuilt" mode="valid"/> 
+<xsl:template match="@name|@href|@filter|package/@version|unit/@version|unit/@prebuilt" mode="valid"/> 
 
-<xsl:template match="component/@introduced" mode="valid"/>
-<xsl:template match="component/@deprecated" mode="valid">
-	<xsl:if test="../@purpose='mandatory'">
-		<xsl:call-template name="Warning"><xsl:with-param name="text">Deprecated component <id><xsl:value-of select="../@id"/></id> should not be mandatory</xsl:with-param></xsl:call-template>
-	</xsl:if>
-</xsl:template>
-
-<xsl:template match="@name" mode="valid"> <!-- look for various naming troubles -->
-	<xsl:variable name="pre"><xsl:value-of select="name(..)"/> with name "<xsl:value-of select="."/>"</xsl:variable>
-	<xsl:if test="normalize-space(.)!=.">
-		<xsl:call-template name="Warning"><xsl:with-param name="text"><xsl:value-of select="$pre"/> has unexpected whitespace</xsl:with-param></xsl:call-template>
-	</xsl:if>
-
-	<xsl:choose> <!-- these are likely to all be the same error -->
-		<xsl:when test=".=../@id or .=substring-after(../@id,':')">
-			<xsl:call-template name="Error"><xsl:with-param name="text"><xsl:value-of select="$pre"/> is the same as the id</xsl:with-param></xsl:call-template>
-		</xsl:when>
-
-		<xsl:when test="contains(.,'_')">
-			<xsl:call-template name="Error"><xsl:with-param name="text">
-			<xsl:value-of select="$pre"/> must not contain the underscore character (_)</xsl:with-param></xsl:call-template>
-		</xsl:when>
-		<xsl:when test="translate(.,'&az;0123456789_ ','')=''">
-			<xsl:call-template name="Warning"><xsl:with-param name="text">The human-readable name for <xsl:value-of select="name(..)"/> "<xsl:value-of select="."/>" cannot be entirely lowercase</xsl:with-param></xsl:call-template>
-		</xsl:when>
-	</xsl:choose>
-
-	<xsl:variable name="spaced" select="concat(' ',.,' ')"/>
-	<xsl:variable name="this" select="."/>
-	<xsl:variable name="terms" select="document('')/*/xsl:template[@name='bad-names']/*"/>
-	<xsl:variable name="std" select="document('')/*/xsl:template[@name='std-names']/*"/>
-
-	<xsl:for-each select="$terms"> <!-- common errors in names -->
-		<xsl:if test="contains($spaced,concat(' ',.,' '))">
-			<xsl:choose>
-				<xsl:when test="name()='bad'">
-					<xsl:call-template name="Warning"><xsl:with-param name="text">
-						<xsl:value-of select="$pre"/> should use "<xsl:value-of select="@ok"/>"</xsl:with-param></xsl:call-template>
-				</xsl:when>
-				<xsl:when test="name()='pref'">
-					<xsl:call-template name="Note"><xsl:with-param name="text">
-						<xsl:value-of select="$pre"/> should use "<xsl:value-of select="@ok"/>" instead of "<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
-				</xsl:when>
-			</xsl:choose>
-		</xsl:if>
-	</xsl:for-each>
-
-	<xsl:if test="../self::component and 
-		( (substring(.,string-length(.) - string-length(' Plugin') + 1) = ' Plugin') or
-		 (substring(.,string-length(.) - string-length(' Plugins') + 1) = ' Plugins') ) 
-		  and not(contains(../@class,'plugin'))">
-		<xsl:call-template name="Note"><xsl:with-param name="text">
-			<xsl:value-of select="$pre"/> should have class "plugin"</xsl:with-param></xsl:call-template>
-	</xsl:if>
-
-	<xsl:for-each select="$std"> <!-- standard naming schemes -->
-		<xsl:choose>
-			<xsl:when test="name()='suffix' and substring($this/../@id,string-length($this/../@id) - string-length(.) + 1)=. 
-				and not(substring($this,string-length($this) - string-length(@name) + 1) = @name or  substring($this,string-length($this) - string-length(@or) + 1) = @or)">
-				<xsl:call-template name="Note"><xsl:with-param name="text">
-					<xsl:value-of select="$pre"/> should end with "...<xsl:value-of select="@name"/>"<xsl:if test="@or"> or "...<xsl:value-of select="@or"/>"</xsl:if></xsl:with-param></xsl:call-template>
-			</xsl:when>
-			<xsl:when test="name()='prefix' and starts-with($this/../@id,.) and not(starts-with($this,@name))">
-				<xsl:call-template name="Note"><xsl:with-param name="text">
-					<xsl:value-of select="$pre"/> should start with "<xsl:value-of select="@name"/>..."</xsl:with-param></xsl:call-template>
-			</xsl:when>
-		</xsl:choose>
-	</xsl:for-each>
-
-</xsl:template>
-
+<xsl:template match="component/@introduced|component/@deprecated" mode="valid"/> 
 
 <xsl:template match="component/@origin-model" mode="valid"/>
 
@@ -190,17 +110,8 @@
 <xsl:template match="@*[namespace-uri()='http://www.nokia.com/qt' and local-name()='proFile']" mode="valid"/> 
 	
 
-<xsl:template match="@*[namespace-uri()='http://www.nokia.com/qt' and local-name()='qmakeArgs' and not(../@*[local-name()='proFile'])]" mode="valid"> 
-	<xsl:call-template name="Error"><xsl:with-param name="text">Extension attribute <code><xsl:value-of select="local-name()"/>="<xsl:value-of select="."/>"</code> in namespace <xsl:value-of select="namespace-uri()"/> cannot be used without a proFile extention attribute</xsl:with-param></xsl:call-template>
-</xsl:template>
-
-
 <xsl:template match="@*[namespace-uri()='http://www.nokia.com/qt' and local-name()='qmakeArgs']" mode="valid"> 
-	<xsl:call-template name="Note"><xsl:with-param name="text">Use of extension attribute <code><xsl:value-of select="local-name()"/>="<xsl:value-of select="."/>"</code> in namespace <xsl:value-of select="namespace-uri()"/> is deprecated. Put contents in the "<code>symbian: { ... }</code>" section of <xsl:value-of select="../@bldFile"/>/<xsl:value-of select="../@*[namespace-uri()='http://www.nokia.com/qt' and local-name()='proFile']"/></xsl:with-param></xsl:call-template>
-</xsl:template>
-
-<xsl:template match="@*[namespace-uri()='http://www.nokia.com/qt' and local-name()='qmakeArgs' and .='-r']" mode="valid"> 
-	<xsl:call-template name="Warning"><xsl:with-param name="text">Extension attribute <code><xsl:value-of select="name()"/>="<xsl:value-of select="."/>"</code> must be removed. The attribute is deprecated and that is the default behaviour</xsl:with-param></xsl:call-template>
+	<xsl:call-template name="Note"><xsl:with-param name="text">Should avoid using extension attribute <xsl:value-of select="local-name()"/>="<xsl:value-of select="."/>" in namespace <xsl:value-of select="namespace-uri()"/></xsl:with-param></xsl:call-template>
 </xsl:template>
 
 
@@ -211,21 +122,6 @@
 </xsl:template>
 
 
-<xsl:template name="bad-names">
-	<bad ok="SHAI">shai</bad>
-	<bad ok="API">api</bad>
-	<pref ok="A-GPS">AGPS</pref>
-	<pref ok="APIs">Headers</pref>
-</xsl:template>
-
-<xsl:template name="std-names">
-	<suffix name=" API">_api</suffix>
-	<suffix name=" SHAI">_shai</suffix>
-	<suffix name=" Info">_info</suffix>
-	<suffix name=" Public Interfaces">_pub</suffix>
-	<suffix name=" Platform Interfaces">_plat</suffix>
-	<suffix name=" Test" or="Tests">test</suffix>
-</xsl:template>
 
 <xsl:template name="validate-class">
 	<ok>plugin</ok>
@@ -302,13 +198,9 @@
 
 <xsl:template match="package/@tech-domain|component/@purpose|component/@target" mode="valid">
 	<xsl:variable name="v" select="document('')/*/xsl:template[@name=concat('validate-',name(current()))]/*[.=current()]"/>
-	<xsl:variable name="ns"><xsl:apply-templates select="../@id" mode="namespace-for-id"/></xsl:variable>
 	<xsl:choose>
-		<xsl:when test="not($v) and $ns=$sf-ns">
-			<xsl:call-template name="Error"><xsl:with-param name="text">Illegal <xsl:value-of select="name()"/> value <xsl:value-of select="name()"/>="<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
-		</xsl:when> 
 		<xsl:when test="not($v)">
-			<xsl:call-template name="Note"><xsl:with-param name="text">Non-standard <xsl:value-of select="name()"/> value <xsl:value-of select="name()"/>="<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
+			<xsl:call-template name="Error"><xsl:with-param name="text">Illegal <xsl:value-of select="name()"/> value <xsl:value-of select="name()"/>="<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
 		</xsl:when> 
 		<xsl:when test="name($v)='ok'"/> 
 		<xsl:when test="name($v)='w'">
@@ -322,37 +214,26 @@
 
 
 <xsl:template match="*" priority="-2">
-	<xsl:call-template name="Error"><xsl:with-param name="text">Element "<xsl:value-of select="name()"/>" is not valid in the context of "<xsl:value-of select="name(..)"/>"<xsl:if test="ancestor::meta"> in <xsl:value-of select="ancestor::meta/@rel"/> metadata section</xsl:if></xsl:with-param></xsl:call-template>
+	<xsl:call-template name="Error"><xsl:with-param name="text">Element "<xsl:value-of select="name()"/>" is not valid in the context of "<xsl:value-of select="name(..)"/>"</xsl:with-param></xsl:call-template>
 </xsl:template>
 
-<xsl:template match="component[not(parent::collection) or (parent::SystemDefinition and count(../*)=1)] | 
-	collection[not(parent::package) or (parent::SystemDefinition and count(../*)=1)] | 
-	package[not(parent::package or parent::layer or (parent::SystemDefinition and count(../*)=1))] |
-	layer[not(parent::systemModel)] " priority="3">
-	<xsl:call-template name="Error"><xsl:with-param name="text"><xsl:value-of select="name()"/> "<id><xsl:value-of select="@id"/></id>" has invalid parent <xsl:value-of select="name(..)"/> "<id><xsl:value-of select="../@id"/></id>"</xsl:with-param></xsl:call-template>
+<xsl:template match="component[not(parent::collection)] | collection[not(parent::package)] | package[not(parent::package or parent::layer or (parent::SystemDefinition and count(../*)=1))] | layer[not(parent::systemModel)] " priority="3">
+	<xsl:call-template name="Error"><xsl:with-param name="text"><xsl:value-of select="name()"/> "<xsl:value-of select="@id"/>" has invalid parent <xsl:value-of select="name(..)"/> "<xsl:value-of select="../@id"/>"</xsl:with-param></xsl:call-template>
 </xsl:template>
 
 <xsl:template match="layer | package | collection | component">
 	<xsl:param name="filename"/>
-
-<xsl:if test="self::package[not(@href)] and not(parent::SystemDefinition)">
-<xsl:call-template name="Section">
-	<xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
-	<xsl:with-param name="text"><xsl:value-of select="translate(substring(name(),1,1),'clp','CLP')"/><xsl:value-of select="substring(name(),2)"/>: <xsl:value-of select="@name"/></xsl:with-param>
-	<xsl:with-param name="sub"><xsl:value-of select="count(descendant::unit)"/> unit<xsl:if test="count(descendant::unit)!=1">s</xsl:if></xsl:with-param>
-</xsl:call-template>
-</xsl:if>
 
 <xsl:apply-templates select="@*" mode="valid"/>
 <xsl:apply-templates select="@id"/>
 <xsl:if test="self::component">
 	<xsl:choose>
 		<xsl:when test="count(unit[not(@filter | @version)]) = 0 "/>
-		<xsl:when test="count(unit[not(@version)]) &gt; 1 and descendant-or-self::*[contains(@filter,'s60')]">
-			<xsl:call-template name="Warning"><xsl:with-param name="text">S60 Component <id><xsl:value-of select="@id"/></id> has <xsl:value-of select="count(unit)"/> units.</xsl:with-param></xsl:call-template>
+		<xsl:when test="count(unit[not(@version)]) &gt; 1 and @filter='s60'">
+			<xsl:call-template name="Warning"><xsl:with-param name="text">S60 Component "<xsl:value-of select="@id"/>" has <xsl:value-of select="count(unit)"/> units.</xsl:with-param></xsl:call-template>
 		</xsl:when>
 		<xsl:when test="count(unit[not(@version)]) &gt; 1">
-			<xsl:call-template name="Error"><xsl:with-param name="text">Component "<id><xsl:value-of select="@id"/></id>" has <xsl:value-of select="count(unit)"/> units.</xsl:with-param></xsl:call-template>
+			<xsl:call-template name="Error"><xsl:with-param name="text">Component "<xsl:value-of select="@id"/>" has <xsl:value-of select="count(unit)"/> units.</xsl:with-param></xsl:call-template>
 		</xsl:when>
 	</xsl:choose>
 	<xsl:choose>
@@ -369,22 +250,22 @@
 <xsl:if test="@href">
 	<xsl:variable name="child" select="document(@href,.)/SystemDefinition"/>
 	<xsl:if test="@id!=$child/@id">
-		<xsl:call-template name="Error"><xsl:with-param name="text"><xsl:value-of select="name()"/> "<id><xsl:value-of select="@id"/></id>" must match ID in linked file "<xsl:value-of select="@href"/>"</xsl:with-param></xsl:call-template>
+		<xsl:call-template name="Error"><xsl:with-param name="text"><xsl:value-of select="name()"/> "<xsl:value-of select="@id"/>" must match ID in linked file "<xsl:value-of select="@href"/>"</xsl:with-param></xsl:call-template>
 	</xsl:if>
 	<xsl:if test="$child/@href">
-		<xsl:call-template name="Error"><xsl:with-param name="text">linked <xsl:value-of select="name()"/> "<id><xsl:value-of select="@id"/></id>" cannot be a link</xsl:with-param></xsl:call-template>
+		<xsl:call-template name="Error"><xsl:with-param name="text">linked <xsl:value-of select="name()"/> "<xsl:value-of select="@id"/>" cannot be a link</xsl:with-param></xsl:call-template>
 	</xsl:if>
 	<xsl:for-each select="@*[name()!='id']">
 		<xsl:if test="$child/@*[name()=name(current())]">
-			<xsl:call-template name="Warning"><xsl:with-param name="text">linked <xsl:value-of select="name()"/> "<id><xsl:value-of select="@id"/></id>" has duplicate attribute to linking document. Duplicate ignored.</xsl:with-param></xsl:call-template>
+			<xsl:call-template name="Warning"><xsl:with-param name="text">linked <xsl:value-of select="name()"/> "<xsl:value-of select="@id"/>" has duplicate attribute to linking document. Duplicate ignored.</xsl:with-param></xsl:call-template>
 		</xsl:if>
 	</xsl:for-each>
 	<xsl:if test="*">
-		<xsl:call-template name="Error"><xsl:with-param name="text"><xsl:value-of select="name()"/> "<id><xsl:value-of select="@id"/></id>" cannot have both link and content. Content ignored.</xsl:with-param></xsl:call-template>
+		<xsl:call-template name="Error"><xsl:with-param name="text"><xsl:value-of select="name()"/> "<xsl:value-of select="@id"/>" cannot have both link and content. Content ignored.</xsl:with-param></xsl:call-template>
 	</xsl:if>
 </xsl:if>
 <xsl:if test="@href and name()!=name(document(@href,.)/SystemDefinition/*)">
-		<xsl:call-template name="Error"><xsl:with-param name="text"><xsl:value-of select="name()"/> "<id><xsl:value-of select="@id"/></id>" must match item in linked file "<xsl:value-of select="@href"/>"</xsl:with-param></xsl:call-template>
+		<xsl:call-template name="Error"><xsl:with-param name="text"><xsl:value-of select="name()"/> "<xsl:value-of select="@id"/>" must match item in linked file "<xsl:value-of select="@href"/>"</xsl:with-param></xsl:call-template>
 </xsl:if>
 <xsl:if test="not(@href)">
 	<xsl:apply-templates select="*">
@@ -407,10 +288,6 @@
 		 </xsl:with-param>
 	</xsl:apply-templates>
 </xsl:if>
-
-<xsl:if test="self::colleciton and not(@level) and ../@levels">
-	<xsl:call-template name="Error"><xsl:with-param name="text">Collection <id><xsl:value-of select="@id"/></id> has no level, despite levels "<xsl:value-of select="../@levels"/>" being defined in <xsl:value-of select="name(..)"/> "<id><xsl:value-of select="../@id"/></id>"</xsl:with-param></xsl:call-template>
-</xsl:if>
 </xsl:template>
 
 
@@ -427,60 +304,9 @@
 	</xsl:apply-templates>
 </xsl:template>
 
-<!-- config metadata -->
-
-<xsl:template match="meta[@rel='config']">	<xsl:param name="filename"/>
-	<xsl:if test="@type!='auto'">
-	<xsl:call-template name="Warning"><xsl:with-param name="text">Unrecognised configuration metadata type <xsl:value-of select="@type"/></xsl:with-param></xsl:call-template>		
-	</xsl:if>
-	<xsl:for-each select="descendant::text()[normalize-space(.)!='']">
-		<xsl:call-template name="Error"><xsl:with-param name="text">Text content not valid in <xsl:value-of select="name(..)"/> (<xsl:value-of select="normalize-space(.)"/>)</xsl:with-param></xsl:call-template>
-	</xsl:for-each>
-	<xsl:if test="pick">
-		<xsl:variable name="npicks" select="count(pick) +1"/>
-		<xsl:for-each select="../descendant-or-self::component">
-			<xsl:if test="count(unit) &gt; $npicks">
-				<xsl:call-template name="Warning"><xsl:with-param name="text">Configuration metadata should have at least one fewer pick elements (<xsl:value-of select="$npicks - 1"/>) than the number of units in <xsl:value-of select="name(..)"/> "<id><xsl:value-of select="../@id"/></id>" (<xsl:value-of select="count(unit)"/>)</xsl:with-param></xsl:call-template>				
-			</xsl:if>
-		</xsl:for-each>
-	</xsl:if>
-	<xsl:apply-templates select="@* | *"/>
-</xsl:template>
-
-
-<xsl:template match="meta[@rel='config']/defined | meta[@rel='config']/not-defined | meta[@rel='config']/pick/defined | meta[@rel='config']/pick/not-defined">
-	<xsl:if test="node()">
-		<xsl:call-template name="Error"><xsl:with-param name="text">Configuration metadata <xsl:value-of select="name()"/> must be empty</xsl:with-param></xsl:call-template>		
-	</xsl:if>
-	<xsl:if test="not(@condition)">
-		<xsl:call-template name="Error"><xsl:with-param name="text">Configuration metadata <xsl:value-of select="name()"/> must have a condition</xsl:with-param></xsl:call-template>		
-	</xsl:if>
-		<xsl:apply-templates select="@*[name()!='condition']" mode="valid"/>
-</xsl:template>
-
-<xsl:template match="meta[@rel='config']/pick">
-	<xsl:choose>
-		<xsl:when test="not(@version)">
-			<xsl:call-template name="Error"><xsl:with-param name="text">Configuration metadata <xsl:value-of select="name()"/> must have a version</xsl:with-param></xsl:call-template>		
-		</xsl:when>
-		<xsl:when test="not(../../descendant::unit[@version=current()/@version])">
-			<xsl:call-template name="Error"><xsl:with-param name="text">Configuration metadata <xsl:value-of select="name()"/> version="<xsl:value-of select="@version"/>" must match a unit within the containing <xsl:value-of select="name(../..)"/> "<xsl:value-of select="../../@id"/>"</xsl:with-param></xsl:call-template>				
-		</xsl:when>
-	</xsl:choose>
-	<xsl:apply-templates select="@*[name()!='version']" mode="valid"/>
-	<xsl:apply-templates select="*"/>
-</xsl:template>
-
-<!-- /config metadata -->
-
-
 
 <xsl:template match="unit/@* | meta/@*" priority="-1">	
 	<xsl:apply-templates select="." mode="valid"/>
-</xsl:template>
-
-<xsl:template match="@*[.='']" mode="valid">
-	<xsl:call-template name="Error"><xsl:with-param name="text">Empty attribute "<xsl:value-of select="name()"/>" on <xsl:value-of select="name(..)"/><xsl:if test="../@id[.!='']"> "<id><xsl:value-of select="../@id"/></id>"</xsl:if></xsl:with-param></xsl:call-template>
 </xsl:template>
 
 
@@ -494,45 +320,13 @@
 
 <xsl:template match="@id">
 <xsl:if test="contains(concat(' ',substring-after($all-ids,concat(' ',.,' '))),concat(' ',.,' '))">
-	<xsl:call-template name="Error"><xsl:with-param name="text">Duplicate ID: <xsl:value-of select="name(..)"/> "<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
+	<xsl:call-template name="Warning"><xsl:with-param name="text">Duplicate ID: <xsl:value-of select="name(..)"/> "<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
 </xsl:if>
 
 <xsl:if test="contains(.,':') and not(ancestor::*/namespace::*[name()=substring-before(current(),':')])">
-	<xsl:call-template name="Error"><xsl:with-param name="text">Undefined namespace for ID "<id><xsl:value-of select="."/></id>"</xsl:with-param></xsl:call-template>
+	<xsl:call-template name="Error"><xsl:with-param name="text">Undefined namespace for ID "<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
 </xsl:if>
 
-<xsl:if test="translate(.,'-','')!=.">
-	<xsl:call-template name="Error"><xsl:with-param name="text">ID "<id><xsl:value-of select="."/></id>" contains reserved character "-" </xsl:with-param></xsl:call-template>
-</xsl:if>
-
-<xsl:if test="contains(.,'.') and not(parent::package) and not(contains(ancestor::package/@id,'.'))">
-	<xsl:call-template name="Error"><xsl:with-param name="text">ID "<xsl:value-of select="."/>" contains reserved character "<code>.</code>" </xsl:with-param></xsl:call-template>
-</xsl:if>
-
-<xsl:if test="translate(substring(.,1,1),'0123456789','')=''">
-	<xsl:call-template name="Error"><xsl:with-param name="text">ID "<id><xsl:value-of select="."/></id>" cannot begin with a digit</xsl:with-param></xsl:call-template>
-</xsl:if>
-
-
-<xsl:if test="translate(.,'&AZ;','')!=.">
-	<xsl:call-template name="Warning"><xsl:with-param name="text">IDs should be entirely in lowercase (<xsl:value-of select="."/>)</xsl:with-param></xsl:call-template>
-</xsl:if>
-
-
-<!-- should also test for outside the range of  Letter | Digit | '.' | '-' | '_' | ':' | CombiningChar | Extender
-	see http://www.w3.org/TR/2000/WD-xml-2e-20000814#NT-Name
- -->
-</xsl:template>
-
-
-<xsl:template match="@*" mode="namespace-for-id">
-<xsl:choose>
-	<xsl:when test="contains(.,':') and ancestor::*/namespace::*[name()=substring-before(current(),':')]">
-		<xsl:value-of select="ancestor::*/namespace::*[name()=substring-before(current(),':')]"/>
-	</xsl:when>
-	<xsl:when test="ancestor::SystemDefinition/@id-namespace"><xsl:value-of select="ancestor::SystemDefinition/@id-namespace"/></xsl:when>
-	<xsl:otherwise><xsl:value-of select="$sf-ns"/></xsl:otherwise>
-</xsl:choose>
 </xsl:template>
 
 
@@ -548,19 +342,6 @@
 </xsl:if>
 <xsl:if test="contains(.,'\')">
 		<xsl:call-template name="Error"><xsl:with-param name="text"><code><xsl:value-of select="name()"/></code> path "<xsl:value-of select="."/>" must use only forward slashes</xsl:with-param></xsl:call-template>
-</xsl:if>
-
-<xsl:if test="count(//unit[@bldFile=current()]/..) &gt; 1">
-		<xsl:call-template name="Error"><xsl:with-param name="text"><code><xsl:value-of select="name()"/></code> path "<xsl:value-of select="."/>" appears in components <xsl:for-each select="//unit[@bldFile=current()]/..">
-			<id><xsl:value-of select="@id"/></id>
-			<xsl:choose>
-			<xsl:when test="position()=last() - 1"> and </xsl:when>
-			<xsl:when test="position()!=last()">, </xsl:when>
-			</xsl:choose>
-			</xsl:for-each>
-		</xsl:with-param>
-		<xsl:with-param name="sub">Use filters or config metadata to control what kind of builds a component can appear in</xsl:with-param>
-		</xsl:call-template>
 </xsl:if>
 
 <!-- this is a realtive path, so just check that it's the expected number of dirs down -->
