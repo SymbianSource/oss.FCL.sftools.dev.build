@@ -119,7 +119,6 @@ file=ABI_DIR\DEBUG_DIR\EDISP.DLL				sys\bin\EDISP.DLL
 #include <freetype.iby>
 #include <opengles.iby>
 
-#include <printers.iby>
 
 // include enough multimedia components to keep cone happy. includes symbian optional, reference and replacable components
 #include <mmf.iby>
