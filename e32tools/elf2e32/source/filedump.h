@@ -35,8 +35,10 @@ class FileDump : public UseCaseBase
 		~FileDump();
 		int Execute();
 	private:
-		int DumpE32Image(const char * fileName);
-		int GenerateAsmFile(const char* afileName);//DumpAsm
+		int DumpE32Image();
+		int GenerateAsmFile();//DumpAsm
+		int GenerateArmasAsmFile();
+		int GenerateGasAsmFile();
 };
 
 #endif

@@ -43,6 +43,11 @@ enum ETargetType
 	EStdExe
 };
 
+enum EAsmDialect // Which dialect of arm assembly to write for the --dump option
+{
+	EArmas, // RVCT armas
+	EGas	// GNU as
+};
 typedef unsigned int UINT;
 
 using std::vector;
@@ -278,6 +283,7 @@ input options.
 	virtual bool SymNamedLookup() = 0;
 	virtual bool IsDebuggable() = 0;
 	virtual bool IsSmpSafe() = 0;
+	virtual EAsmDialect AsmDialect() = 0;
 };
 
 

@@ -30,13 +30,12 @@ const TUint KDeflateHashMultiplier=0xAC4B9B19u;
 const TInt KDeflateHashShift=24;
 
 #define COMPILE_TIME_ASSERT(e)	\
- 	switch (0)					\
- 	{							\
- 	case 0:						\
- 	case e:						\
- 		;						\
- 	}
-
+	switch (0)					\
+	{							\
+	case 0:						\
+	case e:						\
+		;						\
+	}
 
 /**
 Class HDeflateHash
@@ -136,23 +135,21 @@ inline HDeflateHash* HDeflateHash::NewLC(TInt aLinks)
 {
 #if __GNUC__ >= 4
  	// Try to detect if the class' layout has changed.
- 	COMPILE_TIME_ASSERT( sizeof(HDeflateHash) == 1028 );
- 	COMPILE_TIME_ASSERT( sizeof(TOffset) == 2 );
- 	COMPILE_TIME_ASSERT( offsetof(HDeflateHash, iHash) < offsetof(HDeflateHash, iOffset) );
+	COMPILE_TIME_ASSERT( sizeof(HDeflateHash) == 1028 );
+	COMPILE_TIME_ASSERT( sizeof(TOffset) == 2 );
+	COMPILE_TIME_ASSERT( offsetof(HDeflateHash, iHash) < offsetof(HDeflateHash, iOffset) );
  
  	// Compute the size of the class, including rounding it up to a multiple of 4
  	// bytes.
- 
- 	unsigned n = sizeof(TInt) * 256 + sizeof(TOffset) * Min(aLinks, KDeflateMaxDistance);
- 
- 	while (n & 0x1f)
- 	{
- 		n++;	
- 	}
+	unsigned n = sizeof(TInt) * 256 + sizeof(TOffset) * Min(aLinks, KDeflateMaxDistance);
+	while (n & 0x1f)
+	{
+		n++;	
+	}
  	// Allocate the raw memory ...
- 	void* p = ::operator new(n);
+	void* p = ::operator new(n);
  	// ... And create the object in that memory.
- 	return new(p) HDeflateHash;
+	return new(p) HDeflateHash;
 #else
    	return new(new char[_FOFF(HDeflateHash,iOffset[Min(aLinks,KDeflateMaxDistance)])]) HDeflateHash;
 #endif

@@ -25,7 +25,7 @@
 #include "parametermanager.h"
 #include "errorhandler.h"
 #include <iostream>
-#include <ctype.h>
+#include <cstdlib>
 
 #include "h_utl.h"
 #include "h_ver.h"
@@ -111,7 +111,8 @@ ParameterManager::ParameterManager(int aArgc, char** aArgv) :
 	iCustomDllTarget(false),
 	iSymNamedLookup(false),
 	iDebuggable(false),
-	iSmpSafe(false)
+	iSmpSafe(false),
+	iAsmDialect(EArmas)
 {
 	iArgumentCount = aArgc;
 	ParamList temp(aArgv, aArgv+aArgc);
@@ -430,6 +431,12 @@ const ParameterManager::OptionDesc ParameterManager::iOptions[] =
 		(void*)ParameterManager::ParseSmpSafe,
 		"SMP Safe",
 	},
+	{
+		"asm",
+		(void*)ParameterManager::ParseAsmDialect,
+		"Dialect of arm assembly to write for the --dump option. "
+		"Either \"gas\" (GNU as) or \"armas\" (RVCT as: default)",
+	},
 	{ 
 		"help", 
 		(void *)ParameterManager::ParamHelp,
@@ -648,7 +655,7 @@ void ParameterManager::ParameterAnalyser()
 			parser(this, "help", 0, 0);
 		}
 
-		parser(this, const_cast<char*>(aName.c_str()), optval, aDesc);
+		parser(this, aName.c_str(), optval, aDesc);
 	}
 }
 
@@ -1509,6 +1516,20 @@ bool ParameterManager::IsSmpSafe()
 }
 
 /**
+This function indicates the asm assembly dialect that will be written for the
+--dump option, as determined by the specified or default value of the --asm
+option.
+
+@internalComponent
+@released
+
+@return EArmas if --asm=armas was passed, else EGas
+*/
+EAsmDialect ParameterManager::AsmDialect()
+{
+	return iAsmDialect;
+}
+/**
 This function extracts the filename from the absolute path that is given as input.
 
 @internalComponent
@@ -2256,7 +2277,7 @@ DEFINE_PARAM_PARSER(ParameterManager::ParseSysDefs)
 			while (*(p+len-1) == ' ' || *(p+len-1) == '	')
 				len --;
 			symbol = new char[len+1];
-			memcpy(symbol, p, len);
+			memcpy(symbol, &*p, len);
 			symbol[len] = 0;
 			q = nq+1;
       while (*(p+q) == ' ' || *(p+q) == '	')
@@ -2400,7 +2421,7 @@ void ParameterManager::ParseCapabilitiesArg(SCapabilitySet& aCapabilities, const
 			if (*e == '-' || *e == '+') break;
 		}
 		if (e != b)
-			ParseCapability1(b, e, aCapabilities, invert);
+			ParseCapability1(&*b, &*e, aCapabilities, invert);
 
 		b = e;
 		
@@ -2863,6 +2884,22 @@ DEFINE_PARAM_PARSER(ParameterManager::ParseSmpSafe)
 	aPM->SetSmpSafe(true); 
 }
 
+DEFINE_PARAM_PARSER(ParameterManager::ParseAsmDialect)
+{
+	INITIALISE_PARAM_PARSER;
+	if (!strcmp(aValue,"gas"))
+	{
+		aPM->SetAsmDialect(EGas); 
+	}
+	else if (!strcmp(aValue,"armas"))
+	{
+		aPM->SetSmpSafe(EArmas); 
+	}
+	else
+	{
+		throw InvalidArgumentError(INVALIDARGUMENTERROR, aValue, "--asm");
+	} 
+}
 static const ParameterManager::TargetTypeDesc DefaultTargetTypes[] =
 {
 	{ "DLL", EDll },
@@ -3744,4 +3781,17 @@ void ParameterManager::SetDebuggable(bool aVal)
 void ParameterManager::SetSmpSafe(bool aVal)
 {
 	iSmpSafe = aVal;
+}
+/**
+This function sets iAsmDialect if --asm is passed in.
+
+@internalComponent
+@released
+
+@param aVal
+A member of enum EAsmDialect
+*/
+void ParameterManager::SetAsmDialect(EAsmDialect aAsmDialect)
+{
+	iAsmDialect = aAsmDialect;
 }

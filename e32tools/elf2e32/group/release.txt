@@ -4,6 +4,11 @@ Nokia Corporation
 NOTESRC_RELEASE_REASON
 Postlinker(elf2e32) Release
 
+version 2.2 build(6)
+===============
+Released by Marvin Shi, 26/10/2010
+	1) Bug2979 [GCCE] elf2e32 --dump generates RVCT assembly
+
 version 2.2 build(5)
 ===============
 Released by Zheng Shen, 11/07/2010

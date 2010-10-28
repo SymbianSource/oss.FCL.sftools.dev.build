@@ -81,7 +81,7 @@ public:
 	typedef std::map<string, const OptionDesc *, OptionCompare> OptionMap;
 	typedef vector<char *> LibSearchPaths;
 
-	typedef void (*ParserFn)(ParameterManager *, char *, char *, const OptionDesc *);
+	typedef void (*ParserFn)(ParameterManager *, char const *, char const *, const OptionDesc *);
 
 
 	#define DECLARE_PARAM_PARSER(name) \
@@ -144,6 +144,7 @@ public:
 	DECLARE_PARAM_PARSER(ParseSymNamedLookup);
 	DECLARE_PARAM_PARSER(ParseDebuggable);
 	DECLARE_PARAM_PARSER(ParseSmpSafe);
+	DECLARE_PARAM_PARSER(ParseAsmDialect);
 
 	ParameterManager(int aArgc, char** aArgv);
 	virtual ~ParameterManager();
@@ -195,6 +196,7 @@ public:
 	void SetSymNamedLookup(bool aVal);
 	void SetDebuggable(bool aVal);
 	void SetSmpSafe(bool aVal);
+	void SetAsmDialect(EAsmDialect aAsmDialect);
 
 	int NumOptions();
 	int NumShortOptions();
@@ -279,6 +281,7 @@ public:
 	bool SymNamedLookup();
 	bool IsDebuggable();
 	bool IsSmpSafe();
+	EAsmDialect AsmDialect();
 
 private:
 	/** The number of command line arguments passed into the program */
@@ -445,6 +448,7 @@ private:
 	bool iSymNamedLookup;
 	bool iDebuggable;
 	bool iSmpSafe;
+	EAsmDialect iAsmDialect;
 };
 
 

@@ -235,8 +235,12 @@ void ElfFileSupplied::ValidateExports(SymbolList *aDefExports)
 			while( aResultPos != aAbsentListEnd ) 
 			{
 				// intersection set {Absent,ELF_Symbols} is non-empty				
+				if ((strncmp("_ZTI", (*aResultPos)->SymbolName(), len)) &&
+				    (strncmp("_ZTV", (*aResultPos)->SymbolName(), len)))
+				{	
 				iSymList.insert(iSymList.end(), *aResultPos);			
 				cout << "Elf2e32: Warning: Symbol " << (*aResultPos)->SymbolName() << " absent in the DEF file, but present in the ELF file" << endl;
+				}
 				aResultPos++;
 			}
 		}
