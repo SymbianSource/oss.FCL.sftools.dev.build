@@ -1,3 +1,0 @@
-DeviceFamily               0 
-DeviceFamilyRev            0x600 
-ManufacturerSoftwareBuild  Crystal COAKGEN002 
