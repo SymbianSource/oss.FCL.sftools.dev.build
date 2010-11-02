@@ -82,7 +82,7 @@ struct SortableEntry
 	{
 	TRofsEntry* iEntry;
 	TBool iIsDir;
-	TUint32 iOffset;
+	TUint16 iOffset;
 	};
 
 int compare(const void* l, const void* r)
@@ -621,15 +621,31 @@ TInt TRomNode::Place( TUint8* aDestBase )
 			entry = pFileEntry;
 
 			//Offset in 32bit words from start of file block
-			array[index].iOffset = (TUint32) ((((TUint8*) entry) - fileBlockBase) >> 2);
+			TUint32 offset = ((((TUint8*) entry) - fileBlockBase) >> 2);
+			
+			if(offset > 0xFFFF)
+			{
+				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, offset);
+				throw "fail";
+			}
+			
+			
+			array[index].iOffset = (TUint16) offset;
 			array[index].iIsDir = EFalse;
 			}
 		else
 			{
 			entry = pDirEntry;
 
+			TUint32 offset = ((((TUint8*) entry) - dirBlockBase) >> 2);
+			if(offset > 0xFFFF)
+			{
+				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, offset);
+				throw "fail";
+			}
+			
 			//Offset in 32bit words from start of directory block
-			array[index].iOffset = (TUint32) ((((TUint8*) entry) - dirBlockBase) >> 2);
+			array[index].iOffset = (TUint16) offset;
 			array[index].iIsDir = ETrue;
 			}
 		array[index].iEntry = entry;
