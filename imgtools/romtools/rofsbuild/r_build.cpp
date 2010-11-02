@@ -82,7 +82,7 @@ struct SortableEntry
 	{
 	TRofsEntry* iEntry;
 	TBool iIsDir;
-	TUint16 iOffset;
+	TUint32 iOffset;
 	};
 
 int compare(const void* l, const void* r)
@@ -621,7 +621,7 @@ TInt TRomNode::Place( TUint8* aDestBase )
 			entry = pFileEntry;
 
 			//Offset in 32bit words from start of file block
-			array[index].iOffset = (TUint16) ((((TUint8*) entry) - fileBlockBase) >> 2);
+			array[index].iOffset = (TUint32) ((((TUint8*) entry) - fileBlockBase) >> 2);
 			array[index].iIsDir = EFalse;
 			}
 		else
@@ -629,7 +629,7 @@ TInt TRomNode::Place( TUint8* aDestBase )
 			entry = pDirEntry;
 
 			//Offset in 32bit words from start of directory block
-			array[index].iOffset = (TUint16) ((((TUint8*) entry) - dirBlockBase) >> 2);
+			array[index].iOffset = (TUint32) ((((TUint8*) entry) - dirBlockBase) >> 2);
 			array[index].iIsDir = ETrue;
 			}
 		array[index].iEntry = entry;
