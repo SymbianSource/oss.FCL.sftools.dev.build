@@ -1,3 +1,9 @@
+Version 2.16.2 (ROFSBUILD)
+===============
+Released by Ross Qin, 02/11/2010
+	1) Fix the issue of file missing due to too many files under a folder
+	
+	
 Version 2.16.1 (ROFSBUILD)
 ===============
 Released by Marvin Shi, 25/10/2010
