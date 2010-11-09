@@ -21,7 +21,7 @@
 #endif //__MSVCDOTNET__
 
 #if defined(__VC32__) || defined(__TOOLS2__)
- #include <sys\utime.h>
+ #include <sys/utime.h>
 #else
  #include <utime.h>
 #endif

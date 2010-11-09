@@ -80,7 +80,7 @@ extern TBool gPlatSecDiagnostics;
 extern SCapabilitySet gPlatSecDisabledCaps;
 extern SCapabilitySet gPlatSecAllCaps;
 extern SDemandPagingConfig gDemandPagingConfig;
-extern TBool gGenInc;						// DEF095619
+extern TBool gGenInc;						
 extern TBool gEnableStdPathWarning;
 extern TInt gLogLevel;
 extern TBool gLowMem;

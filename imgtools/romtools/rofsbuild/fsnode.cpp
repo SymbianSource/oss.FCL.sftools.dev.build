@@ -287,8 +287,7 @@ void TFSNode::WriteDirEntries(TUint aStartIndex,TUint8* aClusterData){
 		TShortDirEntry* entry = reinterpret_cast<TShortDirEntry*>(aClusterData);
 		if(iParent != NULL) {
 			//Make 
-			GetShortEntry(entry); 
-			//TODO: Add comments to avoid mistaken deleting.			
+			GetShortEntry(entry); 			
 			memcpy(entry->DIR_Name,".            ",sizeof(entry->DIR_Name));
 			entry ++ ;
 			iParent->GetShortEntry(entry);

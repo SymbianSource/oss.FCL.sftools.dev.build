@@ -495,7 +495,7 @@ void E32ImageFile::CreateRelocations(ElfRelocations::RelocationList & aRelocList
 		aRelocsSize = Align(rsize + sizeof(E32RelocSection), sizeof(uint32));
 
 		uint32 aBase = (*aRelocList.begin())->iSegment->p_vaddr;
-		//add for cleanup to be done later..
+		
 		cleanupStack.push_back(aRelocs);
 		aRelocs =	new char [aRelocsSize];
 		memset(aRelocs, 0, aRelocsSize);
