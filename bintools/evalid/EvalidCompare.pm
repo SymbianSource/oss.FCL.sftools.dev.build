@@ -62,7 +62,8 @@ my %typeLookup = (
       'Unknown library' => 'identical',
       'chm file' => 'chm_file',
 	  'Header file' => 'header',
-	  'Distribution Policy' => 'distpol'
+	  'Distribution Policy' => 'distpol',
+	  'Rofs image' => 'img'
      );
 
 
@@ -83,7 +84,8 @@ my %typeHandler = (
       ignore => {filter => \&FilterAll},
       chm_file => {expandor => 'hh -decompile %TEMPDIR% %FILE%', rawretry => 1},
 	  header => {filter => \&FilterCVSTags},
-	  distpol => {filter => \&DistributionPolicyFilter}
+	  distpol => {filter => \&DistributionPolicyFilter},
+      img => {expandor => 'readimage -z %TEMPDIR% %FILE%', rawretry => 1}
      );
 
 
@@ -93,6 +95,7 @@ my %typeHandler = (
 
 my $log;
 my $verbose;
+my $keepgoing;
 my $toRoot;
 my $dumpDir;
 
@@ -108,6 +111,8 @@ sub CompareFiles {
   my $file2 = shift;
   $verbose = defined($_[0]) ? shift : 0;
   $log = defined($_[0]) ? shift : *STDOUT;
+  $keepgoing = defined($_[0]) ? shift : 0;
+  
   # Try binary compare first (to keep semantics the same as evalid)...
   if (DoCompareFiles($file1, $file2, 'unknown format')) {
     return 1,'identical';
@@ -352,6 +357,11 @@ sub IdentifyFileType {
   if ($typeBuf =~/^ITSF/) {
     # chm file
     return "chm file";
+  }
+
+  if ($typeBuf =~/^(ROFS|ROFx)/) {
+    # img file
+    return "Rofs image";
   }
 
   if ($file =~ m/\.(iby|h|hby|hrh|oby|rsg|cpp)$/i) {
@@ -811,34 +821,62 @@ sub ExpandAndCompareFiles
           }, $tempdir2;
   
   #Work out the if the two file lists are different
+  my @tmpfiles;
   foreach my $file (sort keys %iFileList1)
   {
     if (! defined $iFileList2{$file})
     {
       # If the filename does not exist in the second filelist the compressed files cannot be the same.
       print ($log "Did not find $file in $file2\n") if ($verbose);
-      return 0;
+      if(!$keepgoing){
+      	return 0;
+      }else{
+      	push @tmpfiles, $file;
+      }
     } else {
       delete $iFileList2{$file}
     }
+  }
+  foreach my $file (@tmpfiles)
+  {
+   	delete $iFileList1{$file};
   }
   
   # There are extra files in the second compressed file therefore the compressed files cannot be the same.
   if (scalar(keys %iFileList2) > 0)
   {
     print ($log "$file2 contained more files than $file1\n") if ($verbose);
-    return 0;
+    if (!$keepgoing){
+	    return 0;
+	  }else{
+	  	foreach my $file (sort keys %iFileList2){
+	  		print ($log "Dig not find $file in $file1\n") if ($verbose);
+	  	}
+	  }
   }
   
   print($log "Comparing content\n") if ($verbose);
   #filelist1 and filelist2 contain all the same filenames, now compare the contents of each file
-  my $same = -1; # Variable to store collated result of comparison, assume an error
+  my $same = 1; # Variable to store collated result of comparison, assume an error
   foreach my $file (keys %iFileList1)
   {
-    my $type; 
-    ($same, $type) = CompareFiles($tempdir1.$file,$tempdir2.$file, $verbose, $log);
+  	my $tmpsame;
+  	my $type;
+    ($tmpsame, $type) = CompareFiles($tempdir1.$file,$tempdir2.$file, $verbose, $log, $keepgoing);
     print ($log "Comparing $tempdir1.$file against $tempdir2.$file\n") if ($verbose);
-    last if ($same == 0); # do not bother comparing more files if one of the expanded files is different.
+    if (!$keepgoing){
+	    if ($tmpsame == 0){ # do not bother comparing more files if one of the expanded files is different.
+	    	$same = 0;
+	    	last;
+	    }
+	  }else{
+	  	if ($tmpsame == 0){
+	  		print ($log "Failed\n\n") if ($verbose);
+	  		$same = 0;
+	  	}else{
+	  		print ($log "OK\n\n") if ($verbose);
+	  	}
+	  }
   }
   
   #Cleanup the temporary directories

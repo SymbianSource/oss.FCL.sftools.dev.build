@@ -27,13 +27,14 @@ use EvalidCompare;
 my $passed=0;
 my $failed=0;
 
-GetOptions("c", "v", "l=s", "g", "f", "m", "u", "x=s@", "i=s@", "d=s");
+GetOptions("c", "v", "l=s", "k", "g", "f", "m", "u", "x=s@", "i=s@", "d=s");
 $opt_v = $opt_v; # To keep -w quiet.
 $opt_g = $opt_g; # To keep -w quiet.
 $opt_f = $opt_f; # To keep -w quiet.
 $opt_m = $opt_m; # To keep -w quiet.
 $opt_u = $opt_u; # To keep -w quiet.
 $opt_d = $opt_d; # To keep -w quiet.
+$opt_k = $opt_k; # To keep -w quiet.
 
 unless ((@ARGV > 1) && (@ARGV < 4))
 	{
@@ -61,6 +62,7 @@ The opts parameter controls where the output goes:
 	-v            -- verbose information about failed comparisons
 	-c            -- print results to standard output
 	-l <logfile>  -- append results to <logfile>
+	-k            -- keep going
 
 The default is equivalent to "-l evalid.lis"
 
@@ -311,7 +313,7 @@ sub compare
 		return;
 		}
 
-	my ($same, $type) = EvalidCompare::CompareFiles($left, $right, $opt_v, $log);
+	my ($same, $type) = EvalidCompare::CompareFiles($left, $right, $opt_v, $log, $opt_k);
 	if ($same)
 		{
 		identical($left, $right, $type);
