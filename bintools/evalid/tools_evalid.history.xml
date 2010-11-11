@@ -19,6 +19,10 @@
   <purpose>
   </purpose>
 	
+	<feature title="Rofs image comparison" revision="008">
+     EVALID : add Rofs image file comparison support
+  </feature>
+
 	<defect number="Bug 2413" title="evalid not so happy identifying libs created by new mwldsym2.exe" revision="008">
      EVALID : evalid not so happy identifying libs created by new mwldsym2.exe
   </defect>
