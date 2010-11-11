@@ -238,3 +238,18 @@ using the normal EVALID process.
 
 When using the MD5 comparing functionality EVALID processes the contents of the temporary directory
 using the standard EVALID process but amalgamates the results in to one MD5 signiture.
+
+--------
+(ROFS IMAGE file)
+
+EVALID applies "readimage -z" to each file expanding it to a temporary directory and then compares
+the contents of the temporary directory using the following process:
+
+When directly comparing two Rofs image files EVALID will first compare the file listing of the temporary
+directories and return failed if the file listing is not identical.
+If the file listing are identical it will then compare the contents of the two temporary directories
+using the normal EVALID process.
+
+When "-k" (keepgoing) option is specified, EVALID will first compare the file listing. If "-v" option sepcified,
+list the files which do not exist in both directories. Then it will compare the contents of the directories.
+If "-v" option specified, it will report the result for every file in the directories.
