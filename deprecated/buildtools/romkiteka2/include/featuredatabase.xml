@@ -147,6 +147,12 @@
 			<hrhmacro infeaturesetiby="no" exclude="SYMBIAN_EXCLUDE_LIBXML2_DOM_XPATH_API"/>
 		</feature>
 		<!-- PREQ 2051 - Variation Support - End -->
+		<feature name="FeatureIdFfHttpAllowUntrustedCertificates" statusflags="0x00000001" uid="0x00000153">
+			<hrhmacro exclude="SYMBIAN_EXCLUDE_HTTP_ALLOW_UNTRUSTED_CERTIFICATES"/>
+		</feature>
+		<feature name="FeatureIdFfIpsecUmaSupportEnable" statusflags="0x00000001" uid="0x0000014C">
+			<hrhmacro exclude="SYMBIAN_EXCLUDE_IPSEC_UMA_SUPPORT_ENABLE"/>
+		</feature>
 	</featureset>
 	
 	<defaultfeaturerange higheruid="0x10281805" loweruid="0x10279806"></defaultfeaturerange>
