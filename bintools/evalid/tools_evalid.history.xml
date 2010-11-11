@@ -19,7 +19,7 @@
   <purpose>
   </purpose>
 	
-	<feature title="Rofs image comparison" revision="008">
+	<feature title="Rofs image comparison" revision="009">
      EVALID : add Rofs image file comparison support
   </feature>
 
