@@ -12,6 +12,8 @@
 		<env name="CPPFILT" default="$(GCCPREFIX)c++filt$(DOTEXE)" type="tool"/>
 		<env name="SBS_EFREEZE" default="$(PERL) $(EPOCTOOLS)/efreeze.pl" type="script"/>
 		<set name="EFREEZE" value="$(SBS_EFREEZE)"/>
+		<env name="SBS_DEF2DLL" default="$(PERL) $(EPOCTOOLS)/def2dll.pl" type="script"/>
+		<set name="DEF2DLLTOOL" value="$(SBS_DEF2DLL)"/>
 		<env name="SBS_ELF2E32" default="$(EPOCTOOLS)/elf2e32$(DOTEXE)" type="tool"/>
 		<set name="ELF2E32" value="$(SBS_ELF2E32)"/>
 		<env name="SBS_PREPDEF" default="$(PERL) $(EPOCTOOLS)/prepdef.pl" type="script"/>

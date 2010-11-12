@@ -21,6 +21,7 @@
 		<set name="ARCHIVER_CREATE_OPTION" value="cr"/>
 		<set name="ARM_INSTRUCTION_SET" value="-marm"/>
 		<set name="ARMLIBS" value=""/>
+		<set name="ASM_FLAGS" value="-c" />
 		<set name="ASM_OUTPUT_OPTION" value="-o"/>
 		<set name="ASSEMBLER_LISTING_OPTION" value="-S"/>
 		<set name="BPABI_OPTION" value=""/>

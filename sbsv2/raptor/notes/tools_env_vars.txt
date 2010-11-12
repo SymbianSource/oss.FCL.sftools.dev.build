@@ -7,18 +7,43 @@ The list of new SBS_*** environment variables and their purpose is given below:
 SBS_EPOCTOOLS       Directory for epoc32 tools; defaults to $EPOCROOT/epoc32/tools
                     Changes the default locations for all of the following tools.
 SBS_CHECKLIB        Full path to checklib program
+SBS_DEF2DLL         perl, followed by full path to def2dll.pl
 SBS_EFREEZE         perl, followed by full path to efreeze.pl
 SBS_ELF2E32         Full path to elf2e32 program
-SBS_PREPDEF         perl, followed by full path to prepdef.pl
-SBS_RCOMP           Full path to rcomp program
-SBS_TRANASM         perl, followed by full path to tranasm.pl
+SBS_GENDEF          perl, followed by full path to gendef.pl
 SBS_MAKEDEF         perl, followed by full path to makedef.pl
 SBS_PETRAN          perl, followed by full path to petran.pl
+SBS_PREPDEF         perl, followed by full path to prepdef.pl
+SBS_RCOMP           Full path to rcomp program
 SBS_SYMLOOKUPUTIL   perl, followed by full path to sym_lkup_util.pl
+SBS_TRANASM         perl, followed by full path to tranasm.pl
+
+SBS_GCC_BIN         Linux only: full path to GCC and associated tools 
+SBS_MINGW_LINUX_BIN Linux only: location of MINGW tools for Linux-hosted 
+	            cross-compilation of Win32 tools2 targets
 SBS_SLASHBIN        Linux only: location of /bin, i.e. an alternative location for
                     GCC and associated tools
 SBS_USRBIN          Linux only: location of /usr/bin, i.e. an alternative location 
                     for Gnu tools such as the Core Utils
+
+SBS_STLPORTINCDIR         Location of STLport headers files (tools2 builds only)
+SBS_STLPORTBINDIR         Location of STLport library (tools2 builds only). 
+                          Assumes that there is a "rel" and "deb" directory
+                          immediately under this directory containing the
+                          STLport library (release and debug version 
+                          respectively).
+SBS_STLPORTINCDIR_WIN32   Location of STLport headers files for Linux-hosted 
+                          cross-compilation of Win32 tools2 targets. Only 
+                          applicable when using the "win32" variant, 
+                          i.e. "tools2.win32"
+SBS_STLPORTBINDIR_WIN32   Location of STLport library for Linux-hosted 
+                          cross-compilation of Win32 tools2 targets. Only 
+                          applicable when using the "win32" variant, 
+                          i.e. "tools2.win32". 
+                          Assumes that there is a "rel" and "deb" directory
+                          immediately under this directory containing the
+                          STLport library (release and debug version 
+                          respectively).
 
 In the case Perl scripts (.pl files), "perl" can be replaced with the full path to 
 the perl program.
@@ -28,6 +53,7 @@ The above variables supercede the following environment variables:
 CHECKLIB
 EFREEZE
 ELF2E32
+GENDEF
 MAKEDEF
 PETRAN
 PREPDEF
@@ -35,3 +61,4 @@ RCOMP
 TRANASM
 
 which are no longer in use.
+

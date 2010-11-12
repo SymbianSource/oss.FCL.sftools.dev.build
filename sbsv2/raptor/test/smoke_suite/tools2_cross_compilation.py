@@ -27,8 +27,8 @@ def run():
 	t.targets = [
 			"$(EPOCROOT)/epoc32/release/tools2/deb/pdrtran.exe",
 			"$(EPOCROOT)/epoc32/release/tools2/rel/pdrtran.exe",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/deb/pdrtran",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/rel/pdrtran",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/deb/pdrtran",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/rel/pdrtran",
 			"$(EPOCROOT)/epoc32/tools/pdrtran.exe",
 			"$(EPOCROOT)/epoc32/tools/pdrtran"
 			]
@@ -47,20 +47,20 @@ def run():
 			"pdrtran_/pdrtran_exe/tools2/rel/READER.o",
 			"pdrtran_/pdrtran_exe/tools2/rel/RECORD.o",
 			"pdrtran_/pdrtran_exe/tools2/rel/STRNG.o",
-			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM_DIR)/PDRTRAN.o",
-			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM_DIR)/LEXICAL.o",
-			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM_DIR)/PDRREADR.o",
-			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM_DIR)/PDRRECRD.o",
-			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM_DIR)/READER.o",
-			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM_DIR)/RECORD.o",
-			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM_DIR)/STRNG.o",
-			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM_DIR)/PDRTRAN.o",
-			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM_DIR)/LEXICAL.o",
-			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM_DIR)/PDRREADR.o",
-			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM_DIR)/PDRRECRD.o",
-			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM_DIR)/READER.o",
-			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM_DIR)/RECORD.o",
-			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM_DIR)/STRNG.o"
+			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/PDRTRAN.o",
+			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/LEXICAL.o",
+			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/PDRREADR.o",
+			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/PDRRECRD.o",
+			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/READER.o",
+			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/RECORD.o",
+			"pdrtran_/pdrtran_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/STRNG.o",
+			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/PDRTRAN.o",
+			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/LEXICAL.o",
+			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/PDRREADR.o",
+			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/PDRRECRD.o",
+			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/READER.o",
+			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/RECORD.o",
+			"pdrtran_/pdrtran_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/STRNG.o"
 			])
 	t.run("linux")
 
@@ -76,12 +76,12 @@ def run():
 			"$(EPOCROOT)/epoc32/release/tools2/rel/tool_exe.exe",
 			"$(EPOCROOT)/epoc32/release/tools2/rel/libtool_lib1.a",
 			"$(EPOCROOT)/epoc32/release/tools2/rel/libtool_lib2.a",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/deb/tool_exe",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/deb/libtool_lib1.a",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/deb/libtool_lib2.a",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/rel/tool_exe",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/rel/libtool_lib1.a",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/rel/libtool_lib2.a",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/deb/tool_exe",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/deb/libtool_lib1.a",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/deb/libtool_lib2.a",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/rel/tool_exe",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/rel/libtool_lib1.a",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/rel/libtool_lib2.a",
 			"$(EPOCROOT)/epoc32/tools/tool_exe.exe",
 			"$(EPOCROOT)/epoc32/tools/tool_exe"
 			]
@@ -98,18 +98,18 @@ def run():
 			"tool_exe_exe/tool_exe_exe/tools2/rel/tool_exe_b.o",
 			"tool_exe_exe/tool_exe_exe/tools2/deb/tool_exe_b.o",
 			"tool_exe_exe/tool_exe_exe/tools2/deb/tool_exe_a.o",
-			"libtool_lib1_a/libtool_lib1_lib/tools2/rel/$(HOSTPLATFORM_DIR)/tool_lib1_b.o",
-			"libtool_lib1_a/libtool_lib1_lib/tools2/rel/$(HOSTPLATFORM_DIR)/tool_lib1_a.o",
-			"libtool_lib2_a/libtool_lib2_lib/tools2/rel/$(HOSTPLATFORM_DIR)/tool_lib2_b.o",
-			"libtool_lib2_a/libtool_lib2_lib/tools2/rel/$(HOSTPLATFORM_DIR)/tool_lib2_a.o",
-			"libtool_lib1_a/libtool_lib1_lib/tools2/deb/$(HOSTPLATFORM_DIR)/tool_lib1_b.o",
-			"libtool_lib1_a/libtool_lib1_lib/tools2/deb/$(HOSTPLATFORM_DIR)/tool_lib1_a.o",
-			"libtool_lib2_a/libtool_lib2_lib/tools2/deb/$(HOSTPLATFORM_DIR)/tool_lib2_a.o",
-			"libtool_lib2_a/libtool_lib2_lib/tools2/deb/$(HOSTPLATFORM_DIR)/tool_lib2_b.o",
-			"tool_exe_exe/tool_exe_exe/tools2/rel/$(HOSTPLATFORM_DIR)/tool_exe_a.o",
-			"tool_exe_exe/tool_exe_exe/tools2/rel/$(HOSTPLATFORM_DIR)/tool_exe_b.o",
-			"tool_exe_exe/tool_exe_exe/tools2/deb/$(HOSTPLATFORM_DIR)/tool_exe_b.o",
-			"tool_exe_exe/tool_exe_exe/tools2/deb/$(HOSTPLATFORM_DIR)/tool_exe_a.o"
+			"libtool_lib1_a/libtool_lib1_lib/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_lib1_b.o",
+			"libtool_lib1_a/libtool_lib1_lib/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_lib1_a.o",
+			"libtool_lib2_a/libtool_lib2_lib/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_lib2_b.o",
+			"libtool_lib2_a/libtool_lib2_lib/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_lib2_a.o",
+			"libtool_lib1_a/libtool_lib1_lib/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_lib1_b.o",
+			"libtool_lib1_a/libtool_lib1_lib/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_lib1_a.o",
+			"libtool_lib2_a/libtool_lib2_lib/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_lib2_a.o",
+			"libtool_lib2_a/libtool_lib2_lib/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_lib2_b.o",
+			"tool_exe_exe/tool_exe_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_exe_a.o",
+			"tool_exe_exe/tool_exe_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_exe_b.o",
+			"tool_exe_exe/tool_exe_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_exe_b.o",
+			"tool_exe_exe/tool_exe_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_exe_a.o"
 			])
 	t.run("linux")
 

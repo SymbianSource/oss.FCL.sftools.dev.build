@@ -1,0 +1,30 @@
+
+# Put all files in a specific docs folder.
+#
+EPOCDOCS:=$(EPOCROOT)/epoc32/docs
+$(call makepath,$(EPOCDOCS))
+
+# Generate the name of the target for our component. We are going to
+# add dependencies to it in this FLM.
+#
+DOCTARGET:=$(call component_target,$(COMPONENT_META))
+
+# This test also produces a text file per project (which simply lists the
+# target name and target type) to show how per-target data can be fed back
+# up to the per-component target.
+#
+# By making the per-target files into prerequisites of the per-component
+# target we ensure that the per-component target has access to the full list
+# of per-target files.
+#
+MMPTARGET:=$(EPOCDOCS)/$(notdir $(PROJECT_META))
+
+$(DOCTARGET): $(MMPTARGET)
+
+# Script to generate the per-target file.
+#
+SCRIPT:=echo "$(TARGET) $(TARGETTYPE)" > $(MMPTARGET)
+
+# Create a recipe to execute the script.
+#
+$(call raptor_recipe,doc_target,$(MMPTARGET),,$(SCRIPT))

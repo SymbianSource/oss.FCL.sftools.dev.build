@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -34,13 +34,13 @@ endif
 define doexports
 PP_EXPORTS::
 	$(call startrule,makefile_generation_exports) \
-	$(SBS) --toolcheck=off --export-only $(component_list) $(config_list) -f- -m $(MAKEFILE_PATH).exports $(CLI_OPTIONS)  \
+	$(SBS) --toolcheck=off --export-only $(pp_system_definition) $(config_list) -f- -m $(MAKEFILE_PATH).exports $(CLI_OPTIONS)  \
 	$(call endrule,makefile_generation_exports)
 
 CLEANTARGETS:=$$(CLEANTARGETS) $(MAKEFILE_PATH).exports 
 endef
 
-# Generate makefiles for particular bldinf
+# Generate makefiles for a particular system definition
 # $(1) = source target source target......
 define generate_makefiles
 
@@ -48,7 +48,7 @@ ALL:: $(MAKEFILE_PATH)
 
 $(MAKEFILE_PATH): $(COMPONENT_PATHS) $(if $(DOEXPORT),| PP_EXPORTS )
 	$(call startrule,makefile_generation) \
-	$(SBS) --noexport --toolcheck=off -n $(CLI_OPTIONS) $(component_list) $(config_list) -m $$@ -f- \
+	$(SBS) --noexport --toolcheck=off -n $(CLI_OPTIONS) $(pp_system_definition) $(config_list) -m $$@ -f- \
 	$(call endrule,makefile_generation)
 
 CLEANTARGETS:=$$(CLEANTARGETS) $(MAKEFILE_PATH) 
@@ -57,9 +57,10 @@ endef
 
 # Create config list for commands
 config_list:=$(addprefix -c ,$(CONFIGS))
-component_list:=$(addprefix -b ,$(COMPONENT_PATHS))
+pp_system_definition:=-s $(PP_SYSTEM_DEFINITION)
 
 $(if $(FLMDEBUG),$(info <debug>build.flm: configlist: $(config_list)</debug>))
+$(if $(FLMDEBUG),$(info <debug>build.flm: pp_system_definition file in use: $(pp_system_definition)</debug>))
 
 # Do exports only if asked. This doesn't work brilliantly in emake
 # since exports are often duplicated in some components - leads to conflicts 

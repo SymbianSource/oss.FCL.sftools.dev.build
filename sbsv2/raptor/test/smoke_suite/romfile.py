@@ -39,8 +39,8 @@ def run():
 	
 	t.targets = [
 		"$(EPOCROOT)/epoc32/rom/src/ongoing/group/romfile/armv5test.iby",
-		"$(EPOCROOT)/epoc32/data/z/test/src/armv5.auto.bat",
-		"$(EPOCROOT)/epoc32/data/z/test/src/armv5.manual.bat"
+		"$(EPOCROOT)/epoc32/data/z/test/src_ongoing_romfile/armv5.auto.bat",
+		"$(EPOCROOT)/epoc32/data/z/test/src_ongoing_romfile/armv5.manual.bat"
 		]
 
 	# Check the content of the generated .iby file.
@@ -49,8 +49,8 @@ def run():
 		r".*// epoc32/rom/src/ongoing/group/romfile/armv5test\.iby\n.*",
 
 		# The batch files that are added by the build system.
-		r".*\ndata=/epoc32/data/z/test/src/armv5\.auto\.bat test/src\.auto\.bat\n.*",
-		r".*\ndata=/epoc32/data/z/test/src/armv5\.manual\.bat test/src\.manual\.bat\n.*",
+		r".*\ndata=/epoc32/data/z/test/src_ongoing_romfile/armv5\.auto\.bat test/armv5\.auto\.bat\n.*",
+		r".*\ndata=/epoc32/data/z/test/src_ongoing_romfile/armv5\.manual\.bat test/armv5\.manual\.bat\n.*",
 
 		# Some normal files.
 		r".*\nfile=/epoc32/release/##MAIN##/##BUILD##/t_rand\.exe\s+sys/bin/t_rand\.exe\n.*",
@@ -86,8 +86,8 @@ def run():
 	t.mustmatch = [
 		# Check whatlog output includes batch files and .iby file
 		r".*/epoc32/rom/src/ongoing/group/romfile/armv5test.iby</build>.*",
-		r".*/epoc32/data/z/test/src/armv5.auto.bat</build>.*",
-		r".*/epoc32/data/z/test/src/armv5.manual.bat</build>.*"
+		r".*/epoc32/data/z/test/src_ongoing_romfile/armv5.auto.bat</build>.*",
+		r".*/epoc32/data/z/test/src_ongoing_romfile/armv5.manual.bat</build>.*"
 		]
 	t.mustnotmatch = []
 	t.run()
