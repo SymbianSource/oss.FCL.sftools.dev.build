@@ -75,7 +75,7 @@ char HelpText[] =
 	"        -compressionmethod <method>   method one of none|inflate|bytepair to set the compression\n"
 	"        -no-sorted-romfs              do not add sorted entries arrays (6.1 compatible)\n"
 	"        -oby-charset=<charset> used character set in which OBY was written\n"
-	"        -geninc                       to generate include file for licensee tools to use\n"			// DEF095619
+	"        -geninc                       to generate include file for licensee tools to use\n"			
 	"        -loglevel<level>              level of information to log (valid levels are 0,1,2,3,4).\n" //Tools like Visual ROM builder need the host/ROM filenames, size & if the file is hidden.
 	"        -wstdpath                     warn if destination path provided for a file is not a standard path\n"
 	"        -argfile=<fileName>           specify argument-file name containing list of command-line arguments to rombuild\n"
@@ -296,7 +296,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag=EFalse) {
 				}
 			else if (stricmp(arg, "no-sorted-romfs")==0)
 				gSortedRomFs=EFalse;
-			else if (stricmp(arg, "geninc")==0)				// DEF095619
+			else if (stricmp(arg, "geninc")==0)				
 				gGenInc=ETrue;
  			else if (stricmp(arg, "wstdpath")==0)			// Warn if destination path provided for a file		
  				gEnableStdPathWarning=ETrue;					// is not a standard path as per platsec

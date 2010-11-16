@@ -44,7 +44,7 @@ TUint gCompressUnpagedMethod=0;// Default compression method for un-paged part o
 SCapabilitySet gPlatSecDisabledCaps={{0}}; 
 SCapabilitySet gPlatSecAllCaps={{0}};
 SDemandPagingConfig gDemandPagingConfig={0,0,0,{0}}; 
-TBool gGenInc=EFalse;	// Default to no generate INC file.  DEF095619
+TBool gGenInc=EFalse;	// Default to no generate INC file.  
 TInt gLogLevel=0;  // Information is logged based on logging level.
 					// The default is 0. So all the existing logs are generated as if gLogLevel == 0.
 					// If any extra information is required, the log level must be appropriately supplied.
