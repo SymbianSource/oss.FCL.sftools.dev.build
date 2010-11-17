@@ -67,6 +67,18 @@ void LogParser::ParseSymbol(const char* LogFilename) throw (LoggingException)
 					}
 				}
 			}
+			else if(linebuf.compare(0,15,"Executable File") == 0)
+			{
+				if(linebuf.find("size:", 26) != string::npos)
+				{
+					size_t startpos = linebuf.find('\'') ;
+					size_t endpos   = linebuf.rfind('\'');
+					if((startpos!=string::npos) && (endpos!=string::npos))
+					{
+						symgen->AddFile(linebuf.substr(startpos+1,endpos-startpos-1), true);
+					}
+				}
+			}
 			else if(linebuf.compare(0,26,"Compressed executable File") == 0)
 			{
 				if(linebuf.find("size:", 26) != string::npos)

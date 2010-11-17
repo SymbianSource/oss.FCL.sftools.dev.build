@@ -59,6 +59,9 @@
 #include "cache/cachemanager.hpp"
 
 #include "uniconv.hpp"
+
+#define MAX_LINE 65535
+
 extern TUint checkSum(const void* aPtr);
 
 extern ECompression gCompress;
@@ -625,7 +628,7 @@ TInt TRomNode::Place( TUint8* aDestBase )
 			
 			if(offset > 0xFFFF)
 			{
-				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, offset);
+				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, (unsigned int)offset);
 				throw "fail";
 			}
 			
@@ -640,7 +643,7 @@ TInt TRomNode::Place( TUint8* aDestBase )
 			TUint32 offset = ((((TUint8*) entry) - dirBlockBase) >> 2);
 			if(offset > 0xFFFF)
 			{
-				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, offset);
+				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, (unsigned int)offset);
 				throw "fail";
 			}
 			
@@ -790,7 +793,18 @@ void TRomNode::AddNodeForSameFile(TRomNode* aPreviousNode, TRomBuilderEntry* aFi
 	iNextNodeForSameFile = aPreviousNode;
 	}
 
-
+void TRomNode::FlushLogMessages()
+{
+	if(iEntry)
+	{
+		for(int i=0; i < (int) iEntry->iLogMessages.size(); i++)
+		{
+			std::string& log = iEntry->iLogMessages[i];
+			Print(ELog, log.c_str());
+		}
+		iEntry->iLogMessages.clear();
+	}
+}
 
 
 
@@ -863,9 +877,12 @@ void TRomBuilderEntry::SetRomNode(TRomNode* aNode)
 TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE ){
 
 
+	char tmpbuf[MAX_LINE];
 	TUint compression = 0;
 	TBool executable = iExecutable;
-	Print(ELog,"Reading file %s to image\n", iFileName );
+	sprintf(tmpbuf,"Reading file %s to image\n", iFileName );
+	iLogMessages.push_back(tmpbuf);
+
 	TUint32 size = HFile::GetLength(iFileName);
 	if (size==0)
 		Print(EWarning, "File %s does not exist or is 0 bytes in length.\n",iFileName);
@@ -1070,12 +1087,14 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 
 				if( newFileComp == 0)
 				{
-					Print(ELog,"Decompressing executable '%s'\n", iFileName);
+					sprintf(tmpbuf,"Decompressing executable '%s'\n", iFileName);
+					iLogMessages.push_back(tmpbuf);
 					f.iHdr->iCompressionType = 0;
 				}
 				else
 				{
-					Print(ELog,"Compressing executable '%s' with method:%08x\n", iFileName, newFileComp);
+					sprintf(tmpbuf,"Compressing executable '%s' with method:%08x\n", iFileName, (unsigned int)newFileComp);
+					iLogMessages.push_back(tmpbuf);
 					f.iHdr->iCompressionType = newFileComp;
 				}
 				f.UpdateHeaderCrc();
@@ -1124,11 +1143,12 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 					compression = atoi(entryref->GetCachedFileCompressionID());
 					memcpy(&iUids[0], aDest, sizeof(iUids));
 					if (compression)
-						Print(ELog,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, size, compression);
+						sprintf(tmpbuf,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, (unsigned int) size, (unsigned int)compression);
 					else if (iExecutable)
-						Print(ELog,"Executable File '%s' size: %08x\n", iFileName, size);
+						sprintf(tmpbuf,"Executable File '%s' size: %08x\n", iFileName, (unsigned int)size);
 					else
-						Print(ELog,"File '%s' size: %08x\n", iFileName, size);
+						sprintf(tmpbuf,"File '%s' size: %08x\n", iFileName, (unsigned int) size);
+					iLogMessages.push_back(tmpbuf);
 					iRealFileSize = size;	// required later when directory is written
 
 					return size;
@@ -1206,11 +1226,12 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 	}
 
 	if (compression)
-		Print(ELog,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, size, compression);
+		sprintf(tmpbuf,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, (unsigned int) size, (unsigned int) compression);
 	else if (iExecutable)
-		Print(ELog,"Executable File '%s' size: %08x\n", iFileName, size);
+		sprintf(tmpbuf,"Executable File '%s' size: %08x\n", iFileName, (unsigned int) size);
 	else
-		Print(ELog,"File '%s' size: %08x\n", iFileName, size);
+		sprintf(tmpbuf,"File '%s' size: %08x\n", iFileName, (unsigned int) size);
+	iLogMessages.push_back(tmpbuf);
 	iCompressEnabled = compression;
 	iRealFileSize = size;	// required later when directory is written
 
