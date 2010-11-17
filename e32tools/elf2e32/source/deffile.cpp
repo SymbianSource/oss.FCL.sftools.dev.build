@@ -463,27 +463,27 @@ void LineToken::NextToken()
 		IsWord(iLine + iOffset, aCurrentPos);
 
 		char *cmt = strchr(iLine + iOffset, ';');
-		char *aAlias = strchr(iLine + iOffset, '=');
+		char *aExport = strchr(iLine + iOffset, '=');
 
-		if( aAlias && (!cmt || (aAlias < cmt)) )
+		if( aExport && (!cmt || (aExport < cmt)) )
 		{
-			int aAliasPos = aAlias - (iLine+ iOffset);
+			int aExportPos = aExport - (iLine+ iOffset);
 
 			//Check if alias name is also supplied, they should be separated 
-			// by whitespace, i.e., SymbolName=AliasName is valid while, 
-			// SymbolName =AliasName is invalid.
-			if( aAliasPos > aCurrentPos)
+			// by whitespace, i.e., ExportName=SymbolName is valid while,
+			// ExportName =SymbolName is invalid.
+			if( aExportPos > aCurrentPos)
 			{
 				char *aToken = (iLine + iOffset + aCurrentPos);
 				throw DEFFileError(UNRECOGNIZEDTOKEN, iFileName, iLineNum, aToken);
 			}
 
-			aSymbolName = new char[aAliasPos+1];
-			strncpy(aSymbolName, iLine + iOffset, aAliasPos);
-			aSymbolName[aAliasPos] = '\0';
-			char *aExportName = new char[aCurrentPos - aAliasPos + 1];
-			strncpy(aExportName, aAlias +1, (aCurrentPos - aAliasPos));
-			aExportName[(aCurrentPos - aAliasPos)] = '\0';
+			char* aExportName = new char[aExportPos+1];
+			strncpy(aExportName, iLine+iOffset, aExportPos);
+			aExportName[aExportPos] = '\0';
+			aSymbolName = new char[aCurrentPos - aExportPos + 1];
+			strncpy(aSymbolName, aExport +1, (aCurrentPos - aExportPos));
+			aSymbolName[(aCurrentPos - aExportPos-1)] = '\0';
 			iSymbol->ExportName(aExportName);
 		}
 		else

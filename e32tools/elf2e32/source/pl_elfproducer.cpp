@@ -172,7 +172,10 @@ void ElfProducer::InitElfContents() {
 	while(aItr != aEnd) {
 		String		aSymName("");
 		aSym = *aItr;
-		aSymName = aSym->SymbolName();
+		if(aSym->ExportName())
+			aSymName = aSym->ExportName();
+		else
+			aSymName = aSym->SymbolName();
 		//set symbol info..
 		iElfDynSym[aIdx].st_name = iDSOSymNameStrTbl.size();
 
@@ -183,7 +186,10 @@ void ElfProducer::InitElfContents() {
 
 		//set version table info...
 		iVersionTbl[aIdx] = DEFAULT_VERSION;
-		AddToHashTable(aSym->SymbolName(), aIdx);
+		if(aSym->ExportName())
+			AddToHashTable(aSym->ExportName(), aIdx);
+		else
+			AddToHashTable(aSym->SymbolName(), aIdx);
 		aItr++;aIdx++;
 	}
 
