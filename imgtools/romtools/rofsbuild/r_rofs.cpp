@@ -284,6 +284,9 @@ class Worker : public boost::thread {
         p = rofs->GetDeferredJob();
         while(p) {
             p->len = p->node->PlaceFile(p->buf, (TUint32)-1, 0, &bpe);
+	    iOutputMutex.lock();
+	    p->node->FlushLogMessages();
+	    iOutputMutex.unlock();
             p = rofs->GetDeferredJob();
         }
     }
