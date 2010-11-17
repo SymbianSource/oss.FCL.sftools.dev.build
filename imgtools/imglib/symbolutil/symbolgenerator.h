@@ -26,20 +26,24 @@ using namespace std;
 #include "symbolprocessunit.h"
 
 
-struct TPlacedEntry{
-    string iFileName;
-    bool iExecutable;
-    TPlacedEntry(const string& aName, bool aExecutable) {
-        iFileName = aName;
-        iExecutable = aExecutable;
-    }
+enum TSymbolType {
+	ESymCommon = 0,
+	ESymBsym ,
 };
+enum TImageType {
+	ERomImage = 0,
+	ERofsImage,
+	EUnknownType,
+};
+
+
 class SymbolGenerator : public boost::thread {
     public:
         static SymbolGenerator* GetInstance();
         static void Release();
         void SetSymbolFileName( const string& fileName );
         void AddFile( const string& fileName, bool isExecutable );
+	void AddEntry(const TPlacedEntry& aEntry);
         bool HasFinished()	{ return iFinished; }
         void SetFinished();
         bool IsEmpty() { return iQueueFiles.empty(); }
@@ -47,6 +51,10 @@ class SymbolGenerator : public boost::thread {
         void UnlockOutput() { iOutputMutex.unlock(); }
         TPlacedEntry GetNextPlacedEntry();
         ofstream& GetOutputFileStream() { return iSymFile; };
+        void AppendMapFileInfo(MapFileInfo& aMapFileInfo) { iMapFileInfoSet.push_back(aMapFileInfo); }
+        void FlushSymbolFileContent();
+	void SetImageType(TImageType aImageType) {	iImageType = aImageType; };
+	TImageType GetImageType() {	return iImageType; };
     private:
         SymbolGenerator();
         ~SymbolGenerator();
@@ -59,8 +67,11 @@ class SymbolGenerator : public boost::thread {
         static SymbolGenerator* iInst;
         boost::condition_variable iCond;
         bool iFinished;
+        TSymbolType iSymbolType;
+	TImageType iImageType;
 
         ofstream iSymFile;
+        MapFileInfoSet iMapFileInfoSet;
 };
 class SymbolWorker{
 public:
@@ -68,5 +79,16 @@ public:
 	~SymbolWorker();
 	void operator()();
 private:
+};
+class PageCompressWorker {
+public:
+	PageCompressWorker(TCompressedHeaderInfo* aHeaderInfo, char* aChar);
+	~PageCompressWorker();
+	void operator()();
+	static TCompressedHeaderInfo * pHeaderInfo;
+	static int currentPage;
+	static boost::mutex m_mutex;
+	static int m_error;
+	static char* iChar;
 };
 #endif
