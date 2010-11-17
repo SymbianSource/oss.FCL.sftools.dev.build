@@ -18,7 +18,7 @@
 
 const TInt MajorVersion=2;
 const TInt MinorVersion=2;
-const TInt Build=6;
+const TInt Build=7;
 
 #endif
 

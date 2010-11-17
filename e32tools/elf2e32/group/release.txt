@@ -4,6 +4,11 @@ Nokia Corporation
 NOTESRC_RELEASE_REASON
 Postlinker(elf2e32) Release
 
+version 2.2 build(7)
+===============
+Released by Marvin Shi, 26/10/2010
+	1) Bug3494 elf2e32 treatment of ARM$$INIT_ARRAY$$Base can break GCCE builds
+
 version 2.2 build(6)
 ===============
 Released by Marvin Shi, 26/10/2010
