@@ -1438,7 +1438,7 @@ ESegmentType ElfExecutable::Segment(Elf32_Sym *aSym)
 
 	try {
 
-		bool limitSymbolFound = false;
+		bool specialSymbolFound = false;
 
 		// If Symbol is absolute then assume it came from linker and is a
 		// limit symbol.
@@ -1448,19 +1448,21 @@ ESegmentType ElfExecutable::Segment(Elf32_Sym *aSym)
 		}
 		else
 		{
+			// does the symbol point to the address after the end of the code or data segments?
 			if( (iCodeSegmentHdr && aSym->st_value == (iCodeSegmentHdr->p_vaddr + iCodeSegmentHdr->p_memsz)) ||
 				(iDataSegmentHdr && aSym->st_value == (iDataSegmentHdr->p_vaddr + iDataSegmentHdr->p_memsz)) )
 			{
-				//If Symbol is a $$Limit symbol, then consider the open boundary.
-				String limitstr = iStringTable + aSym->st_name;
-				if (limitstr.rfind("$$Limit",limitstr.length()) != String::npos)
+				//If Symbol contains $$, it is linker generated so consider the open boundary.
+ 				//e.g. SHT$$INIT_ARRAY$$Limit and sometimes SHT$$INIT_ARRAY$$Base 
+ 				String aSymstr = iStringTable + aSym->st_name;
+ 				if (aSymstr.rfind("$$",aSymstr.length()) != String::npos)
 				{
 					aHdr = SegmentFromAbs(aSym->st_value);
-					limitSymbolFound = true;
+					specialSymbolFound = true;
 				}
 			}
 
-			if(!limitSymbolFound )
+			if(!specialSymbolFound )
 			{
 				aHdr = Segment(aSym->st_value);
 			}
