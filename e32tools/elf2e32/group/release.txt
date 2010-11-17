@@ -4,6 +4,11 @@ Nokia Corporation
 NOTESRC_RELEASE_REASON
 Postlinker(elf2e32) Release
 
+version 2.2 build(8)
+===============
+Released by Jason Cui, 17/11/2010
+	1) [RC] Failure ou1cimx1#612374 created : elf2e32.exe puts wrong name in library .dso file
+
 version 2.2 build(7)
 ===============
 Released by Marvin Shi, 26/10/2010
