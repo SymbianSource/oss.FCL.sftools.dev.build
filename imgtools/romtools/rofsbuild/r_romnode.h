@@ -20,8 +20,6 @@
 #define __R_ROMNODE_H__
 
 #include <fstream>
-#include <vector>
-#include <string>
 #include <e32std.h>
 #include "rofs.h"
 #include "e32image.h"
@@ -125,8 +123,7 @@ public:
 	TInt GetFullName(char* aBuf, TBool aIgnoreHiddenAttrib = EFalse) const;
 	static void InitializeCount();
 	// Accessor Function.
-   	inline TRomNode* GetParent() const { return iParent; }
-	void FlushLogMessages();
+    inline TRomNode* GetParent() const { return iParent; }
 
 private:
 	void Remove(TRomNode* aChild);
@@ -202,6 +199,7 @@ public:
 	inline TInt RealFileSize() const { return iRealFileSize; };
 	inline void SetRealFileSize(TInt aFileSize) { iRealFileSize=aFileSize;};
 	void DisplaySize(TPrintType aWhere);
+	char* GetSystemFullName();
 	
 private:
 	TRomBuilderEntry();
@@ -212,7 +210,6 @@ private:
 public:
 	char *iName;
 	char *iFileName;
-	std::vector<std::string> iLogMessages;
 
 	TRomBuilderEntry* iNext;
 	TRomBuilderEntry* iNextInArea;

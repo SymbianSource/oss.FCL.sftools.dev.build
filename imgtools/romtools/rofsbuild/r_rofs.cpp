@@ -32,6 +32,7 @@ extern TInt gLogLevel;
 extern TBool gLowMem;
 extern TInt gThreadNum;
 extern TBool gGenSymbols;
+extern TBool gGenBsymbols;
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -49,8 +50,10 @@ E32Rofs::E32Rofs(CObeyFile *aObey)
 //
 	: iObey( aObey ), iOverhead(0)
 	{
-	if(gGenSymbols)
+	if(gGenSymbols || gGenBsymbols) {
 		iSymGen = SymbolGenerator::GetInstance();
+		iSymGen->SetImageType(ERofsImage);
+	}
 	else
 		iSymGen = NULL;
 
@@ -263,7 +266,6 @@ void E32Rofs::LogExecutableAttributes(E32ImageHeaderV *aHdr) {
 }
 class Worker : public boost::thread {
     public:
-    static boost::mutex iOutputMutex;
     static void thrd_func(E32Rofs* rofs){
         CBytePair bpe;
 
@@ -274,9 +276,12 @@ class Worker : public boost::thread {
                 p->len = p->node->PlaceFile(p->buf, (TUint32)-1, 0, &bpe);
                 //no symbol for hidden file
                 if(rofs->iSymGen && !p->node->iEntry->iHidden)
-                    rofs->iSymGen->AddFile(p->node->iEntry->iFileName,(p->node->iEntry->iCompressEnabled|| p->node->iEntry->iExecutable));
-	        boost::mutex::scoped_lock lock(iOutputMutex);
-		p->node->FlushLogMessages();
+		{
+		    char* fullsystemname= p->node->iEntry->GetSystemFullName();
+		    TPlacedEntry tmpEntry(p->node->iEntry->iFileName, fullsystemname, (p->node->iEntry->iCompressEnabled|| p->node->iEntry->iExecutable));
+		    rofs->iSymGen->AddEntry(tmpEntry);
+		    delete[] fullsystemname; 
+		}
             }
             p = rofs->GetFileNode(deferred);
         }
@@ -284,17 +289,12 @@ class Worker : public boost::thread {
         p = rofs->GetDeferredJob();
         while(p) {
             p->len = p->node->PlaceFile(p->buf, (TUint32)-1, 0, &bpe);
-	    iOutputMutex.lock();
-	    p->node->FlushLogMessages();
-	    iOutputMutex.unlock();
             p = rofs->GetDeferredJob();
         }
     }
     Worker(E32Rofs* rofs) : boost::thread(thrd_func,rofs) {
     }
 };
-
-boost::mutex Worker::iOutputMutex;
 
 TPlacingSection* E32Rofs::GetFileNode(bool &aDeferred) {
 	//get a node from the node list, the node list is protected by mutex iMuxTree.

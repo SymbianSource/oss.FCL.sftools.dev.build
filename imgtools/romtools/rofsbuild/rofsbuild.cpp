@@ -34,8 +34,7 @@
 #include "cache/cachevalidator.hpp"
 #include "cache/cacheablelist.hpp"
 #include "cache/cachemanager.hpp"
-#include "logging/loggingexception.hpp"
-#include "logging/logparser.hpp"
+#include "logparser.h"
 #include <malloc.h>
  
 #ifndef WIN32
@@ -48,8 +47,8 @@
 #endif
 
 static const TInt RofsbuildMajorVersion=2;
-static const TInt RofsbuildMinorVersion=16;
-static const TInt RofsbuildPatchVersion=3;
+static const TInt RofsbuildMinorVersion=17;
+static const TInt RofsbuildPatchVersion=0;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 
@@ -61,6 +60,7 @@ TUint  gCompressionMethod=0;
 TInt gThreadNum = 0;
 TInt gCPUNum = 0;
 TBool gGenSymbols = EFalse;
+TBool gGenBsymbols = EFalse;
 TInt gCodePagingOverride = -1;
 TInt gDataPagingOverride = -1;
 TInt gLogLevel = 0;	// Information is logged based on logging level.
@@ -101,6 +101,7 @@ char HelpText[] =
 	"        -compress   compress executable files where possible\n"
 	"        -j<digit> do the main job with <digit> threads\n"
 	"        -symbols generate symbol file\n"
+	"        -bsymbols generate binary symbol file\n"
 	"        -compressionmethod none|inflate|bytepair to set the compression\n"
 	"              none     uncompress the image.\n"
 	"              inflate  compress the image.\n"
@@ -171,6 +172,9 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 				gKeepGoing = ETrue;
 			}else if (stricmp(argv[i], "-SYMBOLS") == 0) {
 				gGenSymbols = ETrue;
+			}
+			else if (stricmp(argv[i], "-BSYMBOLS") == 0 ) {
+				gGenBsymbols = ETrue;
 			}
 			else if (((argv[i][1] | 0x20) == 's') &&  
 				(((argv[i][2]| 0x20) == 'l')||((argv[i][2] | 0x20) == 's'))) {
@@ -353,6 +357,11 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 
 	if (paramFileFlag)
 		return;
+	if(gGenSymbols && gGenBsymbols)
+	{
+		Print(EWarning, "Options symbols and bsymbols cannot be used at the same time, the common symbols file will be created this time!\n");
+		gGenBsymbols = EFalse;
+	}
 
 	if((gDriveImage == EFalse) && (gSmrImage ==  EFalse) && 
 		(filename.empty() || (gUseCoreImage && gImageFilename.length() == 0)) && (loginput.length() == 0)){
@@ -496,11 +505,11 @@ TInt main(int argc, char *argv[]){
 	processCommandLine(argc, argv);
 	if(gThreadNum == 0) {
 		if(gCPUNum > 0) {
-			printf("WARNING: The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
-			gThreadNum = gCPUNum;
+			printf("The double number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum * 2);
+			gThreadNum = gCPUNum * 2;
 		}
 		else {
-			printf("WARNING: Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
+			printf("Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
 			gThreadNum = DEFAULT_THREADS;
 		}
 	}
@@ -508,7 +517,7 @@ TInt main(int argc, char *argv[]){
 	{
 		try
 		{
-			LogParser::GetInstance()->ParseSymbol(loginput.c_str());
+			LogParser::GetInstance(ERofsImage)->ParseSymbol(loginput.c_str());
 		}
 		catch(LoggingException le)
 		{

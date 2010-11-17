@@ -343,6 +343,7 @@ class CBytePair {
         TInt Decompress(TUint8* dst, TInt dstSize, TUint8* src, TInt srcSize, TUint8*& srcNext);
 };
 TInt BytePairCompress(TUint8* dst, TUint8* src, TInt size, CBytePair *aBPE);
+TInt BytePairDecompress(TUint8* dst, TUint8* src, TInt size, CBytePair *aBPE);
 
 #endif
 

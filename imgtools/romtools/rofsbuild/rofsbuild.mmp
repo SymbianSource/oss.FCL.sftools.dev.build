@@ -23,15 +23,15 @@ TARGETTYPE		exe
 // rofsbuild
 SOURCEPATH	../rofsbuild
 SOURCE			 r_obey.cpp r_build.cpp r_rofs.cpp r_driveimage.cpp r_driveutl.cpp
-SOURCE			 rofsbuild.cpp r_coreimage.cpp r_smrimage.cpp symbolgenerator.cpp
+SOURCE			 rofsbuild.cpp r_coreimage.cpp r_smrimage.cpp
 SOURCE			 fatcluster.cpp fsnode.cpp fatimagegenerator.cpp
-SOURCE			 symbolprocessunit.cpp
+SOURCEPATH	../../imglib/symbolutil
+SOURCE			 symbolprocessunit.cpp bsymutil.cpp loggingexception.cpp logparser.cpp
+SOURCE                   symbolgenerator.cpp
 SOURCEPATH	../../imglib/host
 SOURCE			h_utl.cpp h_file.cpp h_mem.cpp utf16string.cpp
 SOURCEPATH ../rofsbuild/src/cache
 SOURCE cachemanager.cpp cacheexception.cpp cache.cpp cacheablelist.cpp cachevalidator.cpp cachegenerator.cpp cacheentry.cpp
-SOURCEPATH ../rofsbuild/src/logging
-SOURCE loggingexception.cpp logparser.cpp
 
 // executable compression
 SOURCEPATH	../../imglib/e32uid
@@ -46,7 +46,7 @@ source					byte_pair.cpp pagedcompress.cpp
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
-USERINCLUDE   ../../imglib/inc ../../imglib/compress
+USERINCLUDE   ../../imglib/inc ../../imglib/compress ../../imglib/symbolutil
 USERINCLUDE   ../../imglib/patchdataprocessor/include ../../imglib/parameterfileprocessor/include
 USERINCLUDE	  ../../imglib/memmap/include
 USERINCLUDE   ../../imglib/uniconv/include
