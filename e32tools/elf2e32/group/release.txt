@@ -11,7 +11,7 @@ Released by Jason Cui, 17/11/2010
 
 version 2.2 build(7)
 ===============
-Released by Marvin Shi, 26/10/2010
+Released by Lorence Wang, 17/11/2010
 	1) Bug3494 elf2e32 treatment of ARM$$INIT_ARRAY$$Base can break GCCE builds
 
 version 2.2 build(6)
