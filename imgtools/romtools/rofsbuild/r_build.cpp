@@ -1082,7 +1082,7 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 				if (overflow)
 				{
 					// need to check if the compressed file will fit in the image
-					//TODO the checking will slow down the build process, should do it later along with the writing on aDest.
+					
 					TUint32 compressedSize;
 					char * buffer = new char [size];
 #if defined(__LINUX__)
