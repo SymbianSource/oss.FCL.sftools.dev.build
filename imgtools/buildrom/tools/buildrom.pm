@@ -67,7 +67,7 @@ if ($^O !~ /^MSWin32$/i){
 my $enforceFeatureManager = 0; # Flag to make Feature Manager mandatory if SYMBIAN_FEATURE_MANAGER macro is defined. 
 
 my $BuildromMajorVersion = 3 ;
-my $BuildromMinorVersion = 31;
+my $BuildromMinorVersion = 32;
 my $BuildromPatchVersion = 0;
 
 
@@ -75,13 +75,18 @@ sub print_usage
 {
 
 	# Option "-fm" will be supported instead of option "-f|fr" if SYMBIAN_FEATURE_MANAGER macro is defined.
-	my $featuresOptionUsage = "-ffeatureuids or -fr=featureuids -- feature registry database XML file name";
+	my $featuresOptionUsage = "-ffeatureuids or -fr=featureuids -- [obsolete] Feature registry database XML file name\n". 
+							   "                                       Please use featureconfigurator.pl to configurate features.\n\n".
+							   "   -nofm                            -- Don't perform feature configuration \n\n"; 
 	if ($enforceFeatureManager) 
 	{
-		$featuresOptionUsage = "-fm=featuredatabasefile          -- feature manager/feature registry database XML file name.\n".
-							   "\t\t\t\t    Multiple XML files can be passed seperated by commas.\n".
-							   "   -nofm=featuresdatafile           -- don't generate features data file.".
-							   " Instead use pre-built features data file.";
+		$featuresOptionUsage = "-fm=featuredatabasefile          -- [obsolete] Feature manager/feature registry database XML file name.\n".
+							   "                                       Multiple XML files can be passed seperated by commas.\n". 
+							   "                                       Please use featureconfigurator.pl to configurate features.\n\n".				
+							   "   -nofm=featuresdatafile           -- [obsolete] Don't generate features data file.\n".
+							   "                                       Use pre-built features data file instead.\n". 
+							   "                                       Please use featureconfigurator.pl to configurate features.\n\n".
+							   "   -nofm                            -- Don't perform feature configuration\n\n";							  
 	}
 
 #........1.........2.........3.........4.........5.........6.........7.....
@@ -117,7 +122,8 @@ The available options are
    -p                               -- preserves the intermediate files pertaining to data drive, Z drive and BMCONV
    -spi                             -- enable producing SPI files
    -spiplacement                    -- enable positioning of spi file
-   -w                               -- warn if file has been selected from a different directory 
+   -w                               -- warn if file has been selected from a different directory
+   
    $featuresOptionUsage
    -etool                           -- external tool specification (xx is tool's perl module)
    -compress                        -- compression type of ROM image:
@@ -159,7 +165,9 @@ The available options are
    -prependepocroot                 -- if there is no EPOCROOT## before /epoc32/, prepend EPOCROOT## to epoc32.
    -stdcpp                          -- ignore symbian customized cpp and try to find another cpp in the PATH.(for Windows only)
    -cpp=xxx                         -- specify a CPP preprocessor used by Buildrom.
-   -xiponly                      -- just create the XIP ROM image without creating the ROFS image.
+   -xiponly                         -- just create the XIP ROM image without creating the ROFS image.
+   -nopreprocess                    -- Input oby files have been or don't need to be preprocessed,
+                                       don't preprocess the input oby files.
    -inputoby=<finalOBYfile>         -- Ignore BUILDROM config phase, invoke Rombuild/Rofsbuild using <finalOBYfile>.
                                     <finalOBYfile> must contain one and ONLY one of romsize/rofssize/dataimagename/imagename keywords,
                                     The keywords will be used to identify the OBY type.
@@ -278,6 +286,7 @@ my $patchDataStmtFlag = 0;
 my $featuremanager = 0; #Flag to enable support for feature manager database XML file and to generate  
 			# features data file.
 my $noFeatureManager = 0; # Flag to stop the generation of features.dat file and use pre-built features.dat if provided.
+my $noFeatureConf  = 0 ;
 my $preBuiltFeaturesDataFile  = ''; # To store the name of pre-built features.dat file provided with "-nofm" option.
 
 #Image Content XML file that supports specific feature to be added
@@ -359,6 +368,7 @@ my $cppoption = 0;
 my $preprocessor = "cpp";
 my $opt_xiponly = 0;
 my $ignoreconfig = 0;
+my $nopreprocess = 0;
 my $romcount = 0;
 
 sub match_obyfile
@@ -755,8 +765,7 @@ sub process_cmdline_arguments
 
 	my ($paramFileFlag, @argList); 
 
-	if (defined @_)
-	{
+	if (defined @_ && scalar(@_) > 0) {
 		($paramFileFlag, @argList) = @_;
 	}
 	else
@@ -783,13 +792,15 @@ sub process_cmdline_arguments
 		}
 	}
 	# first searching argList for keepgoing option
+	my @newArgList = ();
 	foreach my $arg (@argList) {
-		if ( $arg =~ /^-k$/i || $arg =~ /^-keepgoing$/i )
-	  {
-			$opt_k = 1;		
-  		next;	
+		if ( $arg =~ /^-k$/i || $arg =~ /^-keepgoing$/i ) {
+			$opt_k = 1;	 
 		}
-		if ($arg =~ /^-workdir=(.*)/)
+		elsif($arg =~ /^-nopreprocess$/i ) {
+			$nopreprocess = 1 ; 
+		}
+		elsif ($arg =~ /^-workdir=(.*)/)
 		{
 			my $workdir = $1;
 			if (!-d $workdir)
@@ -806,11 +817,13 @@ sub process_cmdline_arguments
 				$thisdir =~ s-\/-\\-g;
 			}
 			$opt_workdir = 1;
-			chdir "$currentdir";
-			next;	
+			chdir "$currentdir"; 
+		}
+		else {
+			push @newArgList, $arg ;
 		}
 	}
-	foreach my $arg (@argList)
+	foreach my $arg (@newArgList)
 	{
 	    if ($arg =~ /^-argfile=(.*)/) 
 		{
@@ -927,6 +940,7 @@ sub process_cmdline_arguments
 				$errors++;
 				next;
 			}
+			$noFeatureConf = 0;
 			$featureXml = $1;
 			$xmlrequired = 1;
 			$featuremanager = 1;
@@ -978,14 +992,18 @@ sub process_cmdline_arguments
 	    	}
 	    	next;
 	    }
-		if ($arg =~ /^-nofm(=(.*))?$/)
-		{
-			if (!$enforceFeatureManager) 
-			{
-				print "Unknown arg: $arg\n";
+		if ($arg =~ /^-nofm(=(.*))?$/) {
+			if(!$1) {
+                $noFeatureConf = 1 ;
+				next ;
+            }
+			 
+			if (!$enforceFeatureManager)  {
+				print "Unsupported option: $arg\n";
 				$errors++;
 				next;
-			}
+			} 
+			$noFeatureConf = 0;
    			$noFeatureManager = 1;
             #DEF125375 If caller is simply giving -nofm without any parameter, a warning message will be given.
             if(!$2)
@@ -1050,42 +1068,49 @@ sub process_cmdline_arguments
 			$checkcase_test=1;
 			next;	
 		}
-		if ($arg =~ /^-workdir=(.*)/)
-		{
-			next;
-		}
+		 
 		if ($arg =~ /^-stdcpp$/)
-		{
-			if (&is_linux)
-			{
-				print "Warning: option -stdcpp only apply for Windows\n";
-				next;
+		{	
+			if($nopreprocess) {
+				print STDERR "Warning: -stdcpp option is invalid because the -nopreprocess option set.\n";
 			}
-			if ($cppoption)
-			{
-				die "Error: -stdcpp option and -cpp=xxx option cannot be used at the same time.\n";
+			else {
+				if (&is_linux)
+				{
+					print "Warning: option -stdcpp only apply for Windows\n";
+					next;
+				}
+				if ($cppoption)
+				{
+					die "Error: -stdcpp option and -cpp=xxx option cannot be used at the same time.\n";
+				}
+				$stdcpp = 1;
 			}
-			$stdcpp = 1;
 			next;
 		}
 		if ($arg =~ /^-cpp=(.*)/)
 		{
-			if ($stdcpp)
-			{
-				die "Error: -stdcpp option and -cpp=xxx option cannot be used at the same time.\n";
+			if($nopreprocess) {
+				print STDERR "Warning: -cpp option is invalid because the -nopreprocess option set.\n";
 			}
-			if ($cppoption)
-			{
-				print "Warning: -cpp option has been set before. The previous configuration will be overwritten!\n";
-			}
-			$cppoption = 1;
-			$preprocessor = $1;
-			$preprocessor =~ s-\\-\/-g;
-			$preprocessor =~ s-EPOCROOT##\/?-$epocroot-g;
-			if (-d $preprocessor)
-			{
-				$preprocessor .= "\/" unless $preprocessor =~ /\/$/;
-				$preprocessor .= "cpp";
+			else {
+				if ($stdcpp)
+				{
+					die "Error: -stdcpp option and -cpp=xxx option cannot be used at the same time.\n";
+				}
+				if ($cppoption)
+				{
+					print "Warning: -cpp option has been set before. The previous configuration will be overwritten!\n";
+				}
+				$cppoption = 1;
+				$preprocessor = $1;
+				$preprocessor =~ s-\\-\/-g;
+				$preprocessor =~ s-EPOCROOT##\/?-$epocroot-g;
+				if (-d $preprocessor)
+				{
+					$preprocessor .= "\/" unless $preprocessor =~ /\/$/;
+					$preprocessor .= "cpp";
+				}
 			}
 			next;
 		}
@@ -1265,11 +1290,6 @@ sub process_cmdline_arguments
 			}
 			next;
 		}
-		if ( $arg =~ /^-k$/i || $arg =~ /^-keepgoing$/i )
-	    {
-			$opt_k = 1;
-			next;
-	    }
 		if ( $arg =~ /^-r$/i || $arg =~ /^-retainfolder$/i )
 	    {
 			$opt_r = 1;
@@ -1391,98 +1411,122 @@ sub process_cmdline_arguments
 
 sub preprocessing_phase
 {
-	my $temp1OBYFile = $thisdir."tmp1.oby";
-	unlink "$temp1OBYFile";
+	if($nopreprocess == 0) {
+		my $temp1OBYFile = $thisdir."tmp1.oby";
+		unlink "$temp1OBYFile";
 
-#	Macro "ROM_FEATURE_MANAGEMENT" is defined when "-f|fr" or "-fm" is used
-	if (defined ($featureXml))
-	{
-		$cppargs .= " -DROM_FEATURE_MANAGEMENT ";
-	}
-
-	# add pre-include file and include directories for feature variants
-	if ($featureVariant{'VALID'})
-	{
-		$cppargs .= " -I.";
-		my $incRef = $featureVariant{'ROM_INCLUDES'};
-		if ($incRef)
+	#	Macro "ROM_FEATURE_MANAGEMENT" is defined when "-f|fr" or "-fm" is used
+		if (defined ($featureXml))
 		{
-			foreach (@$incRef)
+			$cppargs .= " -DROM_FEATURE_MANAGEMENT ";
+		}
+
+		# add pre-include file and include directories for feature variants
+		if ($featureVariant{'VALID'})
+		{
+			$cppargs .= " -I.";
+			my $incRef = $featureVariant{'ROM_INCLUDES'};
+			if ($incRef)
 			{
-		    	$cppargs .= " -I \"$_\"";
+				foreach (@$incRef)
+				{
+					$cppargs .= " -I \"$_\"";
+				}
+			}
+			my $HRH = $featureVariant{'VARIANT_HRH'};
+			if ($HRH)
+			{
+				$cppargs .= " -include \"$HRH\"";
 			}
 		}
-		my $HRH = $featureVariant{'VARIANT_HRH'};
-		if ($HRH)
+		else
 		{
-		    $cppargs .= " -include \"$HRH\"";
+			# no feature variant so use the standard includes
+			$cppargs .= " -I. -I \"$rominclude\"";
 		}
-	}
-	else
-	{
-		# no feature variant so use the standard includes
-		$cppargs .= " -I. -I \"$rominclude\"";
-	}
 
-	if ($stdcpp)
-	{
-		$preprocessor = find_stdcpp();
-	}
-	print "* $preprocessor -Wno-endif-labels -o $temp1OBYFile $cppargs\n" if ($opt_v);
-	
-	is_existinpath("$preprocessor", romutl::DIE_NOT_FOUND);
-	$errors = 0;
-	open CPP, "| $preprocessor -Wno-endif-labels -o $temp1OBYFile $cppargs" or die "* Can't execute cpp";
-	foreach my $arg (@obyfiles)
-	{
-		print CPP "\n#line 1 \"$arg\"\n";
-	
-		if(open(OBY, $arg)) {
-			print "* reading $arg\n" if ($opt_v);
-			while ($line=<OBY>) {
-				print CPP $line;
-			}
-			close OBY;
+		if ($stdcpp)
+		{
+			$preprocessor = find_stdcpp();
 		}
-		else {
-			print STDERR "* Can't open $arg\n";
-			if(!$opt_k){			
-				close CPP;
-				exit(1);
-			}
-		}
-	}
-	close CPP;
-	my $cpp_status = $?;
-	die "* cpp failed\n" if ($cpp_status != 0 || !-f "$temp1OBYFile");
-
-	if( defined ($image_content))
-	{
-		#Read the OBY file that was generated by the pre-processor
-		&ReadPreprocessedFile($temp1OBYFile);
-
-#		Check if the static dependencies of the OBY binaries are resolved.
-		&ImageContentHandler::UpdateObyBinaryStaticDep();
+		print "* $preprocessor -Wno-endif-labels -o $temp1OBYFile $cppargs\n" if ($opt_v);
 		
-		#Now append the files collected from cdfs.
-		&ImageContentHandler::GenObyFile($temp1OBYFile);
-	}
-
-	# Setup default rom configuration
-	$romimage[0] = {xip=>1, compress=>0, extension=>0, composite=>"none",uncompress=>0 };
-	if($obycharset =~ /utf-?8/i)
-	{
-		my $utf8file = $thisdir."tmp1utf8.oby";
-		open INFILE, "<$temp1OBYFile" or die "* Can't open file $temp1OBYFile";
-		open CHARSETTRAN, "| charsettran -to=hostcharset > $utf8file" or die "* Can't execute charsetran";
-		while(<INFILE>)
+		is_existinpath("$preprocessor", romutl::DIE_NOT_FOUND);
+		$errors = 0;
+		open CPP, "| $preprocessor -Wno-endif-labels -o $temp1OBYFile $cppargs" or die "* Can't execute cpp";
+		foreach my $arg (@obyfiles)
 		{
-			print CHARSETTRAN $_;
+			print CPP "\n#line 1 \"$arg\"\n";
+		
+			if(open(OBY, $arg)) {
+				print "* reading $arg\n" if ($opt_v);
+				while ($line=<OBY>) {
+					print CPP $line;
+				}
+				close OBY;
+			}
+			else {
+				print STDERR "* Can't open $arg\n";
+				if(!$opt_k){			
+					close CPP;
+					exit(1);
+				}
+			}
 		}
-		close CHARSETTRAN;
-		close INFILE;	
-		unlink $temp1OBYFile  or die "* Can't remove file $temp1OBYFile";
-		rename 	$utf8file, $temp1OBYFile or die "* Can't rename file $utf8file to file $temp1OBYFile";
+		close CPP;
+		my $cpp_status = $?;
+		die "* cpp failed\n" if ($cpp_status != 0 || !-f "$temp1OBYFile");
+
+		if( defined ($image_content))
+		{
+			#Read the OBY file that was generated by the pre-processor
+			&ReadPreprocessedFile($temp1OBYFile);
+
+	#		Check if the static dependencies of the OBY binaries are resolved.
+			&ImageContentHandler::UpdateObyBinaryStaticDep();
+			
+			#Now append the files collected from cdfs.
+			&ImageContentHandler::GenObyFile($temp1OBYFile);
+		}
+
+		if($obycharset =~ /utf-?8/i)
+		{
+			my $utf8file = $thisdir."tmp1utf8.oby";
+			open INFILE, "<$temp1OBYFile" or die "* Can't open file $temp1OBYFile";
+			open CHARSETTRAN, "| charsettran -to=hostcharset > $utf8file" or die "* Can't execute charsetran";
+			while(<INFILE>)
+			{
+				print CHARSETTRAN $_;
+			}
+			close CHARSETTRAN;
+			close INFILE;	
+			unlink $temp1OBYFile  or die "* Can't remove file $temp1OBYFile";
+			rename 	$utf8file, $temp1OBYFile or die "* Can't rename file $utf8file to file $temp1OBYFile";
+		}
+		@obydata = ();
+		# load tmp1.oby here
+		open TMP1, "$temp1OBYFile" or die("* Can't open $temp1OBYFile\n");
+		while(<TMP1>) { 
+			push @obydata,$_;
+		}
+		close TMP1 ;
+	}
+	else {
+		foreach my $arg (@obyfiles) {		
+			if(open(OBY, $arg)) {
+				print "* reading $arg\n" if ($opt_v);
+				while (<OBY>) {
+					push @obydata,$_;
+				}
+				close OBY;
+			}
+			else {
+				print STDERR "* Can't open $arg\n";
+				if(!$opt_k){	 
+					exit(1);
+				}
+			}
+		}
 	}
 }
 
@@ -1553,50 +1597,46 @@ sub substitution_phase
 		$substitutionData{"RIGHT_NOW"} = sprintf("%02d/%02d/%04d %02d:%02d:%02d", $mday, $mon+1, $year+1900, $hour, $min, $sec);
 		$substitutionData{"EPOCROOT"} = $epocroot;
 		@substitutionOrder = ("TODAY", "RIGHT_NOW", "EPOCROOT");
-	}
-
-	my $temp1OBYFile = $thisdir."tmp1.oby";
-	
-	open TMP1, "$temp1OBYFile" or die("* Can't open $temp1OBYFile\n");
-	while ($line=<TMP1>)
-	{
-		if(($line =~ /^\s*romsize\s*=/i) || ( $line=~ /^\s*rom_image/i) || ($line =~ /^\s*data_image/i))
-		{
+	}	 
+	 
+	foreach $line(@obydata) {
+		if(($line =~ /^\s*romsize\s*=/i) || ( $line=~ /^\s*rom_image/i) || ($line =~ /^\s*data_image/i)) {
 			$onlysmrimage = 0;
 			last;
 		}
 	}
-	close TMP1;	
-	if ($enforceFeatureManager && (!$featuremanager) && (!$noFeatureManager) )
-	{
-		my $defaultFeatureDbFlag = 0;
-		open TMP1, "$temp1OBYFile" or die("* Can't open $temp1OBYFile\n");
-		while ($line=<TMP1>)
-		{
-			if ($line=~/^\s*defaultfeaturedb\s*=?\s*(\S+)/i)
-			{	
-				# Get the default value for featuredatabasefile
-                
-				$featureXml = "$epocroot$1";
-				$featureXml =~ s-\\-\/-g;
-				$featuremanager = 1;				
-				$defaultFeatureDbFlag = 1;
-				load_featuresutil();				
-				last;
+	if($noFeatureConf == 0) { 
+		if ($enforceFeatureManager && (!$featuremanager) && (!$noFeatureManager) ) {
+			my $defaultFeatureDbFlag = 0;
+			foreach $line(@obydata) { 
+				if ($line=~/^\s*defaultfeaturedb\s*=?\s*(\S+)/i)
+				{	
+					# Get the default value for featuredatabasefile
+					
+					$featureXml = "$epocroot$1";
+					$featureXml =~ s-\\-\/-g;
+					$featuremanager = 1;				
+					$defaultFeatureDbFlag = 1;
+					load_featuresutil();				
+					last;
+				}
+			}
+		 
+
+			if(!$defaultFeatureDbFlag && !$onlysmrimage)
+			{
+				print "Error: Neither option \"-fm|-nofm\" nor default value for featuredatabase file is provided.\n";
+				exit(1);			
 			}
 		}
-		close TMP1;
-
-		if(!$defaultFeatureDbFlag && !$onlysmrimage)
-		{
-			print "Error: Neither option \"-fm|-nofm\" nor default value for featuredatabase file is provided.\n";
-			exit(1);			
-		}
 	}
-
-	open TMP1, "$temp1OBYFile" or die("* Can't open $temp1OBYFile\n");
-	while ($line=<TMP1>)
-	{
+	
+	# Setup default rom configuration
+	$romimage[0] = {xip=>1, compress=>0, extension=>0, composite=>"none",uncompress=>0 }; 
+		
+	my @savedObyData = @obydata;
+	@obydata = ();
+	foreach  $line(@savedObyData) {
 		track_source($line);
 		$line =~ s-\\-\/-g;
 
@@ -1653,19 +1693,19 @@ sub substitution_phase
  				}
  			}
 		}
-
-		if($line =~ /^\s*FEATURE\s*(.*)/i || $line =~ /^\s*EXCLUDE_FEATURE\s*(.*)/i)
-		{
-			# Process the feature keywords only when "-f|fr" or "-fm" is passed to buildrom
-			if(defined ($featureXml))
-			{
-				push @obydata, "$line";
+		if($noFeatureConf == 0) { 
+			if($line =~ /^\s*FEATURE\s*(.*)/i || $line =~ /^\s*EXCLUDE_FEATURE\s*(.*)/i) {
+				# Process the feature keywords only when "-f|fr" or "-fm" is passed to buildrom
+				if(defined ($featureXml))
+				{
+					push @obydata, "$line";
+				}
+				else
+				{
+					push @obydata, "REM handled $line";
+				}
+				next;
 			}
-			else
-			{
-				push @obydata, "REM handled $line";
-			}
-			next;
 		}
 
 		if ($line=~/^\s*DEFINE\s+(\w+)\s+(\S+)/i)
@@ -2659,14 +2699,14 @@ my @hidedatafiles; #array of hashes, stores all the data files which are to be h
 my $spicount=0; #counts number of spi files in each rom image
 my $filescount=0; #counts number of data files
 my $hidefilescount=0; #counts number of data files to be hidden
-my $romimage=0; #number of rom image currently working with
+my $romimagecount=0; #number of rom image currently working with
 
 sub locateexisting 
 { # if an SPI file of this type exists in a base image then returns name of SPI file from the array
-	my ($romimage, $spifile, $base) =@_;
+	my ($index, $spifile, $base) =@_;
 	my $i=0;
 	while(defined $spiarray[$base][$i]) {
-		if($spiarray[$base][$i]{spi} eq $spiarray[$romimage][$spifile]{spi}) {
+		if($spiarray[$base][$i]{spi} eq $spiarray[$index][$spifile]{spi}) {
 			my $spiname;
 			my $spiextension;
 			if($spiarray[$base][$i]{spifile} =~ /(.*)\.(.*)$/) {
@@ -2684,27 +2724,27 @@ sub locateexisting
 
 sub create 
 { #called to create SPI file and store in specified directory
-	my ($romimage, $spifile, $base) =@_; #$romimage = current rom image number, $spifile = current spifile number, $base=number of rom image basing on
+	my ($index, $spifile, $base) =@_; #$index = current rom image number, $spifile = current spifile number, $base=number of rom image basing on
 	my $existingspi = "";
 	if(defined($base)) { # checks core image for an existing SPI file of this type, if an existing file exists then $existingspi is set to -i<name of existing spi file> which will later be passed to spitool.pm
-		$existingspi = locateexisting($romimage, $spifile, $base);
+		$existingspi = locateexisting($index, $spifile, $base);
 		if($existingspi ne "") {
 			$existingspi = "-i$existingspi";
 			
 		}
 	}
-	if($spiarray[$romimage][$spifile]{spifile} =~ /(.+)\.(.*)$/) {
-		my $targetspi="$1-$romimage-$spifile\.$2"; #add romimage number and identifier for spi file to spi file name to distinguish from other spi files
+	if($spiarray[$index][$spifile]{spifile} =~ /(.+)\.(.*)$/) {
+		my $targetspi="$1-$index-$spifile\.$2"; #add romimage number and identifier for spi file to spi file name to distinguish from other spi files
 		my @dataforspi; # array to store names of data files to include in spi file
 		my @hidedatainspi; # array to store names of data files that are to be hidden in spi file
 		for(my $k=0;$k<scalar @datafiles;$k++) {
-			if($datafiles[$k]{rom}==$romimage && $datafiles[$k]{spifile} == $spifile) {
+			if($datafiles[$k]{rom}==$index && $datafiles[$k]{spifile} == $spifile) {
 				push @dataforspi, $datafiles[$k]{data}; #push name of data file onto array if correct romimage and spi type
 			}
 		}
 
 		for(my $j=0;$j<scalar @hidedatafiles;$j++) {
-			if($hidedatafiles[$j]{rom}==$romimage && $hidedatafiles[$j]{spifile} == $spifile)
+			if($hidedatafiles[$j]{rom}==$index && $hidedatafiles[$j]{spifile} == $spifile)
 			{
 				push @hidedatainspi, $hidedatafiles[$j]{data}; #push name of data file to be hidden onto array if correct romimage and spi type
 			}
@@ -2740,7 +2780,7 @@ sub spi_creation_phase
 		{
 			if ($line=~/^\s*REM \s*ROM_IMAGE\[(\d)\]/) # specify which romimage following lines are part of
 			{
-				$romimage=$1;
+				$romimagecount=$1;
 				$spicount=0;
 			}	elsif ($line =~ /^\s*REM/i)
 			{
@@ -2751,36 +2791,36 @@ sub spi_creation_phase
 				my $flag=1;
 				my $i;
 				for($i=0;$i<$spicount && $flag;$i++) { #loop to see if name of spi file already added to this romimage in array
-					if($spiarray[$romimage][$i]{spi} eq $targetspi) {
+					if($spiarray[$romimagecount][$i]{spi} eq $targetspi) {
 						$flag=0;
 					}
 				}
 			
 				if($flag) { # adds spi file if not yet listed for this romimage in array
-					$spiarray[$romimage][$spicount++]={spifile=>$3, spidir=>$4, spi=>$4.$3};
+					$spiarray[$romimagecount][$spicount++]={spifile=>$3, spidir=>$4, spi=>$4.$3};
 					$i=$spicount;
 				}
-					$datafiles[$filescount++]= {data=>$1, rom=>$romimage, spifile=>$i-1}; 
+					$datafiles[$filescount++]= {data=>$1, rom=>$romimagecount, spifile=>$i-1}; 
                         } elsif ($spiplacement && $line =~/^\s*SPI_POSITION/i){
         			# mark the image index at which the SPI_POSITION keyword has occured in order to avoid writing duplicate
         			# entries of the spi file.
-        			$spipositionflag{$romimage} = 1;
+        			$spipositionflag{$romimagecount} = 1;
         		} elsif ($line=~/^\s*spidatahide\s*=\s*(\S+)\s+(\S+)\s(\S+)\s*$/)	{
 				#spidatahide=\epoc32\data\Z\Resource\Plugins\Obexclasscontroller.RSC ecom.spi \private\10003a3f\
 				my $targetspi=$3.$2;
 				my $flag=1;
 				my $i;
 				for($i=0;$i<$spicount && $flag;$i++) { #loop to see if name of spi file already added to this romimage in array
-					if($spiarray[$romimage][$i]{spi} eq $targetspi) {
+					if($spiarray[$romimagecount][$i]{spi} eq $targetspi) {
 						$flag=0;
 					}
 				}
 			
 				if($flag) { # adds spi file if not yet listed for this romimage in array
-					$spiarray[$romimage][$spicount++]={spifile=>$2, spidir=>$3, spi=>$3.$2};
+					$spiarray[$romimagecount][$spicount++]={spifile=>$2, spidir=>$3, spi=>$3.$2};
 					$i=$spicount;
 				}
-					$hidedatafiles[$hidefilescount++]= {data=>$1, rom=>$romimage, spifile=>$i-1}; 
+					$hidedatafiles[$hidefilescount++]= {data=>$1, rom=>$romimagecount, spifile=>$i-1}; 
 			}
 
 		}
@@ -2970,9 +3010,12 @@ sub load_featuresutil
 #
 sub featurefile_creation_phase
 {
-	if($onlysmrimage)
-	{
+	if($onlysmrimage){
 		return;
+	}
+	if($noFeatureConf) {
+		checkcase() if ($checkcase);
+		return ;
 	}
 	# Set the name and Rom Image location of feature file.
 	if ($enforceFeatureManager) 
