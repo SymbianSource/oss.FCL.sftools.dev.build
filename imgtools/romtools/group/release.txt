@@ -1,3 +1,7 @@
+Version 2.17.1 (ROFSBUILD)
+===============
+Released by Marvin Shi, 19/11/2010
+	1) ou1cimx1#651819 rofsbiuld fails to generate correct log info when using multi-thread 
 
 Version 2.19.0 (ROMBUILD)
 ===============

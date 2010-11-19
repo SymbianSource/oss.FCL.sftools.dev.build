@@ -266,6 +266,7 @@ void E32Rofs::LogExecutableAttributes(E32ImageHeaderV *aHdr) {
 }
 class Worker : public boost::thread {
     public:
+    static boost::mutex iMutexOut;
     static void thrd_func(E32Rofs* rofs){
         CBytePair bpe;
 
@@ -282,6 +283,9 @@ class Worker : public boost::thread {
 		    rofs->iSymGen->AddEntry(tmpEntry);
 		    delete[] fullsystemname; 
 		}
+		iMutexOut.lock();
+		p->node->FlushLogMessages();
+		iMutexOut.unlock();
             }
             p = rofs->GetFileNode(deferred);
         }
@@ -295,6 +299,8 @@ class Worker : public boost::thread {
     Worker(E32Rofs* rofs) : boost::thread(thrd_func,rofs) {
     }
 };
+
+boost::mutex Worker::iMutexOut;
 
 TPlacingSection* E32Rofs::GetFileNode(bool &aDeferred) {
 	//get a node from the node list, the node list is protected by mutex iMuxTree.

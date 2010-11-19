@@ -490,7 +490,7 @@ int main(int argc, char *argv[])  {
 		}
 		return 0;
 	}
-	if (romlogfile[romlogfile.size()-1] == '\\' || romlogfile[romlogfile.size()-1] == '/')
+	if (romlogfile.empty() || romlogfile[romlogfile.size()-1] == '\\' || romlogfile[romlogfile.size()-1] == '/')
 		romlogfile += "ROMBUILD.LOG";
  	H.SetLogFile(romlogfile.c_str());
 	ObeyFileReader *reader=new ObeyFileReader(filename.c_str());
