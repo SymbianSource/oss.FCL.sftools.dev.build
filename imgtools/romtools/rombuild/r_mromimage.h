@@ -44,9 +44,7 @@ public:
 	virtual TUint32 DataRunAddress() const = 0 ;
 	virtual TUint32 RomAlign() const = 0 ;
  
-#ifdef __LINUX__
 	virtual ~MRomImage() { };
-#endif
 };
 
 #endif //__R_MROMIMAGE_H__

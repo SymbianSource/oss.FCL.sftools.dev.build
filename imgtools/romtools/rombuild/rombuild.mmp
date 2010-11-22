@@ -24,7 +24,10 @@ sourcepath	.
 source			 r_dir.cpp r_header.cpp r_obey.cpp r_srec.cpp
 source			 r_rom.cpp rombuild.cpp r_build.cpp r_collapse.cpp
 source			 r_global.cpp r_areaset.cpp
-source			 r_coreimage.cpp r_coreimagereader.cpp symbolgenerator.cpp
+source			 r_coreimage.cpp r_coreimagereader.cpp
+sourcepath	../../imglib/symbolutil
+source		symbolgenerator.cpp symbolprocessunit.cpp bsymutil.cpp
+source 		loggingexception.cpp logparser.cpp
 sourcepath	../../imglib/e32uid
 source			e32uid.cpp
 sourcepath	../../imglib/host
@@ -38,7 +41,7 @@ sourcepath	../../imglib/compress
 source			byte_pair.cpp
 source			pagedcompress.cpp
 
-userinclude	../../imglib/compress 	../../imglib/inc 
+userinclude	../../imglib/compress 	../../imglib/inc ../../imglib/symbolutil
 userinclude	../../imglib/patchdataprocessor/include ../../imglib/parameterfileprocessor/include
 userinclude     ../../imglib/uniconv/include
 userinclude ../../imglib/memmap/include
@@ -46,7 +49,7 @@ userinclude	../../imglib/boostlibrary/
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
-staticlibrary	patchdataprocessor parameterfileprocessor memmap boost_thread-1.39 uniconv
+staticlibrary	patchdataprocessor parameterfileprocessor memmap boost_thread-1.39 boost_regex-1.39 uniconv
 
 #ifdef TOOLS2_LINUX
 OPTION    GCC -O2 -Wno-uninitialized -pthread

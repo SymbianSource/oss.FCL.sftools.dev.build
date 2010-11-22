@@ -636,3 +636,12 @@ TInt BytePairCompress(TUint8* dst, TUint8* src, TInt size, CBytePair *aBPE)
     memcpy(dst,PakBuffer,compressedSize);
     return compressedSize;
 }
+TInt BytePairDecompress(TUint8* dst, TUint8* src, TInt size, CBytePair *aBPE)
+{
+    TUint8 UnpakBuffer[MaxBlockSize];
+    ASSERT(size<=MaxBlockSize);
+    TUint8* pakEnd;
+    TInt us = aBPE->Decompress(UnpakBuffer,MaxBlockSize,src,size,pakEnd);
+    memcpy(dst,UnpakBuffer,us);
+    return us;
+}
