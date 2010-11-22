@@ -1,3 +1,8 @@
+Version 2.18.5 (ROMBUILD)
+===============
+Released by Lorence Wang, 19/11/2010
+	1) ou1cimx1#656196 one line message of ROM tools
+
 Version 2.16.3 (ROFSBUILD)
 ===============
 Released by Marvin Shi 17/11/2010

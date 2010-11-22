@@ -1509,7 +1509,7 @@ TInt TRomBuilderEntry::BuildDependenceGraph(E32Rom& aRom) {
 		}
 		// prevent the situiation which importer is primary, variant or extension, exporter is device
 		if (is_kernel && !Device() && romnode->iRomFile->iRbEntry->Device())	 {
-			Print(EWarning, "Kernel/variant/extension\n\t%s\nlinks to non-extension LDD/PDD\n\t%s\n",
+			Print(EWarning, "Kernel/variant/extension \"%s\"  links to non-extension LDD/PDD  \"%s\"\n",
 				(const char*)TModuleName(this), (const char*)TModuleName(find_info));
 		}
 		if (romnode->ABI() != my_abi) {
