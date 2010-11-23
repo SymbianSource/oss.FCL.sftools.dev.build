@@ -1,3 +1,9 @@
 #!/bin/sh
-perl -S hpsym.pl $@
+PRGDIR=`dirname "$0"`
+
+PRGDIR=`cd "$PRGDIR"; pwd`
+
+
+perl "$PRGDIR/hpsym.pl" $@
+
 

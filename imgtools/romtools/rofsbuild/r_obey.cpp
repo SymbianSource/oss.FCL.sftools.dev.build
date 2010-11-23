@@ -46,7 +46,7 @@
 #include <unistd.h>
 #else
 #include <io.h> 
-#include <direct.h> //TODO: check under MinGW4 + stlport 5.2
+#include <direct.h> 
 #include <conio.h> 
 #endif
 

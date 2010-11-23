@@ -116,3 +116,4 @@ evalid  left\ok  right\ok
 Failed 1 of 47 comparisons
 ----------------
 
+FAILED: left\ok\Image_file\rofs.img	and right\ok\Image_file\rofs.img  (Rofs image)

@@ -128,7 +128,7 @@ void E32ImageFile_ELF::FixRelocs(ELFFile &aElfFile, Elf32_Rel **codeRelocs, Elf3
 		checkreloc(aElfFile, *data, codeRelocs[i]->r_offset);
 		//*data=FixAddress(aElfFile, *data, codeRelocs[i]);
 		}
-// fix defect
+
 	for (TInt j=0; j<numberOfDataRelocs; j++)
 	        {
 		data=aElfFile.DataPtrFromAddr(dataRelocs[j]->r_offset);

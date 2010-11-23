@@ -11,10 +11,7 @@
 # Contributors:
 #
 # Description:
-# This postbuild script is only called when a Test Build is done.  It deletes the KDDI/AU versions of the shiftjis and j5 plugin RSC file, so
-# that only the Docomo versions remain.  This removed ambiguity over which one will load during tests - a seperate version of the KDDI/AU
-# plugins is created for test build, with a unique UID number so they may coexist for test purposes.
-# 
+# This postbuild script is only called when a Test Build is done.  
 #
 
 TMPROOT:=$(subst \,/,$(EPOCROOT))

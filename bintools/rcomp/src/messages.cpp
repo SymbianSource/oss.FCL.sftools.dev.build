@@ -252,8 +252,8 @@ MessageArray::MessageArray()
 	Add(new Message(LT_044_Message, LT_044, "044", true, KWarning));
 
 	/* This warning has been added to hopefully fix a long standing defect where labels which 
-	 * have not been declared are silently included in the emitted resource file. More 
-	 * details at defect INC061459 */
+	 * have not been declared are silently included in the emitted resource file.  
+	 */
 	const String LT_045_Message = "the following label is used but has not been declared: ";
 	Add(new Message(LT_045_Message, LT_045, "045", true, KWarning));
 

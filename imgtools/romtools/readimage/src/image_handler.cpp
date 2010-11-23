@@ -290,7 +290,6 @@ EImageType ImageHandler::ReadMagicWord() {
  * @fn ImageHandler::ReadBareImage
  * @brief this function processes image type under the condition of that if an image is given without header which means the image is not self-described
  * @return type of the image.
- * @note this function is introduced for handling issues raised by DEF129908
  */
 EImageType ImageHandler::ReadBareImage(ifstream& aIfs) {
     TRomHeader romHdr ; 

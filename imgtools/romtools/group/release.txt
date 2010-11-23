@@ -1,3 +1,23 @@
+Version 2.19.1 (ROMBUILD)
+===============
+Released by Lorence Wang, 19/11/2010
+	1) ou1cimx1#656196 one line message of ROM tools
+
+Version 2.17.1 (ROFSBUILD)
+===============
+Released by Marvin Shi, 19/11/2010
+	1) ou1cimx1#651819 rofsbiuld fails to generate correct log info when using multi-thread 
+
+Version 2.19.0 (ROMBUILD)
+===============
+Released by Marvin Shi, 17/11/2010
+	1) feature symbol file generation from log file
+
+Version 2.17.0 (ROFSBUILD)
+===============
+Released by Marvin Shi, 17/11/2010
+	1) feature bsym format symbol file generation for rofsbuild
+
 Version 2.16.2 (ROFSBUILD)
 ===============
 Released by Ross Qin, 02/11/2010

@@ -26,14 +26,15 @@
 
 #include "r_dir.h"
 #include "r_coreimage.h"
+#include "logparser.h"
 
 const TInt KRomLoaderHeaderNone=0;
 const TInt KRomLoaderHeaderEPOC=1;
 const TInt KRomLoaderHeaderCOFF=2;
 
 static const TInt RombuildMajorVersion=2;
-static const TInt RombuildMinorVersion=18;
-static const TInt RombuildPatchVersion=4;
+static const TInt RombuildMinorVersion=19;
+static const TInt RombuildPatchVersion=1;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 static string compareROMName = "";
@@ -49,11 +50,13 @@ char* g_pCharCPUNum = NULL;
 TBool gGenDepGraph = EFalse;
 string gDepInfoFile = "";
 TBool gGenSymbols = EFalse ;
+TBool gGenBsymbols = EFalse ;
 TBool gIsOBYUTF8 = EFalse;
+static string loginput = "";
 void PrintVersion() {
- 	Print(EAlways,"\nROMBUILD - Rom builder");
-  	Print(EAlways, " V%d.%d.%d\n", RombuildMajorVersion, RombuildMinorVersion, RombuildPatchVersion);
-  	Print(EAlways,Copyright);
+ 	printf("\nROMBUILD - Rom builder");
+  	printf(" V%d.%d.%d\n", RombuildMajorVersion, RombuildMinorVersion, RombuildPatchVersion);
+  	printf(Copyright);
 	}
 
 char HelpText[] = 
@@ -75,14 +78,15 @@ char HelpText[] =
 	"        -compressionmethod <method>   method one of none|inflate|bytepair to set the compression\n"
 	"        -no-sorted-romfs              do not add sorted entries arrays (6.1 compatible)\n"
 	"        -oby-charset=<charset> used character set in which OBY was written\n"
-	"        -geninc                       to generate include file for licensee tools to use\n"			// DEF095619
+	"        -geninc                       to generate include file for licensee tools to use\n"			
 	"        -loglevel<level>              level of information to log (valid levels are 0,1,2,3,4).\n" //Tools like Visual ROM builder need the host/ROM filenames, size & if the file is hidden.
 	"        -wstdpath                     warn if destination path provided for a file is not a standard path\n"
 	"        -argfile=<fileName>           specify argument-file name containing list of command-line arguments to rombuild\n"
 	"        -lowmem                       use memory-mapped file for image build to reduce physical memory consumption\n"
 	"        -coreimage=<core image file>  to pass the core image as input for extension ROM image generation\n"
 	"        -k                            to enable keepgoing when duplicate files exist in oby\n"
-	"        -logfile=<fileName>           specify log file\n";
+	"        -logfile=<fileName>           specify log file\n"
+    "        -loginput=<log filename>      specify as input a log file and produce as output symbol file.\n";
 
 
 char ReallyHelpText[] =
@@ -296,7 +300,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag=EFalse) {
 				}
 			else if (stricmp(arg, "no-sorted-romfs")==0)
 				gSortedRomFs=EFalse;
-			else if (stricmp(arg, "geninc")==0)				// DEF095619
+			else if (stricmp(arg, "geninc")==0)				
 				gGenInc=ETrue;
  			else if (stricmp(arg, "wstdpath")==0)			// Warn if destination path provided for a file		
  				gEnableStdPathWarning=ETrue;					// is not a standard path as per platsec
@@ -349,6 +353,9 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag=EFalse) {
 			else if (strnicmp(arg, "logfile=",8) ==0) {
 				romlogfile = arg + 8;
 			}
+			else if (strnicmp(arg, "loginput=",9) ==0) {
+				loginput = arg + 9;
+			}
 			else 
 #ifdef WIN32
 				cout << "Unrecognised option " << argv[i] << "\n";
@@ -366,7 +373,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag=EFalse) {
 		}
 	if (paramFileFlag)
 		return;
-	if (filename.empty()) {
+	if (filename.empty() && loginput.empty()) {
  		PrintVersion();
 		cout << HelpText;
 		if (reallyHelp) {
@@ -450,29 +457,42 @@ int main(int argc, char *argv[])  {
 	ParseCapabilitiesArg(gPlatSecAllCaps, "all");
 
  	processCommandLine(argc, argv);
- 	if(filename.empty())
+ 	if(filename.empty() && loginput.empty())
    		return KErrGeneral;
 		
-	if (romlogfile[romlogfile.size()-1] == '\\' || romlogfile[romlogfile.size()-1] == '/')
-		romlogfile += "ROMBUILD.LOG";
- 	H.SetLogFile(romlogfile.c_str());
 
     if(gThreadNum == 0) {
  		if(gCPUNum > 0 && gCPUNum <= MAXIMUM_THREADS) {
- 			Print(EAlways, "The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
-			gThreadNum = gCPUNum;
+ 			printf("The double number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum * 2);
+			gThreadNum = gCPUNum * 2;
 		}
 		else if(g_pCharCPUNum) {
- 			Print(EWarning, "The NUMBER_OF_PROCESSORS is invalid, and the default value %d will be used.\n", DEFAULT_THREADS);
+ 			printf("The NUMBER_OF_PROCESSORS is invalid, and the default value %d will be used.\n", DEFAULT_THREADS);
 			gThreadNum = DEFAULT_THREADS;
 		}
 		else {
- 			Print(EWarning, "The NUMBER_OF_PROCESSORS is not available, and the default value %d will be used.\n", DEFAULT_THREADS);
+ 			printf("The NUMBER_OF_PROCESSORS is not available, and the default value %d will be used.\n", DEFAULT_THREADS);
 			gThreadNum = DEFAULT_THREADS;
 		}
 	} 
 	PrintVersion();
 	
+	if(loginput.length() >= 1)
+	{
+		try
+		{
+			LogParser::GetInstance(ERomImage)->ParseSymbol(loginput.c_str());
+		}
+		catch(LoggingException le)
+		{
+			printf("ERROR: %s\r\n", le.GetErrorMessage());
+			return 1;
+		}
+		return 0;
+	}
+	if (romlogfile.empty() || romlogfile[romlogfile.size()-1] == '\\' || romlogfile[romlogfile.size()-1] == '/')
+		romlogfile += "ROMBUILD.LOG";
+ 	H.SetLogFile(romlogfile.c_str());
 	ObeyFileReader *reader=new ObeyFileReader(filename.c_str());
 	if (!reader->Open()) {
  		delete reader;

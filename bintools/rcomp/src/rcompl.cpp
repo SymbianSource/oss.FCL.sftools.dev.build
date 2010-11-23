@@ -236,7 +236,7 @@ static int yy_init = 1;		/* whether we need to initialize */
 static int yy_start = 0;	/* start state number */
 
 /* Flag which is used to allow yywrap()'s to do buffer switches
- * instead of setting up a fresh yyin.  A bit of a hack ...
+ * instead of setting up a fresh yyin.  
  */
 static int yy_did_buffer_switch_on_eof;
 

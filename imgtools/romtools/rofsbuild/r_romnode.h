@@ -21,6 +21,8 @@
 
 #include <fstream>
 #include <e32std.h>
+#include <vector>
+#include <string>
 #include "rofs.h"
 #include "e32image.h"
 #include "h_utl.h"
@@ -123,7 +125,8 @@ public:
 	TInt GetFullName(char* aBuf, TBool aIgnoreHiddenAttrib = EFalse) const;
 	static void InitializeCount();
 	// Accessor Function.
-    inline TRomNode* GetParent() const { return iParent; }
+    	inline TRomNode* GetParent() const { return iParent; }
+	void FlushLogMessages();
 
 private:
 	void Remove(TRomNode* aChild);
@@ -187,6 +190,12 @@ public:
 
 
 class DllDataEntry;
+struct TLogItem
+	{
+		TPrintType iPrintType;
+		std::string iLogMessage;
+	};
+typedef vector<TLogItem> LogVector;
 class TRomBuilderEntry
 	{
 public:
@@ -199,6 +208,7 @@ public:
 	inline TInt RealFileSize() const { return iRealFileSize; };
 	inline void SetRealFileSize(TInt aFileSize) { iRealFileSize=aFileSize;};
 	void DisplaySize(TPrintType aWhere);
+	char* GetSystemFullName();
 	
 private:
 	TRomBuilderEntry();
@@ -217,6 +227,7 @@ public:
 	TUint iCompressEnabled;
 	TUint8 iUids[sizeof(TCheckedUid)];
 	TBool iHidden;
+	LogVector iLogMessages;
   	DllDataEntry* GetFirstDllDataEntry() const;
 	void SetFirstDllDataEntry(DllDataEntry *aDllDataEntry);
 
