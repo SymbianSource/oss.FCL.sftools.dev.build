@@ -20,13 +20,13 @@ from raptor_tests import SmokeTest
 def run():
 	t = SmokeTest()
 	t.id = "0092a"
-	t.name = "toolcheck"
 	t.description = """Test toolcheck works properly, with 3 options: on, off and forced. 
 				TOOL1 3 4 and 5 are expected to fail and 2 to pass"""
 	result = SmokeTest.PASS
 	toolcheckDir = os.environ["SBS_HOME"].replace("\\","/") + "/test/smoke_suite/test_resources/toolcheck"
 
 	# toolcheck ON
+	t.name = "toolcheck_on"
 	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf -n --configpath=" + toolcheckDir + \
 			" -c default.toolcheck --toolcheck=on"
 	
@@ -40,12 +40,13 @@ def run():
 		".*TOOLCHECK2.*",
 		".*TOOLCHECK6.*"
 		]
-	t.errors = 4
+	t.errors = 7
 	t.returncode = 1
 	t.run()
 	if t.result == SmokeTest.FAIL:
 		result = SmokeTest.FAIL
 
+	t.name = "toolcheck_off"
 	# toolcheck OFF
 	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf -n --configpath=" + toolcheckDir + \
 			" -c default.toolcheck --toolcheck=off"
@@ -66,6 +67,7 @@ def run():
 		result = SmokeTest.FAIL
 
 	# force toolcheck
+	t.name = "toolcheck_force"
 	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf -n --configpath=" + toolcheckDir + \
 			" -c default.toolcheck --toolcheck=forced"
 
@@ -80,7 +82,7 @@ def run():
 		".*TOOLCHECK2.*",
 		".*TOOLCHECK6.*"
 	]
-	t.errors = 4
+	t.errors = 16
 	t.returncode = 1
 	t.run()
 	if t.result == SmokeTest.FAIL:

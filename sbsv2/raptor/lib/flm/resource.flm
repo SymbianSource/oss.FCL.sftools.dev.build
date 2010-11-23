@@ -43,7 +43,6 @@ RSCDIR:=$(subst //,/,$(EPOCROOT)/epoc32/data/z/$(TARGETPATH))
 else
 RSCDIR:=$(subst //,/,$(EPOCROOT)/epoc32/data)
 endif
-RESBASE:=$(RSCDIR)/$(TARGET_lower)
 
 # Ensure that RELEASABLES and CLEANTARGETS cannot expand indefinitely in successive calls to this flm:
 CLEANTARGETS:=
@@ -64,7 +63,7 @@ else
 endif
 
 # we create intermediate .rpp and .d files
-INTERBASE_TMP:=$(OUTPUTPATH)/$(TARGET_lower)_$(notdir $(basename $(SOURCE)))
+INTERBASE_TMP:=$(OUTPUTPATH)/$(TARGET_var)_$(notdir $(basename $(SOURCE)))
 
 LANGUAGES:=$(LANGUAGES:SC=sc) # ensure that we don't ever have to worry about case consistency w.r.t languages or get confused into thinking that SC!=sc (which it is)
 LANGUAGES:=$(call uniq,$(LANGUAGES)) # remove any duplicates from the list (usually the result of multiple LANG lists both in and out of START RESOURCE blocks)
@@ -167,7 +166,7 @@ ifeq ($(HEADERONLY),)  # i.e IF NOT HEADERONLY
 
         # invoke the macro that creates targets for building resources, once per language
         # For sc we generate $(INTERBASE_TMP).rsc and define LANGUAGE_SC and LANGUAGE_sc.
-        $(foreach L,$(LANGUAGES),$(eval $(call resource.build,$(INTERBASE_TMP).r$(L),$(L),$(TARGET_lower).r$(L))))
+        $(foreach L,$(LANGUAGES),$(eval $(call resource.build,$(INTERBASE_TMP).r$(L),$(L),$(TARGET_var).r$(L))))
 
 
         DEPENDFILE:=$(wildcard $(DEPENDFILENAME))
@@ -186,7 +185,7 @@ ifeq ($(HEADERONLY),)  # i.e IF NOT HEADERONLY
     # We tried to copy after running rcomp itself but we still need these
     # targets for the sake of dependencies or, for example, if someone
     # merely adds a new copy when the resource is up-to-date
-    $(foreach L,$(LANGUAGES),$(eval $(call resource.makecopies,$(INTERBASE_TMP).r$(L),$(TARGET_lower).r$(L))))
+    $(foreach L,$(LANGUAGES),$(eval $(call resource.makecopies,$(INTERBASE_TMP).r$(L),$(TARGET_var).r$(L))))
 
   endif
 else
@@ -194,7 +193,7 @@ else
   # HEADERONLY was specified
   #
   GUARD:=TARGET_$(call sanitise,$(INTERBASE_TMP))_rsg
-  $(if $(FLMDEBUG),$(info <debug>resource.flm: Headeronly $(INTERBASE_TMP) $(TARGET_lower).rsg LANGUAGES:=$(LANGUAGES)</debug>))
+  $(if $(FLMDEBUG),$(info <debug>resource.flm: Headeronly $(INTERBASE_TMP) $(TARGET_var).rsg LANGUAGES:=$(LANGUAGES)</debug>))
 
   ifeq ($($(GUARD)),)
       $(GUARD):=1  

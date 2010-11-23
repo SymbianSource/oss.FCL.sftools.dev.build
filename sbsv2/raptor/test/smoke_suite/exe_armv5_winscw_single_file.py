@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -27,8 +27,9 @@ def run():
 	t.command = "sbs -b smoke_suite/test_resources/simple_gui/Bld.inf -c armv5 -c winscw"
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
 		"helloworld_exe/helloworld.mbm_bmconvcommands",
-		"helloworld_exe/helloworld_HelloWorld.rsc.rpp",
-		"helloworld_exe/helloworld_HelloWorld.rsc.d",
+		"HelloWorld_exe/HelloWorld_HelloWorld.rsc",
+		"HelloWorld_exe/HelloWorld_HelloWorld.rsc.rpp",
+		"HelloWorld_exe/HelloWorld_HelloWorld.rsc.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_AppUi.o",
@@ -91,13 +92,11 @@ def run():
 		"helloworld_exe/winscw/urel/helloworld_UID_.o",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o.d",
 		"helloworld_exe/winscw/urel/helloworld_urel_objects.lrf",
-		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg.rsc.rpp",
-		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg.rsc.d"
+		"HelloWorld_reg_exe/HelloWorld_reg_HelloWorld_reg.rsc",
+		"HelloWorld_reg_exe/HelloWorld_reg_HelloWorld_reg.rsc.rpp",
+		"HelloWorld_reg_exe/HelloWorld_reg_HelloWorld_reg.rsc.d"
 	])
-
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 
 	# Ensure we don't clean up from the previous build in any subsequent runs
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [])
@@ -120,10 +119,7 @@ def run():
 	t.mustnotmatch = [
 		".*recipe name='(win32simplelink|postlink|link)'.*"
 	]
-
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 
 	# Attempt separate source and resource file compile where nothing should be done
 	t.id = "0089c"
@@ -136,14 +132,10 @@ def run():
 	t.mustnotmatch = [
 		".*recipe name='(resourcecompile|win32compile2object|compile|win32simplelink|postlink|link)'.*"
 	]
-
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 
 	t.id = "89"
 	t.name = "exe_armv5_winscw_single_file"
 	t.description = """Builds a component and tests single file compilation for straight source and resource files"""
-	t.result = result
 	t.print_result()
 	return t

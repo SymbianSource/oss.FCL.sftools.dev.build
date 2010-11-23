@@ -1,0 +1,48 @@
+;
+; Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+; All rights reserved.
+; This component and the accompanying materials are made available
+; under the terms of the License "Eclipse Public License v1.0"
+; which accompanies this distribution, and is available
+; at the URL "http://www.eclipse.org/legal/epl-v10.html".
+;
+; Initial Contributors:
+; Nokia Corporation - initial contribution.
+;
+; Contributors:
+;
+; Description: 
+;
+;
+; Basic install file for HelloWorld application
+;
+
+; List of languages supported.
+; Here, only UK English is supported.
+&EN
+
+; List of localised vendor names.
+; Here, only UK English version is specified.
+%{"Symbian Software Ltd."}
+
+; Single, non-localised (global) vendor name.
+:"Symbian Software Ltd."
+
+; Installation header.
+; Only specifies one component name as we only support English.
+; The UID is the package UID - this is not the same as the app's UID, 
+; which is specified in HelloWorld.mmp.
+
+#{"Hello World"},(0xE8000091),1,0,0
+
+; Four files to install for the minimal application
+"HelloWorld.exe"-"!:\sys\bin\HelloWorld.exe"
+"HelloWorld.rsc"-"!:\resource\apps\HelloWorld.rsc"
+"HelloWorld.mbm" - "!:\resource\apps\HelloWorld.mbm"
+"HelloWorld_reg.rsc" - "!:\private\10003a3f\import\apps\HelloWorld_reg.rsc"
+
+; Required files
+; None
+
+; Component .sis files
+; None

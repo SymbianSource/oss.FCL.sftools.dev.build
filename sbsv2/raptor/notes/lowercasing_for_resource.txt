@@ -1,0 +1,16 @@
+Raptor used to generate resource rsg files in lowercase, regardless what was specified 
+in mmp file. That was incompatible with qmake-generated meta data, and caused build errors
+for Qt projects in Linux.
+
+So Raptor is changed to generate rsg files case sensitively according to mmp files. 
+That could cause build errors on Linux if the case in meta data did not match the real case, 
+and people should fix case issues in their source code and metadata, and keep case consistent.
+
+Because this change could stop people building their code, option "--use-rsg-casefolding"
+is provided for temparary use, which tolerates case issues so people could continue to build 
+their code on Linux before they fixed all of them. However, they should not use this option 
+as a permanent work around.
+
+Usage: By default resource files are not case folding, to enable it use option "--use-rsg-casefolding"
+
+This does not affect build on Windows.

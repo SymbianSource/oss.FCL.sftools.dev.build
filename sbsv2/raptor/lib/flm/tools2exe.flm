@@ -44,14 +44,19 @@ TARGETS:=$(EXETARGET) $(INSTALLED)
 include $(FLMHOME)/tools2common.flm
 
 ## Static libraries
+STATICLIBS:=
 ifneq ($(STATICLIBRARY),)
 STATICLIBS:=$(patsubst %,$(RELEASEPATH)/lib%.a,$(STATICLIBRARY))
-LLIBS:=$(OPT.L)"$(RELEASEPATH)" $(patsubst %,$(OPT.l)%,$(STATICLIBRARY))
-#
-ifneq ($(SYSTEMLIBS),)
-LLIBS:=$(LLIBS) $(patsubst %,$(OPT.l)%,$(SYSTEMLIBS))
 endif
-#
+
+ifneq ($(STLPORTLIBRARY),)
+STATICLIBS:=$(STATICLIBS) $(STLPORTBINDIR)/lib$(STLPORTLIBRARY).a
+endif
+
+# System dynamic libraries (e.g. pthreads)
+LLIBS:=
+ifneq ($(SYSTEMLIBS),)
+LLIBS:=$(patsubst %,$(OPT.l)%,$(SYSTEMLIBS))
 endif
 
 ## Link executable
@@ -59,7 +64,7 @@ endif
 define tools2linkexe
 $(EXETARGET): $(OBJECTFILES) $(STATICLIBS)
 	$(call startrule,tools2linkexe) \
-	$(LINKER) $(CFLAGS) $(LFLAGS) $(OPT.O)"$(EXETARGET)" $(call dblquote,$(OBJECTFILES)) $(LLIBS) $(LINKER_OPTIONS) \
+	$(LINKER) $(CFLAGS) $(LFLAGS) $(OPT.O)"$(EXETARGET)" $(call dblquote,$(OBJECTFILES)) $(STATICLIBS) $(LLIBS) $(LINKER_OPTIONS) \
 	$(if $(SAVESPACE),; $(GNURM) -rf $(OUTPUTPATH); true,) \
 	$(call endrule,tools2linkexe)
 

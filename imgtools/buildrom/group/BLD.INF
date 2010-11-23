@@ -59,6 +59,7 @@ PRJ_EXPORTS
 ../tools/featuresdat.pm		/epoc32/tools/featuresdat.pm
 ../tools/features.pl		/epoc32/tools/features.pl
 ../tools/features.pm		/epoc32/tools/features.pm
+../tools/featureconfigurator.pl		/epoc32/tools/featureconfigurator.pl
 
 #ifndef TOOLS2_LINUX 
 ../tools/features.cmd		/epoc32/tools/features.cmd

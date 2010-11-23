@@ -47,12 +47,13 @@ import pluginbox
 from xml.sax.saxutils import escape
 
 
-if not "HOSTPLATFORM" in os.environ or not "HOSTPLATFORM_DIR" in os.environ:
-	print "Error: HOSTPLATFORM and HOSTPLATFORM_DIR must be set in the environment (this is usually done automatically by the startup script)."
+if not "HOSTPLATFORM" in os.environ or not "HOSTPLATFORM_DIR" in os.environ or not "HOSTPLATFORM32_DIR" in os.environ:
+	print "Error: HOSTPLATFORM, HOSTPLATFORM_DIR and HOSTPLATFORM32_DIR must be set in the environment (this is usually done automatically by the startup script)."
 	sys.exit(1)
 
 hostplatform = os.environ["HOSTPLATFORM"].split(" ")
 hostplatform_dir = os.environ["HOSTPLATFORM_DIR"]
+hostplatform32_dir = os.environ["HOSTPLATFORM32_DIR"]
 
 # defaults can use EPOCROOT
 
@@ -238,7 +239,7 @@ class Project(ModelNode):
 class Component(ModelNode):
 	"""A group of projects or, in symbian-speak, a bld.inf.
 	"""
-	def __init__(self, filename, layername="", componentname=""):
+	def __init__(self, filename, layername="commandline", componentname=""):
 		super(Component,self).__init__(filename)
 		# Assume that components are specified in bld.inf files for now
 		# One day that tyranny might end.
@@ -363,7 +364,7 @@ class Layer(ModelNode):
 
 		build.Info("Parallel Parsing: bld.infs split into %d blocks\n", number_blocks)
 		# Cause the binding makefiles to have the toplevel makefile's
-		# name.  The bindee's have __pp appended.
+		# name.  The bindee's have _pp appended.
 		tm = build.topMakefile.Absolute()
 		binding_makefiles = raptor_makefile.MakefileSet(str(tm.Dir()), build.maker.selectors, makefiles=None, filenamebase=str(tm.File()))
 		build.topMakefile = generic_path.Path(str(build.topMakefile) + "_pp")
@@ -372,21 +373,34 @@ class Layer(ModelNode):
 		for block in component_blocks:
 			loop_number += 1
 			specNode = raptor_data.Specification("metadata_" + self.name)
-
-			componentList = " ".join([str(c.bldinf_filename) for c in block])
-
-
-			configList = " ".join([c.name for c in self.configs if c.name != "build" ])
-
+			
+			# root path for generated sysdef files and their partnering makefiles
 			makefile_path = str(build.topMakefile) + "_" + str(loop_number)
+
 			try:
 				os.unlink(makefile_path) # until we have dependencies working properly
 			except Exception:
 				pass
+			
+			pp_system_definition = makefile_path + ".sysdef.xml"
+			
+			try:
+				sys_def_writer = raptor_xml.SystemModel(build, aDoRead=False)
+				for component in block:
+					sys_def_writer.AddComponent(component)
+				sys_def_writer.Write(pp_system_definition)
+				build.Debug("Wrote intermediate parallel-parsing system definition file " + pp_system_definition)
+			except Exception as e:
+				build.Error("Failed to write intermediate parallel-parsing system definition file " + pp_system_definition)
+				raise
+
+
+			configList = " ".join([c.name for c in self.configs if c.name != "build" ])
+
 
 			# add some basic data in a component-wide variant
 			var = raptor_data.Variant()
-			var.AddOperation(raptor_data.Set("COMPONENT_PATHS", componentList))
+			var.AddOperation(raptor_data.Set("PP_SYSTEM_DEFINITION", pp_system_definition))
 			var.AddOperation(raptor_data.Set("MAKEFILE_PATH", makefile_path))
 			var.AddOperation(raptor_data.Set("CONFIGS", configList))
 			var.AddOperation(raptor_data.Set("CLI_OPTIONS", cli_options))
@@ -528,6 +542,7 @@ class Raptor(object):
 		self.doCheck = False
 		self.doWhat = False
 		self.doParallelParsing = False
+		self.doCaseFolding_rsg = False
 		self.mission = Raptor.M_BUILD
 
 		# what platform and filesystem are we running on?
@@ -710,6 +725,10 @@ class Raptor(object):
 			self.Warn(" parallel parsing option must be either 'on' or 'off' (was %s)"  % type)
 			return False
 
+		return True
+
+	def SetRsgCaseFolding(self, TrueOrFalse):
+		self.doCaseFolding_rsg = TrueOrFalse
 		return True
 
 	def AddProject(self, projectName):
@@ -905,21 +924,29 @@ class Raptor(object):
 
 		return self.toolset.check(evaluator, configname)
 
-
 	def CheckConfigs(self, configs):
 		"""	Tool checking for all the buildable configurations
 			NB. We are allowed to use different tool versions for different
 			configurations."""
 
 		tools_ok = True
+		tool_problems = []
 		for b in configs:
 			self.Debug("Tool check for %s", b.name)
-			evaluator = self.GetEvaluator(None, b, gathertools=True)
-			tools_ok = tools_ok and self.CheckToolset(evaluator, b.name)
+			config_ok = False  #default
+			try:
+				evaluator = self.GetEvaluator(None, b, gathertools=True)
+				config_ok = self.CheckToolset(evaluator, b.name)
+			except raptor_data.UninitialisedVariableException,e:
+				tool_problems.append(b.name)
+				self.Error("{0} is a bad configuration: {1}".format(b.name,str(e)))
+
+			tools_ok = tools_ok and config_ok
+
+		if len(tool_problems) > 0:
+			self.FatalError("Build stopped because the following requested configurations are incomplete or invalid: {0}".format(", ".join(tool_problems)))
 
 		return tools_ok
-
-
 
 	def GatherSysModelLayers(self, systemModel, systemDefinitionRequestedLayers):
 		"""Return a list of lists of components to be built.

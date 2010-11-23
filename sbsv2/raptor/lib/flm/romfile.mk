@@ -13,12 +13,11 @@
 # Description:
 #
 
-EPOC_ROOT:=$(patsubst %/,%,$(EPOCROOT))
-TOBLDINF:=$(dir $(subst :,,$(subst $(EPOC_ROOT)/,,$(COMPONENT_META))))
+TOBLDINF:=$(dir $(subst :,,$(subst $(EPOCROOT)/,,$(COMPONENT_META))))
 
 ifeq ($(ROMFILE_$(call sanitise,$(TOBLDINF)$(TARGET).$(REQUESTEDTARGETEXT))),)
     ROMFILE_$(call sanitise,$(TOBLDINF)$(TARGET).$(REQUESTEDTARGETEXT)):=1
-    ROMDIR:=$(EPOC_ROOT)/epoc32/rom/$(TOBLDINF)
+    ROMDIR:=$(EPOCROOT)/epoc32/rom/$(TOBLDINF)
 
     # Default values
     ROMFILETYPE:=file
@@ -82,10 +81,10 @@ ifeq ($(ROMFILE_$(call sanitise,$(TOBLDINF)$(TARGET).$(REQUESTEDTARGETEXT))),)
     	# Add 'TEST' to the .iby filename
     	ROMTEST:=test
         ifeq ($(TEST_OPTION),BOTH)
-            DATATEXT:="data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).auto.bat test/$(MODULE).auto.bat"\n"data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).manual.bat test/$(MODULE).manual.bat"
+            DATATEXT:="data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).auto.bat test/$(VARIANTPLATFORM).auto.bat"\n"data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).manual.bat test/$(VARIANTPLATFORM).manual.bat"
         else
             ifneq ($(TEST_OPTION),NONE)
-                DATATEXT:="data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TEST_OPTION).bat test/$(MODULE).$(TEST_OPTION).bat"
+                DATATEXT:="data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TEST_OPTION).bat test/$(VARIANTPLATFORM).$(TEST_OPTION).bat"
             endif
         endif
     endif
@@ -132,7 +131,7 @@ $(ALLTARGET)::ROMFILE
 ROMFILE::
 	$(call startrule,rombuild) \
 	$(GNUMKDIR) -p $(ROMDIR) \
-	$(if $(ROMFILE_CREATED_$(TOBLDINF)),,&& echo -e "// $(subst $(EPOC_ROOT)/,,$(ROMFILENAME))\n//\n$(DATATEXT)" > $(ROMFILENAME)) \
+	$(if $(ROMFILE_CREATED_$(TOBLDINF)),,&& echo -e "// $(subst $(EPOCROOT)/,,$(ROMFILENAME))\n//\n$(DATATEXT)" > $(ROMFILENAME)) \
 	$(if $(BUILDROMTARGET),&& echo "$(ROMFILETYPE)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(REQUESTEDTARGETEXT)   $(1)$(ROMDECORATIONS)" >> $(ROMFILENAME)) \
 	$(if $(RAMTARGET),&& echo "$(ROMFILETYPE_RAM)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(REQUESTEDTARGETEXT)   $(ROMPATH_RAM)$(ROMFILE_RAM)$(ROMDECORATIONS_RAM)" >> $(ROMFILENAME)) \
 	$(call endrule,buildromfiletarget)

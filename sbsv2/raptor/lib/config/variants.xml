@@ -9,10 +9,15 @@
 	<!-- This variant enables building win32 tools in Linux. Tools2 on Linux only -->
 	<var name="win32">
 		<set name='TOOLS2WIN32' value='1'/>
+		<env name='SBS_MINGW_LINUX_BIN' default='/usr/bin'/>
 		<env name='SBS_MINGW_LINUX_PREFIX' default='i586-mingw32msvc'/>
-		<env name='GCC' default='$(SBS_MINGW_LINUX_PREFIX)-g++' type='tool'/>
-		<env name='ARCHIVER' default='$(SBS_MINGW_LINUX_PREFIX)-ar' type='tool'/>
-		<env name='RANLIB' default='$(SBS_MINGW_LINUX_PREFIX)-ranlib' type='tool'/>
+		<env name='GCC' default='$(SBS_MINGW_LINUX_BIN)/$(SBS_MINGW_LINUX_PREFIX)-g++' type='tool'/>
+		<env name='ARCHIVER' default='$(SBS_MINGW_LINUX_BIN)/$(SBS_MINGW_LINUX_PREFIX)-ar' type='tool'/>
+		<env name='RANLIB' default='$(SBS_MINGW_LINUX_BIN)/$(SBS_MINGW_LINUX_PREFIX)-ranlib' type='tool'/>
+		<env name='SBS_STLPORTINCDIR_WIN32' default='$(EPOCINCLUDE)/tools/stlport' type='path'/>
+		<env name='SBS_STLPORTBINDIR_WIN32' default='$(EPOCROOT)/epoc32/release/tools2' type='path'/>
+                <set name='STLPORTBINDIR' value='$(SBS_STLPORTBINDIR_WIN32)/$(VARIANTTYPE)'/>
+		<set name='SYSTEMINCLUDE' value='$(SBS_STLPORTINCDIR_WIN32)'/>
 		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2/$(VARIANTTYPE)'/>
 		<set name='DOTEXE' value='.exe'/>
 		<set name='PLATMACROS.LINUX' value='$(PLATMACROS.WINDOWS)'/>

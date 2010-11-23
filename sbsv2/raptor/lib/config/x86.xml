@@ -12,7 +12,10 @@
 		<env name="CPPFILT" default="$(GCCPREFIX)c++filt$(DOTEXE)" type="tool"/>
 		<env name="SBS_EFREEZE" default="$(PERL) $(EPOCTOOLS)/efreeze.pl" type="script"/>
 		<set name="EFREEZE" value="$(SBS_EFREEZE)"/>
-		<env name="GENDEF" default="$(PERL) $(EPOCROOT)/epoc32/tools/gendef.pl" type="script"/>
+		<env name="SBS_DEF2DLL" default="$(PERL) $(EPOCTOOLS)/def2dll.pl" type="script"/>
+		<set name="DEF2DLLTOOL" value="$(SBS_DEF2DLL)"/>
+		<env name="SBS_GENDEF" default="$(PERL) $(EPOCTOOLS)/gendef.pl" type="script"/>
+		<set name="GENDEF" value="$(SBS_GENDEF)"/>
 		<env name="SBS_PETRAN" default="$(EPOCTOOLS)/petran$(DOTEXE)" type="tool"/>
 		<set name="PETRAN" value="$(SBS_PETRAN)"/>
 		<env name="SBS_PREPDEF" default="$(PERL) $(EPOCTOOLS)/prepdef.pl" type="script"/>

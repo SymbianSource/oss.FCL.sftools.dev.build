@@ -16,6 +16,7 @@
 
 @SET HOSTPLATFORM=win 32
 @SET HOSTPLATFORM_DIR=win32
+@SET HOSTPLATFORM32_DIR=win32
 
 @REM Automatically find SBS_HOME if it is not set
 @IF NOT "%SBS_HOME%"=="" GOTO foundhome

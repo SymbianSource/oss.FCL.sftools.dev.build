@@ -1,0 +1,20 @@
+It is possible to specify an interface (and therefore an FLM) to be used
+for each component (bld.inf) in a build in addition to the normal target
+FLMs used to create the binaries.
+
+This is done by setting the variable "INTERFACE.component" in the build
+configuration to the name of the required interface.
+
+Operations can then be performed on a per-component basis. An example of
+how to use this can be seen in the test file,
+
+$SBS_HOME/test/smoke_suite/flm_extension.py
+
+which uses the following files to set-up and perform a "documenting" build,
+
+$SBS_HOME/test/smoke_suite/test_resources/docs/docs_build.xml
+$SBS_HOME/test/smoke_suite/test_resources/docs/component.flm
+$SBS_HOME/test/smoke_suite/test_resources/docs/target.flm
+
+By default the variable "INTERFACE.component" is set to "" and no extra FLM
+is included.

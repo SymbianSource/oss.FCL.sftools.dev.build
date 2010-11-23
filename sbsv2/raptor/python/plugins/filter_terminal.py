@@ -24,6 +24,7 @@ import os
 import os.path
 import re
 
+
 class Recipe(object):
 	"""State machine that parses a recipe
 	"""
@@ -98,7 +99,6 @@ class FreezeRecipe(Recipe):
 		self.infoRE = FreezeRecipe.infoRE
 
 Recipe.recipes.append(FreezeRecipe)
-
 
 
 class FilterTerminal(filter_interface.Filter):
@@ -221,15 +221,23 @@ class FilterTerminal(filter_interface.Filter):
 			end = text.rfind("<")
 			self.err_count += 1
 			if not self.analyseonly:
-				sys.stderr.write(str(raptor.name) + ": error: %s\n" \
-						% text[(start + 1):end])
+				m = FilterTerminal.attribute_re.findall(text, 0, start)
+				component = ""
+				for i in m:
+					if i[0] == 'bldinf':
+						component = " (component " + i[1] + ")"
+				sys.stderr.write(self.formatError(text[(start + 1):end] + component))
 		elif text.startswith("<warning"):
 			start = text.find(">")
 			end = text.rfind("<")
 			self.warn_count += 1
 			if not self.analyseonly:
-				sys.stdout.write(str(raptor.name) + ": warning: %s\n" \
-					% text[(start + 1):end])
+				m = FilterTerminal.attribute_re.findall(text, 0, start)
+				component = ""
+				for i in m:
+					if i[0] == 'bldinf':
+						component = " (component " + i[1] + ")"
+				sys.stdout.write(self.formatWarning(text[(start + 1):end] + component))
 		elif text.startswith("<status "):
 			# detect the status report from a recipe
 			if text.find('failed') != -1:

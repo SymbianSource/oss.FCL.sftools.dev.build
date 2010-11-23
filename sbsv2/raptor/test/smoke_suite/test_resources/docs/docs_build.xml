@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+  <!--
+  
+  This variant replaces [some] standard interfaces with docs ones.
+  
+  The result is that a build of armv5.documentation will use different
+  FLMs for DLL, EXE and LIB target types which gather up documentation
+  rather than building the code.
+  
+  There is also a per-component FLM which gets included for every bld.inf
+  in the build so that documentation can be generated at that granularity
+  as well as at the target (or MMP) level.
+  
+  -->
+  <var name="documentation">
+    <set name='INTERFACE.component' value='doc.component'/>
+    <set name='INTERFACE.dll' value='doc.target'/>
+    <set name='INTERFACE.exe' value='doc.target'/>
+    <set name='INTERFACE.lib' value='doc.target'/>
+  </var>
+ 
+  <!-- these are the new interfaces referred to in the above variant -->
+  
+  <interface name="doc.component" extends="base.flm" flm="component.flm">
+    <param name="COMPONENT_META"/>    <!-- absolute path of bld.inf file -->
+    <param name="COMPONENT_NAME"/>    <!-- descriptive name in package definition -->
+	<param name="COMPONENT_LAYER"/>   <!-- layer name in package definition -->
+	<param name="EPOCROOT"/>
+  </interface>
+
+  <interface name="doc.target" extends="base.flm" flm="target.flm">
+    <param name="COMPONENT_META"/>    <!-- absolute path of bld.inf file -->
+    <param name="PROJECT_META"/>      <!-- absolute path of .mmp file -->
+    <param name="TARGET"/>
+    <param name="TARGETTYPE"/>
+  </interface>
+
+</build>

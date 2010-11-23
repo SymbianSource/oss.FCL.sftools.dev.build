@@ -34,7 +34,7 @@ const TInt KRomLoaderHeaderCOFF=2;
 
 static const TInt RombuildMajorVersion=2;
 static const TInt RombuildMinorVersion=19;
-static const TInt RombuildPatchVersion=0;
+static const TInt RombuildPatchVersion=1;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 static string compareROMName = "";
@@ -490,7 +490,7 @@ int main(int argc, char *argv[])  {
 		}
 		return 0;
 	}
-	if (romlogfile[romlogfile.size()-1] == '\\' || romlogfile[romlogfile.size()-1] == '/')
+	if (romlogfile.empty() || romlogfile[romlogfile.size()-1] == '\\' || romlogfile[romlogfile.size()-1] == '/')
 		romlogfile += "ROMBUILD.LOG";
  	H.SetLogFile(romlogfile.c_str());
 	ObeyFileReader *reader=new ObeyFileReader(filename.c_str());

@@ -131,6 +131,44 @@ class TestRaptorXML(unittest.TestCase):
 				
 		# Probably redundant, but return local environment (at least its dictionary) to pre-test state
 		os.environ["SOURCEROOT"] = sourceroot
+
+	def testSystemDefinitionWriting(self):
+		# Test creating a system model not from a file
+		model = raptor_xml.SystemModel(self.__logger, aDoRead=False)
+		sbsHome = os.environ["SBS_HOME"]
+		bldInfDir = os.path.join(sbsHome, "test/smoke_suite/test_resources/sysdef/")
+		bldinf1 = generic_path.Path(os.path.join(bldInfDir,'metadata_export_pre1/bld.inf'))
+		bldinf2 = generic_path.Path(os.path.join(bldInfDir,'dependent_on_exports/bld.inf'))
+		bldinf3 = generic_path.Path(os.path.join(bldInfDir,'metadata_export_pre2/bld.inf'))
+		model.AddComponent(raptor.Component(bldinf1,'layer1'))
+		model.AddComponent(raptor.Component(bldinf2,'layer1'))
+		model.AddComponent(raptor.Component(bldinf3,'layer2'))
+		self.assertTrue(model.HasLayer('layer2'))
+		self.assertTrue(len(model.GetLayerNames())==2)
+		self.__compareFileLists([bldinf1,bldinf2],model.GetLayerComponents('layer1'))
+		self.__compareFileLists([bldinf3],model.GetLayerComponents('layer2'))
+		self.__compareFileLists([bldinf1,bldinf2,bldinf3],model.GetAllComponents())
+
+		# Write out the file
+		epocroot="/"
+		if os.environ.has_key('EPOCROOT'):
+			epocroot = os.environ['EPOCROOT']
+		try:
+			os.mkdir(os.path.join(epocroot,'epoc32/build'))
+		except OSError:
+			# Dir already exists?
+			pass
+		sysdeffile = os.path.join(epocroot,'epoc32/build/sysdefwrite.xml')
+		model.Write(sysdeffile)
+
+		# Reload it and rerun the tests
+		model2 = raptor_xml.SystemModel(self.__logger,generic_path.Path(sysdeffile),"")
+		self.assertTrue(model2.HasLayer('layer2'))
+		self.assertTrue(len(model2.GetLayerNames())==2)
+		self.__compareFileLists([bldinf1,bldinf2],model2.GetLayerComponents('layer1'))
+		self.__compareFileLists([bldinf3],model2.GetLayerComponents('layer2'))
+		self.__compareFileLists([bldinf1,bldinf2,bldinf3],model2.GetAllComponents())
+
 		
 	def __compareFileLists (self, aListOne, aListTwo):
 		
