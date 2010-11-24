@@ -36,11 +36,22 @@ sub loadTools{
 	my @toolModules = split(/,/,$toolList);
 	foreach my $tool (@toolModules) {
 		# An optional command line can be passed to the tool if it is of the form "<toolname>[:<cmdline>]"
-		if ($tool !~ /^([^:]+)(:(.*))?$/) {
+		if ($tool !~ /^((\w:)?[^:]+)(:(.*))?$/) {
 			print "No tool specified as parameter for external tool invocation\n";
 		}
 		my $toolName = $1;
-		my $toolCmdLine = $3;
+		my $toolCmdLine = $4;
+		if($toolName =~ /^(.*)[\\\/]([^\\\/]+)$/){
+			$toolName = $2;
+			my $path = $1;
+			if($path =~ /^EPOCROOT/){
+				my $epocroot = $ENV{EPOCROOT};
+				$epocroot =~ s-\\-\/-g;
+				$epocroot .= "\/" unless ($epocroot =~ /\/$/);
+				$path =~ s-^EPOCROOT[\/\\]?-$epocroot-;
+			}
+			push (@INC, $path);
+		}
 		if($toolName =~ /configpaging/i){			 
 			my %info = (name=>"configpaging", args=>$toolCmdLine ); 
 			push @{$invocations{"invocationpoint2"}}, \%info;
