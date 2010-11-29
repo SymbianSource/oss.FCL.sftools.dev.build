@@ -671,7 +671,7 @@ class TestRaptorMeta(unittest.TestCase):
 	
 	
 		mmpContent = mmpFile.getContent(self.ARMV5)
-		mmpBackend = raptor_meta.MMPRaptorBackend(None, str(mmpFile.filename), str(bldInfObject.filename))
+		mmpBackend = raptor_meta.MMPRaptorBackend(self.raptor, str(mmpFile.filename), str(bldInfObject.filename))
 		mmpParser = mmpparser.MMPParser(mmpBackend)
 		parseresult = None
 		try:
@@ -830,6 +830,7 @@ class TestRaptorMeta(unittest.TestCase):
 
 		def DummyMetaReaderInit(self, aRaptor):
 			self._MetaReader__Raptor = aRaptor
+			self.ExportPlatforms = []
 
 		raptor_meta.MetaReader.__init__ = DummyMetaReaderInit
 
@@ -913,20 +914,20 @@ class TestRaptorMeta(unittest.TestCase):
 		# Test how we resolve known permutations of values given to the .mmp file OPTION_REPLACE keyword
 		mockBackend = raptor_meta.MetaReader(self.raptor)
 		
-		resultsDictList = [ {"bldinf":"Z:/src/romfile/group/tb92/GROUP/bld.inf", "result":"romfile"},
-				    {"bldinf":"/src/romfile/group/tb92/GROUP/bld.inf", "result":"romfile"},
-				    {"bldinf":"Z:/src/romFile/group/tb92/GROUP/another.inf", "result":"romFile"},
-				    {"bldinf":"X:/src/RoMfile/group/bld.inf", "result":"RoMfile"},
-				    {"bldinf":"w:/contacts/group/ONgoing/group/bld.inf", "result":"contacts"},
-				    {"bldinf":"p:/group/bld.inf", "result":"module"},
-				    {"bldinf":"/group/bld.inf", "result":"module"},
-				    {"bldinf":"p:/ONGOING/bld.inf", "result":"module"},
-				    {"bldinf":"/ONGOING/bld.inf", "result":"module"}
-				    ]
+		resultsDictList = [ {"bldinf":"Z:/src/Romfile/group/tb92/GROUP/bld.inf", 'epocroot': 'Z:', "result":"src_romfile_tb92"},
+				    {"bldinf":"/home/src/roMfile/group/tb92/GROUP/bld.inf", 'epocroot': '/home', "result":"src_romfile_tb92"},
+				    {"bldinf":"Z:/src/romFile/tb92/GROUP/another.inf", 'epocroot': 'Z:', "result":"src_romfile_tb92"},
+				    {"bldinf":"X:/some/path/that/is/much/longer/than/expected/bld.inf", 'epocroot': 'X:', "result":"longer_than_expected"},
+				    {"bldinf":"w:/contacts/ONgoing/group/bld.inf", 'epocroot': 'w:', "result":"contacts_ongoing"},
+				    {"bldinf":"p:/group/bld.inf", 'epocroot': 'p:', "result":"module"},
+				    {"bldinf":"/home/group/bld.inf", 'epocroot': '/home', "result":"module"}
+				]
 
 		for result in resultsDictList:
+			mockBackend.ExportPlatforms.append({'EPOCROOT': result['epocroot']})
 			moduleName = mockBackend.ModuleName(result["bldinf"])
 			self.assertEquals(moduleName, result["result"])
+			mockBackend.ExportPlatforms.pop()
 
 		self.restoreMetaReader()
 

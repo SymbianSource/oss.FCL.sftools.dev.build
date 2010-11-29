@@ -399,7 +399,7 @@ E32Rom::E32Rom(CObeyFile *aObey) {
 
 E32Rom::~E32Rom() {
 	if(iSymGen){		
-		delete iSymGen;
+		SymbolGenerator::Release();
 		iSymGen = NULL ;
 	}
 	if(gLowMem)
@@ -699,8 +699,6 @@ TInt E32Rom::CreateExtension(MRomImage* aKernelRom)
 	if (r!=KErrNone)
 		{
 		Print(EError, "LoadContents failed - return code %d\n", r);
-		if(iSymGen)
-			iSymGen->WaitThreads();
 		return r;
 		}
 	iExtensionRomHeader->iRomRootDirectoryList = dummy.iRomRootDirectoryList;
@@ -708,8 +706,6 @@ TInt E32Rom::CreateExtension(MRomImage* aKernelRom)
 	iLoaderHeader->SetUp(iObey);
 	FinaliseExtensionHeader(aKernelRom);
 	DisplayExtensionHeader();
-	if(iSymGen)
-		iSymGen->WaitThreads();
 	return KErrNone;
 	}
 	
@@ -740,8 +736,6 @@ TInt E32Rom::Create()
 	if (r!=KErrNone)
 		{
 		Print(EError, "LoadContents failed - return code %d\n", r);
-		if(iSymGen)
-			iSymGen->WaitThreads();
 		return r;
 		}
 
@@ -749,16 +743,12 @@ TInt E32Rom::Create()
 	if(r!=KErrNone)
 		{
 		Print(EError, "Setup pages information failed - return code %d\n", r);
-		if(iSymGen)
-			iSymGen->WaitThreads();
 		return r;
 		}
 	
 	r = CheckUnpagedMemSize(); // check for unpaged memory overflow
 	if(r!=KErrNone)
 	{
-		if(iSymGen)
-			iSymGen->WaitThreads();
 		return r;
 	}
 	
@@ -766,8 +756,6 @@ TInt E32Rom::Create()
 	if(r!=KErrNone)
 		{
 		Print(EError, "CompressPages failed - return code %d\n", r);
-		if(iSymGen)
-			iSymGen->WaitThreads();
 		return r;
 		}
 
@@ -795,8 +783,6 @@ TInt E32Rom::Create()
 	TUint testCheckSum = HMem::CheckSum((TUint *)iHeader, iHeader->iRomSize);
 	Print(ELog, "Rom 32bit words sum to   %08x\n", testCheckSum);
 	if (testCheckSum != iObey->iCheckSum){
-		if(iSymGen)
-			iSymGen->WaitThreads();
 		return Print(EError, "Rom checksum is incorrect: %08x should be %08x\n",
 					testCheckSum, iObey->iCheckSum);
 	}
@@ -836,8 +822,6 @@ TInt E32Rom::Create()
 					}
 			}
 		}
-	if(iSymGen)
-			iSymGen->WaitThreads();
 	return KErrNone;
 	}
 
@@ -1325,9 +1309,9 @@ char *E32Rom::LayoutRom(char *romaddr)
 	TInt fileCount=0;
 	if(gGenSymbols && !iSymGen) {
 		string filename(iObey->GetFileName());
-		filename.erase(filename.length() - 3,3);
-		filename.append("symbol");
-		iSymGen = new SymbolGenerator(filename.c_str(),gThreadNum - 1);		
+		iSymGen = SymbolGenerator::GetInstance();
+		iSymGen ->SetImageType(ERomImage);
+		iSymGen ->SetSymbolFileName(filename);		
 	}
 		
 	//
@@ -1399,9 +1383,7 @@ char *E32Rom::LayoutRom(char *romaddr)
 	mainptr->Extend(offset);
 	iOverhead +=offset;
 	if(iSymGen){
-		SymGenContext context ;
-		memset(&context,0,sizeof(SymGenContext));
-		iSymGen->AddEntry(context);
+		iSymGen->SetFinished();
 	}
 	return (char*)mainptr->iImagePtr;
  	}
@@ -1454,8 +1436,7 @@ void E32Rom::LayoutFile(TRomBuilderEntry* current, TAddressRange& aMain, TAddres
 			return;		// first section has overflowed
 		current->FixupRomEntries(size);
 		if(iSymGen) {
-			SymGenContext context ;
-			memset(&context,0,sizeof(SymGenContext));
+			TPlacedEntry context ;
 			context.iFileName = current->iFileName ;
 			context.iDataAddress = savedAddr ;
 			iSymGen->AddEntry(context); 
@@ -1470,8 +1451,7 @@ void E32Rom::LayoutFile(TRomBuilderEntry* current, TAddressRange& aMain, TAddres
 		iHeader->iHcrFileAddress =  current->iHeaderRange.iImageAddr ;
 		TRACE(TAREA, Print(ELog, "iHeader->iHcrFileAddress = %08x\n", iHeader->iHcrFileAddress));	
 		if(iSymGen) {
-			SymGenContext context ;
-			memset(&context,0,sizeof(SymGenContext));
+			TPlacedEntry context ;
 			context.iFileName = current->iFileName ;
 			context.iDataAddress = savedAddr ;
 			iSymGen->AddEntry(context); 
@@ -1535,7 +1515,7 @@ void E32Rom::LayoutFile(TRomBuilderEntry* current, TAddressRange& aMain, TAddres
 	LoadFileToRom(current);
 	TRomImageHeader *header = current->iRomImageHeader;
 	if(iSymGen){
-		SymGenContext context  ;
+		TPlacedEntry context  ;
 		context.iFileName = current->iFileName ;		
 		context.iTotalSize = section1size;
 		context.iCodeAddress = header->iCodeAddress; 

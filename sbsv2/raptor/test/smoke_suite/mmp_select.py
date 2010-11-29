@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -30,10 +30,10 @@ def run():
 		"$(EPOCROOT)/epoc32/release/winscw/urel/HelloWorld.exe"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/basics/helloworld/Bld.inf', [
-		"helloworld_exe/armv5/udeb/HelloWorld.o",
-		"helloworld_exe/armv5/urel/HelloWorld.o",
-		"helloworld_exe/winscw/udeb/HelloWorld.o",
-		"helloworld_exe/winscw/urel/HelloWorld.o"
+		"HelloWorld_exe/armv5/udeb/HelloWorld.o",
+		"HelloWorld_exe/armv5/urel/HelloWorld.o",
+		"HelloWorld_exe/winscw/udeb/HelloWorld.o",
+		"HelloWorld_exe/winscw/urel/HelloWorld.o"
 	])
 	t.run()
 	return t

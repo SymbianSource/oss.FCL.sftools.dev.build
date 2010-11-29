@@ -22,7 +22,7 @@ def run():
 	result = SmokeTest.PASS
 
 	description = """This test covers parallel parsing."""
-	command = "cd $(SBS_HOME)/test/smoke_suite/test_resources/pp/ && sbs --command=$(SBS_HOME)/test/smoke_suite/test_resources/pp/ppbldinf_commandfile -c armv5 -c winscw --pp=on --noexport -m ${SBSMAKEFILE} -f - | grep recipe "
+	command = "mkdir -p $(EPOCROOT)/epoc32/build && cd $(SBS_HOME)/test/smoke_suite/test_resources/pp/ && sbs --command=$(SBS_HOME)/test/smoke_suite/test_resources/pp/ppbldinf_commandfile -c armv5 -c winscw --pp=on --noexport -m ${SBSMAKEFILE} -f - | grep recipe "
 
 	mmpcount = 10 # how many mmps in this parallel parsing test
 

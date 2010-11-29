@@ -44,7 +44,7 @@ def run():
 		"$(EPOCROOT)/epoc32/tools/dependency.exe"
 	]
 	linuxTargets = [
-		"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/rel/dependency",
+		"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/rel/dependency",
 		"$(EPOCROOT)/epoc32/tools/dependency"
 	]
 
@@ -68,7 +68,7 @@ def run():
 	if t.result == AntiTargetSmokeTest.SKIP:
 		hostPlatform = "linux"
 		hostPlatformTargets = genericTargets + linuxTargets
-		hostPlatformOffset = "$(HOSTPLATFORM_DIR)/"
+		hostPlatformOffset = "$(HOSTPLATFORM32_DIR)/"
 		t.targets = hostPlatformTargets
 		t.run(hostPlatform)
 	
@@ -129,7 +129,7 @@ def run():
 	buildLocation = "$(EPOCROOT)/epoc32/build/" + BldInfFile.outputPathFragment('smoke_suite/test_resources/dependencies/bld.inf') + "/dependency_"
         # use one long bash command so that we can capture 
 	# the output in a way that isn't messed up with all the ordering confused.
-	t.command = " mkdir -p $(EPOCROOT)/epoc32/build/smoketestlogs ; { sleep 1 ; set -x ; \
+	t.command = " echo \"making directory for logfile ${SBSLOGFILE}\" ; mkdir -p `dirname ${SBSLOGFILE} 2>/dev/null` ; { sleep 1 ; set -x ; \
 touch smoke_suite/test_resources/dependencies/dependency.cpp; \
 echo INVALIDATE_ARMV5_DEPENDENCY_FILE >> %s/armv5/urel/dependency.o.d ; \
 echo INVALIDATE_WINSCW_DEPENDENCY_FILE >> %s/winscw/urel/dependency.o.d ;\

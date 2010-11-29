@@ -20,6 +20,7 @@
 		<set name="AAPCS_OPTION" value="--apcs /inter"/>
 		<set name="ARCHIVER_CREATE_OPTION" value="--create"/>
 		<set name="ARM_INSTRUCTION_SET" value="--arm"/>
+		<set name="ASM_FLAGS" value="" />
 		<set name="ASM_OUTPUT_OPTION" value="-o"/>
 		<set name="ASSEMBLER_LISTING_OPTION" value="-S"/>
 		<set name="BPABI_OPTION" value="--bpabi"/>

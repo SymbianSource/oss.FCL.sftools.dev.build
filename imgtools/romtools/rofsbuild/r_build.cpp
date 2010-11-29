@@ -68,6 +68,9 @@ extern TInt  gDataPagingOverride;
 extern TInt  gLogLevel;
 extern bool gCache;
 extern TBool gIsOBYUTF8;
+
+#define MAX_LINE  65535
+
 TBool gDriveImage=EFalse;	// for drive image support.
 
 
@@ -625,7 +628,7 @@ TInt TRomNode::Place( TUint8* aDestBase )
 			
 			if(offset > 0xFFFF)
 			{
-				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, offset);
+				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, (int)offset);
 				throw "fail";
 			}
 			
@@ -640,7 +643,7 @@ TInt TRomNode::Place( TUint8* aDestBase )
 			TUint32 offset = ((((TUint8*) entry) - dirBlockBase) >> 2);
 			if(offset > 0xFFFF)
 			{
-				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, offset);
+				printf("ERROR: Offset overflow: name=%s, OFFSET = %d\n", node->iName, (int)offset);
 				throw "fail";
 			}
 			
@@ -789,6 +792,18 @@ void TRomNode::AddNodeForSameFile(TRomNode* aPreviousNode, TRomBuilderEntry* aFi
 		}
 	iNextNodeForSameFile = aPreviousNode;
 	}
+void TRomNode::FlushLogMessages()
+	{
+	if(iEntry)
+		{
+		for(int i = 0; i < (int)iEntry->iLogMessages.size(); i++)
+			{
+			TLogItem& aLogItem = iEntry->iLogMessages[i];
+			Print(aLogItem.iPrintType, aLogItem.iLogMessage.c_str());
+			}
+		iEntry->iLogMessages.clear();
+		}
+	}
 
 
 
@@ -862,13 +877,23 @@ void TRomBuilderEntry::SetRomNode(TRomNode* aNode)
 // Returns the number of bytes used, or -ve error code
 TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE ){
 
-
+	char tmpbuf[MAX_LINE];
+	TLogItem tmpLog;
 	TUint compression = 0;
 	TBool executable = iExecutable;
-	Print(ELog,"Reading file %s to image\n", iFileName );
+	sprintf(tmpbuf,"Reading file %s to image\n", iFileName );
+	tmpLog.iPrintType = ELog;
+	tmpLog.iLogMessage = tmpbuf;
+	iLogMessages.push_back(tmpLog);
+
 	TUint32 size = HFile::GetLength(iFileName);
 	if (size==0)
-		Print(EWarning, "File %s does not exist or is 0 bytes in length.\n",iFileName);
+	{
+		sprintf(tmpbuf, "File %s does not exist or is 0 bytes in length.\n",iFileName);
+		tmpLog.iPrintType = EWarning;
+		tmpLog.iLogMessage = tmpbuf;
+		iLogMessages.push_back(tmpLog);
+	}
 	if (aDest == NULL) {
 		aMaxSize = size << 1;
 		aMaxSize = (aMaxSize>0) ? aMaxSize : 2;
@@ -890,7 +915,10 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 		// is it really a valid E32ImageFile?
 		if (r != KErrNone)
 		{
-			Print(EWarning, "File '%s' is not a valid executable.  Placing file as data.\n", iFileName);
+			sprintf(tmpbuf, "File '%s' is not a valid executable.  Placing file as data.\n", iFileName);
+			tmpLog.iPrintType = EWarning;
+			tmpLog.iLogMessage = tmpbuf;
+			iLogMessages.push_back(tmpLog);
 			executable = EFalse;
 		}
 		else
@@ -912,7 +940,10 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 				while( aDllEntry ){
 					if(aDllEntry->iOrdinal != (TUint32)-1){
 						if(aDllEntry->iOrdinal < 1 || aDllEntry->iOrdinal > (TUint)f.iOrigHdr->iExportDirCount){
-							Print(EWarning, "Invalid ordinal %d specified for DLL %s\n", aDllEntry->iOrdinal, iRomNode->iName);
+							sprintf(tmpbuf, "Invalid ordinal %d specified for DLL %s\n", (unsigned int) aDllEntry->iOrdinal, iRomNode->iName);
+							tmpLog.iPrintType = EWarning;
+							tmpLog.iLogMessage = tmpbuf;
+							iLogMessages.push_back(tmpLog);
 							aDllEntry = aDllEntry->NextDllDataEntry();
 							continue;
 						}
@@ -931,7 +962,10 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 						}
 						else
 						{
-							Print(EWarning, "Patchdata failed as address pointed by ordinal %d of DLL %s doesn't lie within Code or Data section limits\n", aDllEntry->iOrdinal, iRomNode->iName);
+							sprintf(tmpbuf, "Patchdata failed as address pointed by ordinal %d of DLL %s doesn't lie within Code or Data section limits\n", (unsigned int) aDllEntry->iOrdinal, iRomNode->iName);
+							tmpLog.iPrintType = EWarning;
+							tmpLog.iLogMessage = tmpbuf;
+							iLogMessages.push_back(tmpLog);
 						}
 					}
 					else if(aDllEntry->iDataAddress != (TLinAddr)-1){
@@ -948,7 +982,10 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 						}
 						else
 						{
-							Print(EWarning, "Patchdata failed as address 0x%x of DLL %s doesn't lie within Code or Data section limits\n", aDllEntry->iOrdinal, iRomNode->iName);
+							sprintf(tmpbuf, "Patchdata failed as address 0x%x of DLL %s doesn't lie within Code or Data section limits\n", (unsigned int) aDllEntry->iOrdinal, iRomNode->iName);
+							tmpLog.iPrintType = EWarning;
+							tmpLog.iLogMessage = tmpbuf;
+							iLogMessages.push_back(tmpLog);
 						}
 					}
 					aDllEntry = aDllEntry->NextDllDataEntry();
@@ -956,7 +993,10 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 			}
 
 			compression = f.iHdr->CompressionType();
-			Print(ELog,"Original file:'%s' is compressed by method:%08x\n", iFileName, compression);
+			sprintf(tmpbuf,"Original file:'%s' is compressed by method:%08x\n", iFileName, compression);
+			tmpLog.iPrintType = ELog;
+			tmpLog.iLogMessage = tmpbuf;
+			iLogMessages.push_back(tmpLog);
 
 
 			TUint32 oldFileComp;
@@ -1070,19 +1110,25 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 
 				if( newFileComp == 0)
 				{
-					Print(ELog,"Decompressing executable '%s'\n", iFileName);
+					sprintf(tmpbuf,"Decompressing executable '%s'\n", iFileName);
 					f.iHdr->iCompressionType = 0;
+					tmpLog.iPrintType = ELog;
+					tmpLog.iLogMessage = tmpbuf;
+					iLogMessages.push_back(tmpLog);
 				}
 				else
 				{
-					Print(ELog,"Compressing executable '%s' with method:%08x\n", iFileName, newFileComp);
+					sprintf(tmpbuf,"Compressing executable '%s' with method:%08x\n", iFileName, (unsigned int) newFileComp);
+					tmpLog.iPrintType = ELog;
+					tmpLog.iLogMessage = tmpbuf;
+					iLogMessages.push_back(tmpLog);
 					f.iHdr->iCompressionType = newFileComp;
 				}
 				f.UpdateHeaderCrc();
 				if (overflow)
 				{
 					// need to check if the compressed file will fit in the image
-					//TODO the checking will slow down the build process, should do it later along with the writing on aDest.
+					
 					TUint32 compressedSize;
 					char * buffer = new char [size];
 #if defined(__LINUX__)
@@ -1103,8 +1149,14 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 			}
 			if (overflow)
 			{
-				Print(EError, "Can't fit '%s' in image\n", iFileName);
-				Print(EError, "Overflowed by approximately 0x%x bytes.\n", size - aMaxSize);
+				sprintf(tmpbuf, "Can't fit '%s' in image\n", iFileName);
+				tmpLog.iPrintType = EError;
+				tmpLog.iLogMessage = tmpbuf;
+				iLogMessages.push_back(tmpLog);
+				sprintf(tmpbuf, "Overflowed by approximately 0x%x bytes.\n", (unsigned int) (size - aMaxSize));
+				tmpLog.iPrintType = EError;
+				tmpLog.iLogMessage = tmpbuf;
+				iLogMessages.push_back(tmpLog);
 				exit(667);
 			}
 
@@ -1124,11 +1176,27 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 					compression = atoi(entryref->GetCachedFileCompressionID());
 					memcpy(&iUids[0], aDest, sizeof(iUids));
 					if (compression)
-						Print(ELog,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, size, compression);
+					{
+						sprintf(tmpbuf,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, (unsigned int) size, (unsigned int) compression);
+
+						tmpLog.iPrintType = ELog;
+						tmpLog.iLogMessage = tmpbuf;
+						iLogMessages.push_back(tmpLog);
+					}
 					else if (iExecutable)
-						Print(ELog,"Executable File '%s' size: %08x\n", iFileName, size);
+					{
+						sprintf(tmpbuf,"Executable File '%s' size: %08x\n", iFileName, (unsigned int) size);
+						tmpLog.iPrintType = ELog;
+						tmpLog.iLogMessage = tmpbuf;
+						iLogMessages.push_back(tmpLog);
+					}
 					else
-						Print(ELog,"File '%s' size: %08x\n", iFileName, size);
+					{
+						sprintf(tmpbuf,"File '%s' size: %08x\n", iFileName, (unsigned int) size);
+						tmpLog.iPrintType = ELog;
+						tmpLog.iLogMessage = tmpbuf;
+						iLogMessages.push_back(tmpLog);
+					}
 					iRealFileSize = size;	// required later when directory is written
 
 					return size;
@@ -1183,7 +1251,10 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 					}
 					catch (CacheException ce)
 					{
-						Print(EWarning, "Cache brings up an exception (%s) when processes %s\r\n", ce.GetErrorMessage(), iFileName);
+						sprintf(tmpbuf, "Cache brings up an exception (%s) when processes %s\r\n", ce.GetErrorMessage(), iFileName);
+						tmpLog.iPrintType = EWarning;
+						tmpLog.iLogMessage = tmpbuf;
+						iLogMessages.push_back(tmpLog);
 					}
 				}
 			}
@@ -1196,8 +1267,14 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 	{
 		if ( size > aMaxSize )
 		{
-			Print(EError, "Can't fit '%s' in image\n", iFileName);
-			Print(EError, "Overflowed by approximately 0x%x bytes.\n", size - aMaxSize);
+			sprintf(tmpbuf, "Can't fit '%s' in image\n", iFileName);
+			tmpLog.iPrintType = EError;
+			tmpLog.iLogMessage = tmpbuf;
+			iLogMessages.push_back(tmpLog);
+			sprintf(tmpbuf, "Overflowed by approximately 0x%x bytes.\n", (unsigned int) (size - aMaxSize));
+			tmpLog.iPrintType = EError;
+			tmpLog.iLogMessage = tmpbuf;
+			iLogMessages.push_back(tmpLog);
 			exit(667);
 		}
 		size = HFile::Read(iFileName, (TAny *)aDest);
@@ -1206,11 +1283,26 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 	}
 
 	if (compression)
-		Print(ELog,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, size, compression);
+	{
+		sprintf(tmpbuf,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, (unsigned int) size, (unsigned int) compression);
+		tmpLog.iPrintType = ELog;
+		tmpLog.iLogMessage = tmpbuf;
+		iLogMessages.push_back(tmpLog);
+	}
 	else if (iExecutable)
-		Print(ELog,"Executable File '%s' size: %08x\n", iFileName, size);
+	{
+		sprintf(tmpbuf,"Executable File '%s' size: %08x\n", iFileName, (unsigned int) size);
+		tmpLog.iPrintType = ELog;
+		tmpLog.iLogMessage = tmpbuf;
+		iLogMessages.push_back(tmpLog);
+	}
 	else
-		Print(ELog,"File '%s' size: %08x\n", iFileName, size);
+	{
+		sprintf(tmpbuf,"File '%s' size: %08x\n", iFileName, (unsigned int) size);
+		tmpLog.iPrintType = ELog;
+		tmpLog.iLogMessage = tmpbuf;
+		iLogMessages.push_back(tmpLog);
+	}
 	iCompressEnabled = compression;
 	iRealFileSize = size;	// required later when directory is written
 
@@ -1350,4 +1442,12 @@ void TRomBuilderEntry::DisplaySize(TPrintType aWhere)
 			Print(aWhere, "%s\t%d\n", iFileName, RealFileSize());
 		}
 
+}
+char* TRomBuilderEntry::GetSystemFullName()
+{
+	TBool aIgnoreHiddenAttrib = ETrue;
+	TInt aLen = iRomNode->FullNameLength(aIgnoreHiddenAttrib);
+	char *aBuf = new char[aLen+1];
+	iRomNode->GetFullName(aBuf, aIgnoreHiddenAttrib);
+	return aBuf;
 }

@@ -55,7 +55,7 @@ Function responsible to return the Hash value for the received string.
 @internalComponent
 @released
 
-@param aString - const string& on which Hash value calcualtion to be done
+@param aString - const string& on which Hash value calcualtion 
 */
 int HashTable::Hash(const string& aString) {
 	unsigned int hashVal = 0;

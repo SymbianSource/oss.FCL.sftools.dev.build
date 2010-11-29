@@ -1440,7 +1440,12 @@ class MMPRaptorBackend(MMPBackend):
 			self.__debug("Set REQUESTEDTARGETEXT to " + self.__TARGETEXT.lower())
 
 			self.BuildVariant.AddOperation(raptor_data.Set("TARGET", self.__TARGET))
-			self.BuildVariant.AddOperation(raptor_data.Set("TARGET_lower", lowercase_TARGET))
+			# case folding: case insensitive for resources
+			if self.__Raptor.doCaseFolding_rsg:
+				self.BuildVariant.AddOperation(raptor_data.Set("TARGET_var", lowercase_TARGET))
+			else:
+				self.BuildVariant.AddOperation(raptor_data.Set("TARGET_var", self.__TARGET))
+
 			if  lowercase_TARGET !=  self.__TARGET:
 				self.__debug("TARGET is not lowercase: '%s' - might cause BC problems." % self.__TARGET)
 		elif varname=='TARGETTYPE':
@@ -1448,7 +1453,7 @@ class MMPRaptorBackend(MMPBackend):
 			self.__targettype=toks[1]
 			if  self.__targettype.lower() == "none":
 				self.BuildVariant.AddOperation(raptor_data.Set("TARGET", ""))
-				self.BuildVariant.AddOperation(raptor_data.Set("TARGET_lower",""))
+				self.BuildVariant.AddOperation(raptor_data.Set("TARGET_var",""))
 				self.BuildVariant.AddOperation(raptor_data.Set("REQUESTEDTARGETEXT", ""))
 			self.BuildVariant.AddOperation(raptor_data.Set(varname,toks[1].lower()))
 
@@ -1785,9 +1790,14 @@ class MMPRaptorBackend(MMPBackend):
 
 			target = source.File().rsplit(".", 1)[0]	# remove the extension
 			variant.AddOperation(raptor_data.Set("TARGET", target))
-			variant.AddOperation(raptor_data.Set("TARGET_lower", target.lower()))
-
-			header = target.lower() + ".rsg"			# filename policy
+			
+			if self.__Raptor.doCaseFolding_rsg:
+				variant.AddOperation(raptor_data.Set("TARGET_var", target.lower()))
+				header = target.lower() + ".rsg"
+			else:
+				variant.AddOperation(raptor_data.Set("TARGET_var", target))
+				header = target + ".rsg"
+			 
 			variant.AddOperation(raptor_data.Set("HEADER", header))
 
 			if sysRes:
@@ -1915,10 +1925,16 @@ class MMPRaptorBackend(MMPBackend):
 		target = self.__current_resource.rsplit("/",1)[-1]
 		target = target.rsplit(".",1)[0]
 		self.__currentResourceVariant.AddOperation(raptor_data.Set("TARGET", target))
-		self.__currentResourceVariant.AddOperation(raptor_data.Set("TARGET_lower", target.lower()))
+
+		if self.__Raptor.doCaseFolding_rsg:
+			self.__currentResourceVariant.AddOperation(raptor_data.Set("TARGET_var", target.lower()))
+			self.__current_resource_header = target.lower() + ".rsg"
+		else:
+			self.__currentResourceVariant.AddOperation(raptor_data.Set("TARGET_var", target))
+			self.__current_resource_header = target + ".rsg"
+
 		self.__headerspecified = False
 		self.__headeronlyspecified = False
-		self.__current_resource_header = target.lower() + ".rsg"
 
 		return "OK"
 
@@ -1935,8 +1951,14 @@ class MMPRaptorBackend(MMPBackend):
 		if varname == "TARGET":
 			target_withext = varvalue.rsplit("/\\",1)[-1]
 			target = target_withext.rsplit(".",1)[0]
-			self.__current_resource_header = target.lower() + ".rsg"
-			self.__currentResourceVariant.AddOperation(raptor_data.Set("TARGET_lower", target.lower()))
+
+			if self.__Raptor.doCaseFolding_rsg:
+				self.__current_resource_header = target.lower() + ".rsg"
+				self.__currentResourceVariant.AddOperation(raptor_data.Set("TARGET_var", target.lower()))
+			else:
+				self.__current_resource_header = target + ".rsg"
+				self.__currentResourceVariant.AddOperation(raptor_data.Set("TARGET_var", target))
+
 			self.__debug("Set resource "+varname+" to " + target)
 			self.__currentResourceVariant.AddOperation(raptor_data.Set(varname,target))
 		if varname == "TARGETPATH":
@@ -2007,7 +2029,7 @@ class MMPRaptorBackend(MMPBackend):
 
 		self.__currentBitmapVariant = raptor_data.Variant(name = toks[1].replace('.','_'))
 		# Use BMTARGET and BMTARGET_lower because that prevents
-		# confusion with the TARGET and TARGET_lower of our parent MMP
+		# confusion with the TARGET and TARGET_var of our parent MMP
 		# when setting the OUTPUTPATH.  This in turn allows us to
 		# not get tripped up by multiple mbms being generated with
 		# the same name to the same directory.
@@ -2360,9 +2382,9 @@ class MMPRaptorBackend(MMPBackend):
 		self.BuildVariant.AddOperation(raptor_data.Set("DEBUGGABLE", self.__debuggable))
 
 		if self.__explicitversion:
-			self.BuildVariant.AddOperation(raptor_data.Append("UNIQUETARGETPATH","$(TARGET_lower)_$(VERSIONHEX)_$(REQUESTEDTARGETEXT)",'/'))
+			self.BuildVariant.AddOperation(raptor_data.Append("UNIQUETARGETPATH","$(TARGET_var)_$(VERSIONHEX)_$(REQUESTEDTARGETEXT)",'/'))
 		else:
-			self.BuildVariant.AddOperation(raptor_data.Append("UNIQUETARGETPATH","$(TARGET_lower)_$(REQUESTEDTARGETEXT)",'/'))
+			self.BuildVariant.AddOperation(raptor_data.Append("UNIQUETARGETPATH","$(TARGET_var)_$(REQUESTEDTARGETEXT)",'/'))
 
 		# Put the list of sourcefiles in with one Set operation - saves memory
 		# and performance over using multiple Append operations.
@@ -2586,6 +2608,7 @@ class MetaReader(object):
 			flm_export_dir = evaluator.CheckedGet("FLM_EXPORT_DIR")
 			detail['FLM_EXPORT_DIR'] = generic_path.Path(flm_export_dir)
 			detail['CACHEID'] = flm_export_dir
+			detail['INTERFACE.component'] = evaluator.Get('INTERFACE.component')
 			if raptor_utilities.getOSPlatform().startswith("win"):
 				detail['PLATMACROS'] = evaluator.CheckedGet("PLATMACROS.WINDOWS")
 			else:
@@ -2646,7 +2669,7 @@ class MetaReader(object):
 		    	+ detail['PLATFORM'] \
 		    	+ detail['PLATMACROS']
 
-		    # Keep a short version of the key for use in filenames.
+			# Keep a short version of the key for use in filenames.
 			uniq = hashlib.md5()
 			uniq.update(key)
 
@@ -2840,14 +2863,10 @@ class MetaReader(object):
 	def ModuleName(self,aBldInfPath):
 		"""Calculate the name of the ROM/emulator batch files that run the tests"""
 
-		def LeftPortionOf(pth,sep):
-			""" Internal function to return portion of str that is to the left of sep. 
-			The split is case-insensitive."""
-			length = len((pth.lower().split(sep.lower()))[0])
-			return pth[0:length]
-			
-		modulePath = LeftPortionOf(LeftPortionOf(os.path.dirname(aBldInfPath), "group"), "ongoing")
-		moduleName = os.path.basename(modulePath.strip("/"))
+		epocroot = str(self.ExportPlatforms[0]['EPOCROOT'])
+		modulePath = os.path.dirname(aBldInfPath).replace(epocroot, '', 1).lower().replace('group', '')
+		# Only join the last 3 folder names in case the path is very long
+		moduleName = '_'.join([i for i in modulePath.split('/') if i][-3:])
 		
 		# Ensure that ModuleName does not return blank, if the above calculation determines
 		# that moduleName is blank
@@ -2902,6 +2921,11 @@ class MetaReader(object):
 				# remember what component this spec node comes from for later
 				specNode.component = component
 
+				# if there is a per-component interface for this platform
+				# then set it for this spec node.
+				if bp['INTERFACE.component']:
+					specNode.SetInterface(bp['INTERFACE.component'])
+					
 				# add some basic data in a component-wide variant
 				var = raptor_data.Variant(name='component-wide-settings-' + plat)
 				var.AddOperation(raptor_data.Set("COMPONENT_META",str(component.bldinf_filename)))

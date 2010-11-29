@@ -19,7 +19,7 @@
 #
 # both of these are done automatically by the installer builder.
 
-version=(2,15,2,"ISODATE","symbian build system","CHANGESET")
+version=(2,15,3,"ISODATE","symbian build system","CHANGESET")
 
 def numericversion():
 	"""Raptor version string"""

@@ -1,3 +1,13 @@
+Version 3.32.1 (BUILDROM)
+===============
+Released by Lorence Wang, 24/11/2010
+	1) ou1cimx1#657440 [MCL]external tools cannot specify path.
+
+Version 3.32.0 (BUILDROM)
+===============
+Released by Ross Qin, 18/11/2010
+	1) Moving feature configuration out of the buildrom scope.
+	
 Version 3.31.0 (BUILDROM)
 ===============
 Released by Lorence Wang, 20/10/2010
