@@ -1072,33 +1072,33 @@ TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword){
 	if (isPeFile)
 		iNumberOfPeFiles++;
 
-	// check the PC file exists
-	char* nname = NormaliseFileName(iReader.Word(1)); 
-	if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(nname))
-	{
-		char* tempnname = strdup(nname);
-		unsigned int namelen = 0;
-		if(UniConv::UTF82DefaultCodePage(tempnname, strlen(tempnname), &nname, &namelen) < 0)
-		{
-			Print(EError, "Invalid filename encoding: %s\n", tempnname);
-			free(tempnname);
-			iMissingFiles++;
-			delete[] nname;
-			return EFalse;
-		}
-		free(tempnname);
-	}
-	ifstream test(nname,ios_base::binary | ios_base::in); 
-
-	if (!test.is_open()) {
-		Print(EError,"Cannot open file %s for input.\n",iReader.Word(1));
-		if(EKeywordHardwareConfigRepositoryData == aKeyword) {
-			delete []nname;
-			return EFalse ;
-		}
-		iMissingFiles++;
-	}
 	if(EKeywordHardwareConfigRepositoryData == aKeyword) { // check hcr file 
+		// check the PC file exists
+		char* nname = NormaliseFileName(iReader.Word(1)); 
+		if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(nname))
+		{
+			char* tempnname = strdup(nname);
+			unsigned int namelen = 0;
+			if(UniConv::UTF82DefaultCodePage(tempnname, strlen(tempnname), &nname, &namelen) < 0)
+			{
+				Print(EError, "Invalid filename encoding: %s\n", tempnname);
+				free(tempnname);
+				iMissingFiles++;
+				delete[] nname;
+				return EFalse;
+			}
+			free(tempnname);
+		}
+		ifstream test(nname,ios_base::binary | ios_base::in); 
+	
+		if (!test.is_open()) {
+			Print(EError,"Cannot open file %s for input.\n",iReader.Word(1));
+			if(EKeywordHardwareConfigRepositoryData == aKeyword) {
+				delete []nname;
+				return EFalse ;
+			}
+			iMissingFiles++;
+		}
 
 		TUint32 magicWord = 0;
 		test.read(reinterpret_cast<char*>(&magicWord),sizeof(TUint32));
@@ -1108,10 +1108,9 @@ TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword){
 			delete []nname;
 			return EFalse;
 		}
-
+		test.close();
+		delete []nname;
 	}
-	test.close();
-	delete []nname;
 
 
 	TBool endOfName=EFalse; 
