@@ -1,3 +1,13 @@
+Version 2.19.2 (ROMBUILD)
+===============
+Released by Jason Cui, 29/11/2010
+	1) Remove "repeated" file existence checking
+
+Version 2.17.2 (ROFSBUILD)
+===============
+Released by Jason Cui, 29/11/2010
+	1) Remove "repeated" file existence checking
+
 Version 2.19.1 (ROMBUILD)
 ===============
 Released by Lorence Wang, 19/11/2010
