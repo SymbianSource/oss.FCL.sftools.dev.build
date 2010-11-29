@@ -1484,33 +1484,9 @@ TBool CObeyFile::ProcessFile(TInt /*aAlign*/, enum EKeyword aKeyword){
 		return EFalse;
 	}
 
-	if (aKeyword!=EKeywordHideV2) {
-
-		// check the PC file exists
-		char* nname = NormaliseFileName(iReader.Word(1)); 
-		if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(nname))
-		{
-			char* tempnname = strdup(nname);
-			unsigned int namelen = 0;
-			if(UniConv::UTF82DefaultCodePage(tempnname, strlen(tempnname), &nname, &namelen) < 0)
-			{
-				Print(EError, "Invalid filename encoding: %s\n", tempnname);
-				free(tempnname);
-				delete[] nname;
-				return EFalse;
-			}
-			free(tempnname);
-		}
-		ifstream test(nname);
-		if (!test) {
-			Print(EError,"Cannot open file %s for input.\n",iReader.Word(1));
-			iMissingFiles++;
-		}
-		test.close();
-		delete []nname;
-	}
-	else
+	if (aKeyword==EKeywordHideV2) {
 		epocPathStart=1;
+	}
 
 	iNumberOfFiles++;
 
