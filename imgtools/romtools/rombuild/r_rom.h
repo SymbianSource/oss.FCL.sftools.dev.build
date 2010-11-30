@@ -389,6 +389,7 @@ public:
 	void FixupRomEntries(TInt aSize);
 	TRomEntry* RomEntry() const {return iRomNode->RomEntry(); };
 	void DisplaySize(TPrintType aWhere);
+	char* GetSystemFullName();
 public:
 	inline TBool Primary() const
 		{return iRomImageFlags & KRomImageFlagPrimary;}

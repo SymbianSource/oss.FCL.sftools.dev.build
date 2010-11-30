@@ -53,12 +53,14 @@ class SymbolProcessUnit
 public:
 	virtual void ProcessExecutableFile(const string& aFile) = 0;
 	virtual void ProcessDataFile(const string& afile) = 0;
-	virtual void FlushStdOut(ostream& aOut) = 0;
+	virtual void FlushStdOut(stringlist& aList);
 	virtual void FlushSymbolContent(ostream &aOut) = 0;
 	virtual void ResetContentLog() = 0;
 	virtual ~SymbolProcessUnit() {}
 	virtual void ProcessEntry(const TPlacedEntry& aEntry);
 	int GetSizeFromBinFile( const string& fileName );
+protected:
+	stringlist iStdoutLog;
 };
 
 class CommenRomSymbolProcessUnit : public SymbolProcessUnit
@@ -66,7 +68,6 @@ class CommenRomSymbolProcessUnit : public SymbolProcessUnit
 public:
 	virtual void ProcessExecutableFile(const string& aFile);
 	virtual void ProcessDataFile(const string& afile);
-	virtual void FlushStdOut(ostream& aOut);
 	virtual void FlushSymbolContent(ostream &aOut);
 	virtual void ResetContentLog();
 	virtual void ProcessEntry(const TPlacedEntry& aEntry);
@@ -75,7 +76,6 @@ private:
 	void ProcessGcceOrArm4File( const string& fileName, ifstream& aMap );
 	void ProcessX86File( const string& fileName, ifstream& aMap );
 private:
-	stringlist iStdoutLog;
 	stringlist iSymbolContentLog;
 	TPlacedEntry iPlacedEntry;
 };
@@ -85,14 +85,12 @@ class CommenRofsSymbolProcessUnit : public SymbolProcessUnit
 public:
 	virtual void ProcessExecutableFile(const string& aFile);
 	virtual void ProcessDataFile(const string& afile);
-	virtual void FlushStdOut(ostream& aOut);
 	virtual void FlushSymbolContent(ostream &aOut);
 	virtual void ResetContentLog();
 private:
 	void ProcessArmv5File( const string& fileName, ifstream& aMap );
 	void ProcessGcceOrArm4File( const string& fileName, ifstream& aMap );
 private:
-	stringlist iStdoutLog;
 	stringlist iSymbolContentLog;
 };
 
@@ -105,7 +103,6 @@ public:
 	BsymRofsSymbolProcessUnit(){}
 	virtual void ProcessExecutableFile(const string& aFile);
 	virtual void ProcessDataFile(const string& afile);
-	virtual void FlushStdOut(ostream& aOut);
 	virtual void FlushSymbolContent(ostream &aOut);
 	virtual void ResetContentLog();
 	virtual void ProcessEntry(const TPlacedEntry& aEntry);
@@ -113,8 +110,27 @@ private:
 	void ProcessArmv5File( const string& fileName, ifstream& aMap );
 	void ProcessGcceOrArm4File( const string& fileName, ifstream& aMap );
 private:
-	stringlist iStdoutLog;
 	MapFileInfo iMapFileInfo;
 	SymbolGenerator* iSymbolGeneratorPtr;
 };
+
+class BsymRomSymbolProcessUnit : public SymbolProcessUnit
+{
+public:
+	BsymRomSymbolProcessUnit(SymbolGenerator* aSymbolGeneratorPtr): iSymbolGeneratorPtr(aSymbolGeneratorPtr){}
+	virtual void ProcessExecutableFile(const string& aFile);
+	virtual void ProcessDataFile(const string& afile);
+	virtual void FlushSymbolContent(ostream &aOut);
+	virtual void ResetContentLog();
+	virtual void ProcessEntry(const TPlacedEntry& aEntry);
+private:
+	void ProcessArmv5File( const string& fileName, ifstream& aMap );
+	void ProcessGcceOrArm4File( const string& fileName, ifstream& aMap );
+	void ProcessX86File( const string& fileName, ifstream& aMap );
+private:
+	MapFileInfo iMapFileInfo;
+	SymbolGenerator* iSymbolGeneratorPtr;
+	TPlacedEntry iPlacedEntry;
+};
+
 #endif

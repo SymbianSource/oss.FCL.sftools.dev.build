@@ -37,6 +37,7 @@ const TInt KSpareExports=16;
 extern TInt gThreadNum;
 extern string gDepInfoFile;
 extern TBool gGenDepGraph;
+extern TBool gGenBsymbols;
 
 TUint32 DeflateCompressCheck(char *bytes,TInt size,ostream &os);
 void DeflateCompress(char *bytes,TInt size,ostream &os);
@@ -1307,7 +1308,7 @@ char *E32Rom::LayoutRom(char *romaddr)
 		}
 
 	TInt fileCount=0;
-	if(gGenSymbols && !iSymGen) {
+	if((gGenSymbols || gGenBsymbols )&& !iSymGen) {
 		string filename(iObey->GetFileName());
 		iSymGen = SymbolGenerator::GetInstance();
 		iSymGen ->SetImageType(ERomImage);
@@ -1439,6 +1440,9 @@ void E32Rom::LayoutFile(TRomBuilderEntry* current, TAddressRange& aMain, TAddres
 			TPlacedEntry context ;
 			context.iFileName = current->iFileName ;
 			context.iDataAddress = savedAddr ;
+			char* fullname = current->GetSystemFullName();
+			context.iDevFileName = fullname;
+			delete fullname;
 			iSymGen->AddEntry(context); 
 		}
 		return;
@@ -1454,6 +1458,9 @@ void E32Rom::LayoutFile(TRomBuilderEntry* current, TAddressRange& aMain, TAddres
 			TPlacedEntry context ;
 			context.iFileName = current->iFileName ;
 			context.iDataAddress = savedAddr ;
+			char* fullname = current->GetSystemFullName();
+			context.iDevFileName = fullname;
+			delete fullname;
 			iSymGen->AddEntry(context); 
 		}		
 		return ;
@@ -1517,6 +1524,9 @@ void E32Rom::LayoutFile(TRomBuilderEntry* current, TAddressRange& aMain, TAddres
 	if(iSymGen){
 		TPlacedEntry context  ;
 		context.iFileName = current->iFileName ;		
+		char* fullname = current->GetSystemFullName();
+		context.iDevFileName = fullname;
+		delete fullname;
 		context.iTotalSize = section1size;
 		context.iCodeAddress = header->iCodeAddress; 
 		context.iDataAddress = header->iDataAddress; 

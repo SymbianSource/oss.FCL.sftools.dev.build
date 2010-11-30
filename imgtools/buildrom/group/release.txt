@@ -1,3 +1,8 @@
+Version 3.33.0 (BUILDROM)
+===============
+Released by Marvin Shi, 30/11/2010
+	1) Feature add option for -bsymbols
+
 Version 3.32.2 (BUILDROM)
 ===============
 Released by Ross Qin, 30/11/2010

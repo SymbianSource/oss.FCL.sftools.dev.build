@@ -1581,6 +1581,15 @@ void TRomBuilderEntry::DisplaySize(TPrintType aWhere) {
 	}
 }
 
+char* TRomBuilderEntry::GetSystemFullName()
+{
+	TBool aIgnoreHiddenAttrib = ETrue;
+	TInt aLen = iRomNode->FullNameLength(aIgnoreHiddenAttrib);
+	char * aBuf = new char[aLen+1];
+	iRomNode->GetFullName(aBuf, aIgnoreHiddenAttrib);
+	return aBuf;
+}
+
 /**
 * TRomFile iRomEntry is a linked list through the various
 * distinct TRomEntry objects which may exist for the associated file

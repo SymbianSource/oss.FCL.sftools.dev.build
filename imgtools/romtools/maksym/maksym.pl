@@ -55,8 +55,7 @@ sub main()
 
   if(($maksym ne "") && ($maksym ne $symbolfile))
   {
-	  copy($symbolfile, $maksym);
-	  unlink $symbolfile;
+	 	rename($symbolfile, $maksym);
   }
 }
 

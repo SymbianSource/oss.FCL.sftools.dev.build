@@ -89,9 +89,9 @@ bool gNoCache = false;
 TBool gIsOBYUTF8 = EFalse;
 TBool gKeepGoing = EFalse;
 void PrintVersion() {
-	printf("\nROFSBUILD - Rofs/Datadrive image builder");
-	printf(" V%d.%d.%d\n", RofsbuildMajorVersion, RofsbuildMinorVersion, RofsbuildPatchVersion);
-	printf("%s\n\n", "Copyright (c) 1996-2010 Nokia Corporation.");
+	Print(EAlways,"\nROFSBUILD - Rofs/Datadrive image builder");
+	Print(EAlways, " V%d.%d.%d\n", RofsbuildMajorVersion, RofsbuildMinorVersion, RofsbuildPatchVersion);
+	Print(EAlways, "Copyright (c) 1996-2010 Nokia Corporation.");
 }
 
 char HelpText[] = 
@@ -166,7 +166,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 					gSmrFileName.assign(&argv[i][5]);
 				}
 				else {
-					printf ("ERROR: SMR obey file is missing\n");
+					Print (EError, "SMR obey file is missing\n");
 				}
 			} else if (stricmp(argv[i], "-K") == 0) {
 				gKeepGoing = ETrue;
@@ -245,7 +245,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 				if((stricmp(&argv[i][13], "UTF8")==0) || (stricmp(&argv[i][13], "UTF-8")==0))
 					gIsOBYUTF8 = ETrue;
 				else
-					printf("ERROR: Invalid encoding %s, default system internal encoding will be used.\n", &argv[i][13]);
+					Print(EError, "Invalid encoding %s, default system internal encoding will be used.\n", &argv[i][13]);
 			}
 			else if (stricmp(argv[i], "-UNCOMPRESS") == 0) {
 				gCompress = ECompressionUncompress;
@@ -253,7 +253,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 			else if( stricmp(argv[i], "-COMPRESSIONMETHOD") == 0 ) {
 				// next argument should a be method
 				if( (i+1) >= argc || argv[i+1][0] == '-') {
-					printf("ERROR: Missing compression method! Set it to default (no compression)!");
+					Print (EError, "Missing compression method! Set it to default (no compression)!");
 					gCompressionMethod = 0;
 				}
 				else {
@@ -271,7 +271,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 						gCompressionMethod = KUidCompressionBytePair;	
 					}
 					else {
-						printf("ERROR: Unknown compression method! Set it to default (no compression)!");
+						Print (EError, "Unknown compression method! Set it to default (no compression)!");
 						gCompress = ECompressionUnknown;
 						gCompressionMethod = 0;		
 					}
@@ -283,7 +283,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 				gUseCoreImage = ETrue;
 				// next argument should be image filename
 				if ((i+1 >= argc) || argv[i+1][0] == '-')
-					printf("ERROR: Missing image file name");
+					Print (EError, "Missing image file name");
 				else {
 					i++;
 					gImageFilename.assign(argv[i]);
@@ -295,7 +295,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 					gDriveFilename.assign(&argv[i][11]);	
 				}
 				else {
-					printf("ERROR: Drive obey file is missing\n"); 
+					Print (EError, "Drive obey file is missing\n"); 
 				}
 			}
 			else if (argv[i][1] == '?') {
@@ -307,7 +307,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 			else if( stricmp(argv[i], "-LOGLEVEL") == 0) {
 				// next argument should a be loglevel
 				if( (i+1) >= argc || argv[i+1][0] == '-') {
-					printf ("ERROR: Missing loglevel!");
+					Print (EError, "Missing loglevel!");
 					gLogLevel = DEFAULT_LOG_LEVEL;
 				}
 				else {
@@ -319,7 +319,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 					else if (strcmp(argv[i], "0") == 0)
 						gLogLevel = DEFAULT_LOG_LEVEL;
 					else
-						printf("ERROR: Only loglevel 0, 1 or 2 is allowed!");
+						Print(EError, "Only loglevel 0, 1 or 2 is allowed!");
 				}
 			}
 			else if( stricmp(argv[i], "-LOGLEVEL2") == 0)
@@ -338,13 +338,13 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 			}
 			else {
 #ifdef WIN32
-				printf ("WARNING: Unrecognised option %s\n",argv[i]);
+				Print (EWarning, "Unrecognised option %s\n",argv[i]);
 #else
 				if(0 == access(argv[i],R_OK)){
 					filename.assign(argv[i]);
 				}
 				else {
-					printf("WARNING: Unrecognised option %s\n",argv[i]);
+					Print (EWarning, "Unrecognised option %s\n",argv[i]);
 				}
 #endif				
 
@@ -371,7 +371,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 				Print (EAlways, ReallyHelpText);
 			}
 			else if (filename.empty()){
-				printf("WARNING: Obey filename is missing\n");
+				Print(EAlways, "Obey filename is missing\n");
 			}
 	}	
 }
@@ -499,8 +499,8 @@ TInt main(int argc, char *argv[]){
 	if (pCPUNum != NULL)
 		gCPUNum = atoi(pCPUNum);
 #endif		
-	if(gCPUNum > MAXIMUM_THREADS)
-		gCPUNum = MAXIMUM_THREADS;
+	if(gCPUNum > MAXIMUM_THREADS >> 1)
+		gCPUNum = MAXIMUM_THREADS >> 1;
 	PrintVersion();
 	processCommandLine(argc, argv);
 	if(gThreadNum == 0) {

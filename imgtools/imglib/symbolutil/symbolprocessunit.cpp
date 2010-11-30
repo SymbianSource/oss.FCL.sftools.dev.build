@@ -40,14 +40,14 @@ void SymbolProcessUnit::ProcessEntry(const TPlacedEntry& aEntry)
 	else
 		ProcessDataFile(aEntry.iFileName);
 }
-// CommenRomSymbolProcessUnit start
-void CommenRomSymbolProcessUnit::FlushStdOut(ostream& aOut)
+void SymbolProcessUnit::FlushStdOut(stringlist& aList)
 {
 	for(int i = 0; i < (int) iStdoutLog.size(); i++)
 	{
-		aOut << iStdoutLog[i];
+		aList.push_back(iStdoutLog[i]);
 	}
 }
+// CommenRomSymbolProcessUnit start
 
 void CommenRomSymbolProcessUnit::FlushSymbolContent(ostream &aOut)
 {
@@ -484,7 +484,9 @@ void CommenRomSymbolProcessUnit::ProcessX86File(const string& aFile, ifstream& a
 			char* outputLine = new char[allocBytes];
 			int n = snprintf(outputLine,allocBytes,"%08x    %04x    %s\r\n",romAddr,size,lastName.c_str());
 			lines.push_back(pair<int, char*>(n,outputLine));
-		}		
+		}
+		lastName = name;
+		lastAddr = addr;		
 	}
 
 	vector<pair<int,char*> >::iterator it; 
@@ -558,13 +560,6 @@ void CommenRofsSymbolProcessUnit::ProcessDataFile(const string& aFile)
 	ResetContentLog();
 	string line = "\nFrom    "+aFile+"\n\n00000000    0000    "+aFile.substr(aFile.rfind(PATH_SEPARATOR)+1)+"\n";
 	iSymbolContentLog.push_back(line);
-}
-void CommenRofsSymbolProcessUnit::FlushStdOut(ostream& aOut)
-{
-	for(int i = 0; i < (int) iStdoutLog.size(); i++)
-	{
-		aOut << iStdoutLog[i];
-	}
 }
 void CommenRofsSymbolProcessUnit::FlushSymbolContent(ostream &aOut)
 {
@@ -808,13 +803,6 @@ void BsymRofsSymbolProcessUnit::ProcessDataFile(const string& aFile)
 	iMapFileInfo.iSymbolPCEntrySet.push_back(tmpEntry);
 	iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.iDataSymbolCount++;
 }
-void BsymRofsSymbolProcessUnit::FlushStdOut(ostream& aOut)
-{
-	for(int i = 0; i < (int) iStdoutLog.size(); i++)
-	{
-		aOut << iStdoutLog[i];
-	}
-}
 void BsymRofsSymbolProcessUnit::FlushSymbolContent(ostream &aOut)
 {
 	iSymbolGeneratorPtr->AppendMapFileInfo(iMapFileInfo);
@@ -996,4 +984,409 @@ void BsymRofsSymbolProcessUnit::ProcessGcceOrArm4File( const string& fileName, i
             }
         }
     }
+}
+
+// BsymRomSymbolProcessUnit start
+
+void BsymRomSymbolProcessUnit::ProcessEntry(const TPlacedEntry& aEntry)
+{
+	iPlacedEntry = aEntry;
+	SymbolProcessUnit::ProcessEntry(aEntry);
+	iMapFileInfo.iDbgUnitPCEntry.iPCName = aEntry.iFileName;
+	iMapFileInfo.iDbgUnitPCEntry.iDevName = aEntry.iDevFileName;
+}
+
+void BsymRomSymbolProcessUnit::ProcessExecutableFile(const string& aFile)
+{
+	ResetContentLog();
+	char str[MAX_LINE];
+	string mapFile2 = aFile+".map";
+	size_t dot = aFile.rfind('.');
+	string mapFile = aFile.substr(0,dot)+".map";
+	ifstream fMap;
+	fMap.open(mapFile2.c_str());
+	if(!fMap.is_open()) {
+		fMap.open(mapFile.c_str());
+	}
+	if(!fMap.is_open()) {
+		sprintf(str, "\nWarning: Can't open \"%s\" or \"%s\"\n",mapFile2.c_str(),mapFile.c_str());
+		iStdoutLog.push_back(str);
+	    TSymbolPCEntry tmpEntry;
+	    tmpEntry.iSymbolEntry.iAddress = iPlacedEntry.iCodeAddress;
+	    tmpEntry.iSymbolEntry.iLength = iPlacedEntry.iTotalSize;
+	    tmpEntry.iName = aFile.substr(aFile.rfind(PATH_SEPARATOR)+1);
+		iMapFileInfo.iSymbolPCEntrySet.push_back(tmpEntry);
+	    iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.iDataSymbolCount++;
+	}
+	else {
+	    if(!fMap.good()) fMap.clear();
+	    char buffer[100];
+	    fMap.getline(buffer, 100);
+	    boost::regex regARMV5("ARM Linker", boost::regex::icase);
+	    boost::regex regGCCEoARMV4("Archive member included", boost::regex::icase);
+	    boost::cmatch what;
+	    if(regex_search(buffer, what, regARMV5)) {
+	        ProcessArmv5File(aFile, fMap);
+	    }
+	    else if(regex_search(buffer, what, regGCCEoARMV4)) {
+	        ProcessGcceOrArm4File(aFile, fMap);
+	    }
+	    else {
+		fMap.seekg(0, ios_base::beg);
+		ProcessX86File(aFile, fMap);
+	    }
+	}
+}
+
+void BsymRomSymbolProcessUnit::ProcessArmv5File(const string& fileName, ifstream& aMap)
+{
+	string symName ; 
+	ArmSymMap symbols ; 
+	vector<char*> words ;
+	ArmSymbolInfo info;
+	char* lineStart ;
+	char buffer[MAX_LINE];  
+	while(aMap.good() && (!aMap.eof())){
+		*buffer = 0;
+		aMap.getline(buffer,MAX_LINE);
+		lineStart = buffer ;
+		SKIP_WS(lineStart);	 
+		if(strstr(lineStart,"Global Symbols"))
+			break ;
+		char* armstamp = strstr(lineStart,"ARM Code");
+		if(0 == armstamp)
+			armstamp = strstr(lineStart,"Thumb Code") ;
+		if(0 == armstamp) continue ; 
+		*(armstamp - 1) = 0 ;
+		
+		char* hexStr = lineStart ;
+		char* nameEnd;
+		while(1) {
+			hexStr = strstr(hexStr,"0x");
+			if(0 == hexStr) break ; 		
+			nameEnd = hexStr - 1;
+			if(*nameEnd == ' ' || *nameEnd == '\t') break ;
+			hexStr += 2 ;
+		}	 
+		if(0 == hexStr) continue ; 	
+		while(nameEnd > lineStart && (*nameEnd == ' ' || *nameEnd == '\t'))
+			nameEnd -- ;
+		
+		nameEnd[1] = 0;
+		info.name = lineStart;		
+		char* temp ;
+		TUint32 addr = strtoul(hexStr + 2,&temp,16);
+		char* decStr ;
+		if(*armstamp == 'A')
+			decStr = armstamp + 9 ;
+		else 
+			decStr = armstamp + 11 ;
+		SKIP_WS(decStr);
+		info.size = strtoul(decStr,&temp,10);
+		SKIP_WS(temp);
+		info.section = temp;
+		if(info.section.find("(StubCode)") != string::npos )
+			info.size = 8 ; 			
+		if(addr > 0){
+			symbols.insert(pair<TUint32,ArmSymbolInfo>(addr,info));
+		}
+	}	 
+	size_t lenOfFileName = iPlacedEntry.iFileName.length();
+	while(aMap.good() && (!aMap.eof())){
+		*buffer = 0;
+		aMap.getline(buffer,MAX_LINE);
+		lineStart = buffer ;
+		SKIP_WS(lineStart); 
+		char* hexStr = lineStart ;
+		char* nameEnd;
+		while(1) {
+			hexStr = strstr(hexStr,"0x");
+			if(0 == hexStr) break ; 		
+			nameEnd = hexStr - 1;
+			if(*nameEnd == ' ' || *nameEnd == '\t') 
+				break ;
+			hexStr += 2 ;
+		}	 
+		if(0 == hexStr) continue ; 
+		while(nameEnd > lineStart && (*nameEnd == ' ' || *nameEnd == '\t')){
+			nameEnd -- ;
+		}
+		nameEnd[1] = 0;
+		info.name = lineStart; 
+		char *temp ;
+		TUint32 addr = strtoul(hexStr + 2,&temp,16);
+		while(*temp < '0' || *temp > '9' )//[^\d]*
+			temp++ ;
+		char* decStr = temp ;
+		info.size = strtoul(decStr,&temp,10);
+		SKIP_WS(temp);
+		info.section = temp;
+		if(info.section.find("(StubCode)") != string::npos )
+			info.size = 8 ; 
+		if(addr > 0){
+			symbols.insert(pair<TUint32,ArmSymbolInfo>(addr,info));
+		} 
+	}
+	
+	TUint32 textSectAddr = 0x00008000;  // .text gets linked at 0x00008000
+	TUint32 dataSectAddr = 0x00400000 ; // .data gets linked at 0x00400000
+	size_t allocBytes;
+	boost::regex regScope("^\\s*(\\w+)\\s*::\\s*(.*)$");
+	boost::cmatch what;
+	for( ArmSymMap::iterator it = symbols.begin(); it != symbols.end() ; it++){
+		TSymbolPCEntry tmpEntry;
+		TUint32 thisAddr = it->first ;
+		TUint32 romAddr ;
+		ArmSymbolInfo& info = it->second; 
+		if (thisAddr >= textSectAddr && thisAddr <= (textSectAddr + iPlacedEntry.iTextSize)) {
+			romAddr = thisAddr - textSectAddr + iPlacedEntry.iCodeAddress ;
+			tmpEntry.iSymbolEntry.iAddress = romAddr;
+			iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.iCodeSymbolCount++;
+		} 
+		else if ( iPlacedEntry.iDataAddress && 
+			( thisAddr >= dataSectAddr && thisAddr <= (dataSectAddr + iPlacedEntry.iTextSize))) {
+			romAddr = thisAddr-dataSectAddr + iPlacedEntry.iDataBssLinearBase;
+			tmpEntry.iSymbolEntry.iAddress = romAddr;
+			iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.iDataSymbolCount++;
+		} 
+		else if ( iPlacedEntry.iDataBssLinearBase && 
+			( thisAddr >= dataSectAddr && thisAddr <= (dataSectAddr+ iPlacedEntry.iTotalDataSize))) {
+			romAddr = thisAddr - dataSectAddr + iPlacedEntry.iDataBssLinearBase;
+			tmpEntry.iSymbolEntry.iAddress = romAddr;
+			iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.iBssSymbolCount++;
+		} 
+		else { 
+			allocBytes = info.name.length() + 60;
+			char* msg = new char[allocBytes] ;
+			snprintf(msg,allocBytes,"\r\nWarning: Symbol %s @ 0x%08x not in text or data segments\r\n", \
+				info.name.c_str() ,(unsigned int)thisAddr) ; 
+			iStdoutLog.push_back(msg);	
+			allocBytes = lenOfFileName + 80;
+			msg = new char[allocBytes];
+			snprintf(msg,allocBytes,"Warning:  The map file for binary %s is out-of-sync with the binary itself\r\n\r\n",iPlacedEntry.iFileName.c_str());
+			iStdoutLog.push_back(msg);	
+			continue ;
+		}
+		tmpEntry.iSymbolEntry.iLength = info.size;
+		if(regex_search(info.name.c_str(), what, regScope))
+		{
+			tmpEntry.iScopeName.assign(what[1].first, what[1].second-what[1].first);
+			tmpEntry.iName.assign(what[2].first, what[2].second-what[2].first);
+		}
+		else
+		{
+			tmpEntry.iScopeName = "";
+			tmpEntry.iName = info.name;
+		}
+		tmpEntry.iSecName = info.section;
+		iMapFileInfo.iSymbolPCEntrySet.push_back(tmpEntry);
+	} 
+}
+
+void BsymRomSymbolProcessUnit::ProcessGcceOrArm4File(const string& fileName, ifstream& aMap)
+{
+	char* lineStart; 
+	vector<char*> words ;
+	char buffer[MAX_LINE];
+	while(aMap.good() && (!aMap.eof())){
+		aMap.getline(buffer,MAX_LINE);
+		lineStart = buffer ;
+		SKIP_WS(lineStart);
+		if( 0 == strncmp(lineStart,".text",5)) {
+			lineStart += 5;
+			break ;
+		}		
+	}
+	split(lineStart,words);
+	TUint32 codeAddr , codeSize;
+	size_t allocBytes ;
+	if(words.size() != 2 ||
+	KErrNone != Val(codeAddr,words.at(0)) || 
+	KErrNone != Val(codeSize,words.at(1))) {
+		allocBytes = iPlacedEntry.iFileName.length() + 60;
+		char* msg = new char[allocBytes];
+		snprintf(msg,allocBytes,"\nError: Can't get .text section info for \"%s\"\r\n",iPlacedEntry.iFileName.c_str());
+		iStdoutLog.push_back(msg);
+		return;
+	}
+	map<TUint32,string> symbols ;
+	TUint32 stubHex = 0;
+	//Slurp symbols 'til the end of the text section
+	while(aMap.good() && (!aMap.eof())){
+		aMap.getline(buffer,MAX_LINE);
+		lineStart = buffer ;
+		SKIP_WS(lineStart); 
+		if(0 == *lineStart) break ; //blank line marks the end of the text section
+		
+		// .text <addr> <len>  <library(member)>
+		// .text$something
+		//       <addr> <len>  <library(member)>
+		//       <addr> <len>  LONG 0x0
+		// (/^\s(\.text)?\s+(0x\w+)\s+(0x\w+)\s+(.*)$/io)	 
+		if(strncmp(lineStart,".text",5) == 0){
+			lineStart += 5 ;
+			SKIP_WS(lineStart);
+		}
+		char* hex1 = NULL ;
+		char* hex2 = NULL ;
+		char* strAfterhex1 = NULL ;
+		TUint32 addr,size ;
+		if(strncmp(lineStart,"0x",2) == 0){
+			hex1 = lineStart + 2;
+			char* temp ;
+			addr = strtoul(hex1,&temp,16);
+			SKIP_WS(temp);
+			strAfterhex1 = temp ;
+			if(strncmp(temp,"0x",2) == 0){
+				hex2 = temp + 2 ;
+			}
+		}
+		if(NULL != hex2){
+			char* libraryfile ;
+			size = strtoul(hex2,&libraryfile,16);
+			SKIP_WS(libraryfile);  
+			TUint32 key = addr + size ;
+			put_to_map(symbols,key,string(""));//impossible symbol as end marker 
+			make_lower(libraryfile); 
+			size_t len = strlen(libraryfile);
+			char* p1 = strstr(libraryfile,".lib(");
+			if(NULL == p1) 
+				continue ; 
+			p1 += 5;
+			if(strcmp(libraryfile + len - 3,".o)")!= 0)
+				continue ;		 
+			len -= 3 ;
+			libraryfile[len] = 0; 
+			if(EFalse == IsValidNumber(libraryfile + len - 5))
+				continue ;
+			len -= 7 ;
+			if('_' == libraryfile[len])
+				len -- ;
+			if('s' != libraryfile[len])
+				continue ;		 
+			char* p2 = libraryfile + len - 1;
+			while(p2 > p1 ) { 
+				if(*p2 < '0' || *p2 > '9')
+					break ;
+				p2 -- ;
+			}
+			if(*p2 != 'd') 
+				continue ;
+			stubHex = addr ;
+		}
+		else if(NULL != hex1 && NULL != strAfterhex1){ 
+			//#  <addr>  <symbol name possibly including spaces>
+			//(/^\s+(\w+)\s\s+([a-zA-Z_].+)/o) 			 
+			char* symName = strAfterhex1; 
+			if((*symName >= 'A' && *symName <= 'Z') ||
+				(*symName >= 'a' && *symName <= 'z') || *symName == '_') {				 
+				string symbol(symName);
+				if(addr == stubHex) 
+					symbol.insert(0,"stub ");
+			 
+				put_to_map(symbols,addr,symbol);
+			}			
+		}		
+	}  
+	map<TUint32,string>::iterator it = symbols.begin();
+	TUint32 lastAddr = it->first;
+	string lastSymName = it->second;
+	vector<pair<int,char*> >lines ;
+	it ++ ;
+	while(it != symbols.end()) {
+		TSymbolPCEntry tmpEntry;		
+		TUint32 addr = it->first ; 
+		unsigned int fixedupAddr = lastAddr - codeAddr + iPlacedEntry.iCodeAddress;
+		TUint size = addr - lastAddr ;
+		if(!lastSymName.empty()) {
+			tmpEntry.iSymbolEntry.iAddress = fixedupAddr;
+			tmpEntry.iSymbolEntry.iLength = size;
+			tmpEntry.iScopeName = "";
+			tmpEntry.iName = lastSymName;
+			tmpEntry.iSecName = "";
+			iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.iCodeSymbolCount++;
+		}		
+		lastAddr = addr ;
+		lastSymName = it->second;
+		it ++ ;
+	}
+}
+
+void BsymRomSymbolProcessUnit::ProcessX86File(const string& fileName, ifstream& aMap)
+{
+	char buffer[MAX_LINE]; 
+	char* lineStart; 
+	while(aMap.good() && (!aMap.eof())){
+		aMap.getline(buffer,MAX_LINE);
+		lineStart = buffer ;
+		SKIP_WS(lineStart);
+		if( 0 == strncmp(lineStart,"Address",7)) { 
+			break ;
+		}		
+	}
+	aMap.getline(buffer,MAX_LINE);
+	string lastName ;
+	TUint32 lastAddr = 0;
+	vector<pair<int, char*> >lines ;
+	while(aMap.good() && (!aMap.eof())){
+		TSymbolPCEntry tmpEntry;
+		aMap.getline(buffer,MAX_LINE);
+		lineStart = buffer ;
+		SKIP_WS(lineStart);
+		if(0 != strncmp(lineStart,"0001:",5))
+			break ;		 
+		char* end ; 
+		TUint32 addr = strtoul(lineStart + 5,&end,16);
+		char* name = end + 1;
+		SKIP_WS(name);
+		end = name + 1;
+		FIND_WS(end);
+		*end = 0 ;
+		if(!lastName.empty()){
+			unsigned int size = addr - lastAddr ; 
+			unsigned int romAddr = lastAddr + iPlacedEntry.iCodeAddress;
+			tmpEntry.iSymbolEntry.iAddress = romAddr;
+			tmpEntry.iSymbolEntry.iLength = size;
+			tmpEntry.iName = lastName;
+			iMapFileInfo.iSymbolPCEntrySet.push_back(tmpEntry);
+			iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.iCodeSymbolCount++;
+		}
+		lastName = name;
+		lastAddr = addr;		
+	}
+	if(!lastName.empty()){
+		TSymbolPCEntry tmpEntry;
+		unsigned int romAddr = lastAddr + iPlacedEntry.iCodeAddress;
+		tmpEntry.iSymbolEntry.iAddress = romAddr;
+		tmpEntry.iSymbolEntry.iLength = 0;
+		tmpEntry.iName = lastName;
+		iMapFileInfo.iSymbolPCEntrySet.push_back(tmpEntry);
+		iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.iCodeSymbolCount++;
+	}
+}
+
+void BsymRomSymbolProcessUnit::FlushSymbolContent(ostream &aOut)
+{
+	iSymbolGeneratorPtr->AppendMapFileInfo(iMapFileInfo);
+}
+
+void BsymRomSymbolProcessUnit::ResetContentLog()
+{
+	iStdoutLog.clear();
+	iMapFileInfo.iDbgUnitPCEntry.iPCName = "";
+	iMapFileInfo.iDbgUnitPCEntry.iDevName = "";
+	iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.Reset();
+	iMapFileInfo.iSymbolPCEntrySet.clear();
+}
+
+void BsymRomSymbolProcessUnit::ProcessDataFile(const string& aFile)
+{
+	ResetContentLog();
+	string basename = aFile.substr(aFile.rfind(PATH_SEPARATOR)+1);
+	TSymbolPCEntry tmpEntry;
+	tmpEntry.iSymbolEntry.iAddress = iPlacedEntry.iDataAddress;
+	tmpEntry.iSymbolEntry.iLength = 0;
+	tmpEntry.iName = basename;
+	iMapFileInfo.iSymbolPCEntrySet.push_back(tmpEntry);
+	iMapFileInfo.iDbgUnitPCEntry.iDbgUnitEntry.iDataSymbolCount++;
 }

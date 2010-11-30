@@ -75,6 +75,7 @@ HPrint::~HPrint()
 
 void HPrint::SetLogFile(const char* aFileName)
 	{
+	iLogFile.clear();
 	iLogFile.open(aFileName);
 	}
 

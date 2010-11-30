@@ -67,8 +67,8 @@ if ($^O !~ /^MSWin32$/i){
 my $enforceFeatureManager = 0; # Flag to make Feature Manager mandatory if SYMBIAN_FEATURE_MANAGER macro is defined. 
 
 my $BuildromMajorVersion = 3 ;
-my $BuildromMinorVersion = 32;
-my $BuildromPatchVersion = 2;
+my $BuildromMinorVersion = 33;
+my $BuildromPatchVersion = 0;
 
 
 sub print_usage
@@ -134,6 +134,7 @@ The available options are
    -geninc                          -- generate INC file
    -gendep                          -- generate dependence graph for rom image
    -nosymbols                       -- disable creation of symbol file
+   -bsymbols                        -- create symbol file in bsym format
    -noimage                         -- disable creation of ROM/ROFS/DataDrive Image
    -j<digit>                        -- do the main job with <digit> threads
    -cache                           -- allow the ROFSBUILD to reuse/generate cached executable files
@@ -296,6 +297,7 @@ my $featureXml = undef;
 my $geninc = "";
 my $gendep = "";
 my $nosymbols = "";
+my $bsymbols = "";
 my $noimage = "";
 my $customizedPlat = undef;
 my $opt_jobs= "";
@@ -1047,6 +1049,11 @@ sub process_cmdline_arguments
 		if ($arg =~ /^-nosymbols$/)
 		{
 			$nosymbols=1;
+			next;	
+		}
+		if ($arg =~ /^-bsymbols$/)
+		{
+			$bsymbols=1;
 			next;	
 		}
 		if ($arg =~ /^-geninc$/)
@@ -4563,7 +4570,17 @@ sub invoke_rombuild
 			if ($xip)
 			{
 				is_existinpath("rombuild", romutl::DIE_NOT_FOUND);
-				$rombuild .= " -symbols" unless($nosymbols) ;
+				unless($nosymbols)
+				{
+					if($bsymbols)
+					{
+						$rombuild .= " -bsymbols";
+					}
+					else
+					{
+						$rombuild .= " -symbols";
+					}
+				}
 				run_rombuilder($rombuild.$compress, $obeyfile, $thisdir."ROMBUILD.LOG");
 			}
 			elsif($opt_xiponly == 0)
@@ -4589,7 +4606,14 @@ sub invoke_rombuild
 					is_existinpath("rofsbuild", romutl::DIE_NOT_FOUND);
 					if(!$nosymbols)
 					{
+						if($bsymbols)
+						{
+							$rofsbuild .= " -bsymbols";
+						}
+						else
+						{
 						$rofsbuild .= " -symbols";
+						}
 					}			
 					run_rombuilder($rofsbuild.$compress, $obeyfile, $thisdir."ROFSBUILD.LOG");
 				}

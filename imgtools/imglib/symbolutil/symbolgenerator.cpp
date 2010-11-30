@@ -33,11 +33,14 @@ extern TBool gGenBsymbols;
 boost::mutex SymbolGenerator::iMutexSingleton;
 SymbolGenerator* SymbolGenerator::iInst = NULL;
 SymbolGenerator* SymbolGenerator::GetInstance(){
-    iMutexSingleton.lock();
-    if(iInst == NULL) {
-        iInst = new SymbolGenerator();
+    if(iInst == NULL)
+    {
+    	iMutexSingleton.lock();
+    	if(iInst == NULL) {
+        	iInst = new SymbolGenerator();
+    	}
+    	iMutexSingleton.unlock();
     }
-    iMutexSingleton.unlock();
     return iInst;
 }
 void SymbolGenerator::Release() {
@@ -99,7 +102,7 @@ void SymbolGenerator::AddEntry(const TPlacedEntry& aEntry)
 
 void SymbolGenerator::SetFinished() 
 { 
-
+	boost::mutex::scoped_lock lock(iMutex);
 	iFinished = true; 
 	iCond.notify_all();
 }
@@ -142,6 +145,10 @@ SymbolGenerator::SymbolGenerator() : boost::thread(thrd_func),iFinished(false) {
 SymbolGenerator::~SymbolGenerator(){
     if(joinable())
         join();
+    for(int i=0; i < (int)iLogMessages.size(); i++)
+    {
+	    cout << iLogMessages[i];
+    }
     iSymFile.flush();
     iSymFile.close();
 }
@@ -304,7 +311,14 @@ void SymbolWorker::operator()()
 	SymbolGenerator* symbolgenerator = SymbolGenerator::GetInstance();
 	if(symbolgenerator->GetImageType() == ERomImage)
 	{
-		aSymbolProcessUnit = new CommenRomSymbolProcessUnit();
+		if(gGenBsymbols)
+		{
+			aSymbolProcessUnit = new BsymRomSymbolProcessUnit(symbolgenerator);
+		}
+		else
+		{
+			aSymbolProcessUnit = new CommenRomSymbolProcessUnit();
+		}
 	}
 	else
 	{
@@ -331,7 +345,7 @@ void SymbolWorker::operator()()
 		aSymbolProcessUnit->ProcessEntry(pe);
 
 		symbolgenerator->LockOutput();
-		aSymbolProcessUnit->FlushStdOut(cout);
+		aSymbolProcessUnit->FlushStdOut(symbolgenerator->iLogMessages);
 		aSymbolProcessUnit->FlushSymbolContent(symbolgenerator->GetOutputFileStream());
 		symbolgenerator->UnlockOutput();
 	}

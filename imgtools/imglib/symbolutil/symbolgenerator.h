@@ -55,6 +55,7 @@ class SymbolGenerator : public boost::thread {
         void FlushSymbolFileContent();
 	void SetImageType(TImageType aImageType) {	iImageType = aImageType; };
 	TImageType GetImageType() {	return iImageType; };
+	stringlist iLogMessages;
     private:
         SymbolGenerator();
         ~SymbolGenerator();

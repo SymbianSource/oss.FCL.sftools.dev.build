@@ -33,8 +33,8 @@ const TInt KRomLoaderHeaderEPOC=1;
 const TInt KRomLoaderHeaderCOFF=2;
 
 static const TInt RombuildMajorVersion=2;
-static const TInt RombuildMinorVersion=19;
-static const TInt RombuildPatchVersion=3;
+static const TInt RombuildMinorVersion=20;
+static const TInt RombuildPatchVersion=0;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 static string compareROMName = "";
@@ -75,6 +75,7 @@ char HelpText[] =
 	"                                      unpaged 	compress unpaged section only\n\n"	
 	"        -j<digit>                     do the main job with <digit> threads\n"
 	"        -symbols                      generate symbol file\n"
+	"        -bsymbols                     generate binary symbol file\n"
 	"        -compressionmethod <method>   method one of none|inflate|bytepair to set the compression\n"
 	"        -no-sorted-romfs              do not add sorted entries arrays (6.1 compatible)\n"
 	"        -oby-charset=<charset> used character set in which OBY was written\n"
@@ -137,6 +138,8 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag=EFalse) {
 			char* arg = argv[i] + 1;
 			if (stricmp(arg, "symbols") == 0)  
 				gGenSymbols = ETrue; 
+			if (stricmp(arg, "bsymbols") == 0)  
+				gGenBsymbols = ETrue; 
 			else if (stricmp(arg, "v") == 0)
 				H.iVerbose = ETrue;
 			else if (stricmp(arg, "sl") == 0 || stricmp(arg, "slog") == 0) {
@@ -373,6 +376,11 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag=EFalse) {
 		}
 	if (paramFileFlag)
 		return;
+	if( gGenSymbols && gGenBsymbols)
+	{
+		Print(EWarning, "Optiont symbols and bsymbols cannot be used at the same time, the  common symbols file will be created this time!");
+		gGenBsymbols = EFalse;
+	}
 	if (filename.empty() && loginput.empty()) {
  		PrintVersion();
 		cout << HelpText;
@@ -462,7 +470,7 @@ int main(int argc, char *argv[])  {
 		
 
     if(gThreadNum == 0) {
- 		if(gCPUNum > 0 && gCPUNum <= MAXIMUM_THREADS) {
+ 		if(gCPUNum > 0 && gCPUNum <= MAXIMUM_THREADS >> 1) {
  			printf("The double number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum * 2);
 			gThreadNum = gCPUNum * 2;
 		}

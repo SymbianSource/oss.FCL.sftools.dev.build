@@ -1,3 +1,10 @@
+Version 2.20.0 (ROMBUILD)
+===============
+Released by Marvin Shi, 30/11/2010
+	1) Feature bsym symbol file rombuild support
+	2) ou1cimx1#662919 rombuild hung when creating image by helium 
+	3) ou1cimx1#664530 rombuild log output mixted 
+
 Version 2.19.3 (ROMBUILD)
 ===============
 Released by Ross Qin, 30/11/2010
