@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -31,9 +31,9 @@ def run():
 		"$(EPOCROOT)/epoc32/release/armv7/udeb/simple_test_auto.exe",
 		"$(EPOCROOT)/epoc32/release/armv7/udeb/simple_test_manual.exe",
 		"$(EPOCROOT)/epoc32/include/testexportheader.h",
-		"$(EPOCROOT)/epoc32/data/z/test/simple_test/armv7.auto.bat",
-		"$(EPOCROOT)/epoc32/data/z/test/simple_test/armv7.manual.bat"
+		"$(EPOCROOT)/epoc32/data/z/test/smoke_suite_test_resources_simple_test/armv7.auto.bat",
+		"$(EPOCROOT)/epoc32/data/z/test/smoke_suite_test_resources_simple_test/armv7.manual.bat"
 		]
-	t.mustmatch = [".*/epoc32/data/z/test/simple_test/armv7.auto.bat</build>.*"]
+	t.mustmatch = [".*/epoc32/data/z/test/smoke_suite_test_resources_simple_test/armv7.auto.bat</build>.*"]
 	t.run()
 	return t

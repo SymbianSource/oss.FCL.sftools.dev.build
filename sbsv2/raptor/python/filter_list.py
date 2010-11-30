@@ -116,9 +116,16 @@ class FilterList(filter_interface.Filter):
 			# if the filter exists and is a valid filter use it
 			if f.lower() in filterdict:
 				if params:
-					self.filters.append(filterdict[f.lower()](params))
+					try:
+						self.filters.append(filterdict[f.lower()](params))
+					except TypeError:
+						raise ValueError("requested filter does not take any parameters")
 				else:
-					self.filters.append(filterdict[f.lower()]())
+					try:
+						self.filters.append(filterdict[f.lower()]())
+					except TypeError:
+						# Claims to need parameters - pass in an empty list
+						self.filters.append(filterdict[f.lower()]([]))
 			else:
 				# record missing filters
 				unfound.append(f)
@@ -132,12 +139,17 @@ class FilterList(filter_interface.Filter):
 		else:
 			self.out=[]
 			for filter in self.filters:
-				if filter.open(raptor_instance):
+				try:
+					ok = filter.open(raptor_instance)
+				except Exception, e:
+					sys.stderr.write(filter.formatError(str(e)))
+					ok = False
+
+				if ok:
 					self.out.append(filter)
 				else:
 					sys.stderr.write(str(raptor.name) + \
 							": error: Cannot open filter: %s\n" % str(filter))
-					ok = False
 					
 			if self.out == []:
 				sys.stderr.write(str(raptor.name) + \

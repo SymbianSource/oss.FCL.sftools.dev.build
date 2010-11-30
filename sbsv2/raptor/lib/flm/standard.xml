@@ -41,7 +41,7 @@
 		<param name='SECUREID' default=''/>
 		<param name='SOURCE' default=''/>
 		<param name='TARGET'/>
-		<param name='TARGET_lower'/>
+		<param name='TARGET_var'/>
 		<param name='TARGETPATH' default=''/>
 		<param name='LTCG' default=''/>
 		<param name='LTCG_OPTION' default='--ltcg'/>
@@ -88,6 +88,7 @@
 		<param name='DEFAULT_SYMBIAN_NEWLIB'/>
 		<param name='CHECKLIB'/>
 		<param name='ASM'/>
+		<param name='ASM_FLAGS'/>
 		<param name='ASM_OUTPUT_OPTION'/>
 		<param name='ARM_INSTRUCTION_SET'/>
 		<param name='THUMB_INSTRUCTION_SET'/>
@@ -112,6 +113,7 @@
 		<param name='CREATEVMAPCPP'/>
 		<param name='DEBUG_FORMAT'/>
 		<param name='DEBUG_INFO'/>
+		<param name='DEF2DLLTOOL'/>
 		<param name='DEFGENTOOL'/>
 		<param name='DEPEND_OPTION'/>
 		<param name='EFREEZE'/>

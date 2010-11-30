@@ -76,6 +76,8 @@ def AnnoFileParseOutput(annofile):
 	inOutput = False
 
 	buildid = ""
+	duration = "unknown"
+	availability = "unknown"
 	for line in af:
 		line = line.rstrip("\n\r")
 
@@ -186,16 +188,19 @@ class MakeEngine(object):
 			# console output is lost.  The annotation file has a copy of this
 			# output in the "parse" job and it turns out to be uncorrupted.
 			self.copyLogFromAnnoFile = (evaluator.Get("copylogfromannofile") == "true")
-			self.annoFileName = None
+			self.emakeCm = (len([opt for opt in self.raptor.makeOptions if opt.startswith("--emake-cm")]) > 0)
+			self.annoFileName = None # store the anno file name
 
 			if self.copyLogFromAnnoFile:
-				for o in self.raptor.makeOptions:
-					self.annoFileName = string_following("--emake-annofile=", o)
-					if self.annoFileName:
-						self.raptor.Info("annofile: " + o)
-
-				if not self.annoFileName:
-					self.raptor.Info("Cannot copy log from annotation file as no annotation filename was specified via the option --mo=--emake-annofile=<filename>")
+				try:
+					self.annoFileName = string_following("--emake-annofile=", [opt for opt in self.raptor.makeOptions if opt.startswith("--emake-annofile")][0])
+					self.raptor.Info("annofile: " + self.annoFileName)
+				except IndexError, bad_index:
+					cannot_use_anno_msg = "Cannot copy log from annotation file as no annotation filename was specified via the option --mo=--emake-annofile=<filename>"
+					if self.emakeCm:
+						self.raptor.Error(cannot_use_anno_msg) # Only an error if requested use of cm
+					else:
+						self.raptor.Info(cannot_use_anno_msg)
 					self.copyLogFromAnnoFile = False
 
 			# buffering
@@ -284,6 +289,7 @@ USE_TALON:=
 
 HOSTPLATFORM:=%s
 HOSTPLATFORM_DIR:=%s
+HOSTPLATFORM32_DIR:=%s
 OSTYPE:=%s
 FLMHOME:=%s
 SHELL:=%s
@@ -298,6 +304,7 @@ include %s
 """ 		% (  raptor.name, raptor_version.fullversion(),
 			 " ".join(raptor.hostplatform),
 			 raptor.hostplatform_dir,
+			 raptor.hostplatform32_dir,
 			 self.raptor.filesystem,
 			 str(self.raptor.systemFLM),
 			 self.shellpath,
@@ -482,7 +489,7 @@ include %s
 				guard = "guard_" + hash
 
 		# generate the call to the FLM
-		if iface is not None:
+		if iface is not None and not dupe:
 			makefileset.addCall(spec.name, config.name, iface.name, useAllInterfaces, iface.GetFLMIncludePath(self.raptor.cache), parameters, guard)
 
 		# recursive includes

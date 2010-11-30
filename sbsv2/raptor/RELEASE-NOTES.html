@@ -6,6 +6,33 @@
 
 <h1>Release Notes for Symbian Build System v2</h1>
 
+<h2>version 2.15.3</h2>
+
+<h3>Engineering Changes</h2>
+<ul>
+<li><a href="notes/filter_exes.txt">New filter_exes filter for listing generated executable files from a build</a></li>
+<li><a href="notes/per_component_flm.txt">Hook for including an FLM for each component</a></li>
+</ul>
+
+<h3>Defect Fixes</h3>
+<ul>
+<li>Fix: correct calculation of build duration and cluster availability</li>
+<li>Fix: correct parsing for anno file</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3687">SF Bug 3687</a> make 32-bit tools2 binaries appear in 32-bit release locations even when built on a 64-bit machine e.g. release/tools2/linux-i386-libc2_5 rather than linux-x86_64-libc2_5</li>
+<li>Fix: in some cases, tools2 build omits STLport when linking</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3766">SF Bug 3766</a> - [Raptor] Missing -c option to g++ in expgen recipes when using GCCE</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3778">SF Bug 3778</a> - [GCCE] Raptor 2.15 gcce.xml config breaks gcce kernel builds.</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3747">SF Bug 3747</a> - Terminal filter does not report missing bld.inf names</li>
+<li>Layer information missing from logs with parallel processing on</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2745">SF Bug 2745</a> - Generated .bat files are incorrect</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3511">SF Bug 3511</a> - sbs shell script ignores SBS_CYGWIN17</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3388">SF Bug 3388</a> - Configuration of python paths confused in sbs_filter</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3246">SF Bug 3246</a> - Improve a cryptic error message</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3608">SF Bug 3608</a> - Compile fails on mixed case Qt projects</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3848">SF Bug 3848</a> - [Raptor] - parallel parsing in 2.15.3 - sysdef files for blocks don't have unique names</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3807">SF Bug 3807</a> - [Raptor] "Child" invocations of Raptor fail with parallel parsing (--pp=on) on some linuxes - unknown hostplatform</li>
+</ul>
+
 <h2>version 2.15.2</h2>
 
 <h3>Engineering Changes</h3>

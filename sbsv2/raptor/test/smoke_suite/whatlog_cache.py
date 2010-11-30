@@ -33,7 +33,7 @@ def run():
 	# Build something using the .whatlog variant.  Take the build log and give it to sbsv2cache.py, deducing
 	# the location of the generated cache file from the verbose output.  If generated, dump the cache file to
 	# STDOUT so we can validate the content in this test script.  Clean up when finished.
-	t.command = """sbs -b smoke_suite/test_resources/simple_gui/Bld.inf -f ${SBSLOGFILE} -m ${SBSMAKEFILE} -c armv5.whatlog -c winscw.whatlog
+	t.command = """sbs -b smoke_suite/test_resources/simple_gui/Bld.inf -f ${SBSLOGFILE} -m ${SBSMAKEFILE} -c armv5.whatlog -c winscw.whatlog 
 		CACHEFILE=`%s $SBS_HOME/bin/sbsv2cache.py -v -s -o $EPOCROOT/epoc32/build/abldcache -l $SBSLOGFILE | sed -n \'s#Creating: ##p\'`
 		if [ -n \"${CACHEFILE:+x}\" ]; then
 			cat $CACHEFILE
@@ -44,13 +44,13 @@ def run():
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.mbm",
-		"$(EPOCROOT)/epoc32/include/helloworld.rsg",
-		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.rsc",
-		"$(EPOCROOT)/epoc32/data/z/private/10003a3f/apps/helloworld_reg.rsc",
-		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.rsc",
-		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.rsc",
-		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/private/10003a3f/apps/helloworld_reg.rsc",
-		"$(EPOCROOT)/epoc32/release/winscw/urel/z/private/10003a3f/apps/helloworld_reg.rsc",
+		"$(EPOCROOT)/epoc32/include/HelloWorld.rsg",
+		"$(EPOCROOT)/epoc32/data/z/resource/apps/HelloWorld.rsc",
+		"$(EPOCROOT)/epoc32/data/z/private/10003a3f/apps/HelloWorld_reg.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/HelloWorld.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/HelloWorld.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/private/10003a3f/apps/HelloWorld_reg.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/private/10003a3f/apps/HelloWorld_reg.rsc",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/helloworld.exe",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/helloworld.exe.map",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/helloworld.exe",
@@ -61,8 +61,8 @@ def run():
 		]
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
 		"helloworld_exe/helloworld.mbm_bmconvcommands",
-		"helloworld_exe/helloworld_HelloWorld.rsc.rpp",
-		"helloworld_exe/helloworld_HelloWorld.rsc.d",
+		"HelloWorld_exe/HelloWorld_HelloWorld.rsc.rpp",
+		"HelloWorld_exe/HelloWorld_HelloWorld.rsc.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_AppUi.o",
@@ -123,19 +123,19 @@ def run():
 		"helloworld_exe/winscw/urel/helloworld_UID_.dep",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o.d",
-		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg.rsc.d"
+		"HelloWorld_reg_exe/HelloWorld_reg_HelloWorld_reg.rsc.d"
 	])
 	t.countmatch = [
 		["\$self->{abldcache}->{.*\\\\test\\\\smoke_suite\\\\test_resources\\\\simple_gui target (armv5|winscw) (udeb|urel) -what\'} =", 4],
-		[".*\'.*\\\\\\\\epoc32\\\\\\\\data\\\\\\\\z\\\\\\\\private\\\\\\\\10003a3f\\\\\\\\apps\\\\\\\\helloworld_reg.rsc\'", 4],
+		[".*\'.*\\\\\\\\epoc32\\\\\\\\data\\\\\\\\z\\\\\\\\private\\\\\\\\10003a3f\\\\\\\\apps\\\\\\\\HelloWorld_reg.rsc\'", 4],
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\data\\\\\\\\z\\\\\\\\resource\\\\\\\\apps\\\\\\\\helloworld.mbm\'", 4],
-		[".*\'.*\\\\\\\\epoc32\\\\\\\\data\\\\\\\\z\\\\\\\\resource\\\\\\\\apps\\\\\\\\helloworld.rsc\'", 4],
-		[".*\'.*\\\\\\\\epoc32\\\\\\\\include\\\\\\\\helloworld.rsg\'", 4],
+		[".*\'.*\\\\\\\\epoc32\\\\\\\\data\\\\\\\\z\\\\\\\\resource\\\\\\\\apps\\\\\\\\HelloWorld.rsc\'", 4],
+		[".*\'.*\\\\\\\\epoc32\\\\\\\\include\\\\\\\\HelloWorld.rsg\'", 4],
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\(armv5|winscw)\\\\\\\\(udeb|urel)\\\\\\\\helloworld.exe\'",4],
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\(armv5|winscw)\\\\\\\\(udeb|urel)\\\\\\\\helloworld.exe.map\'", 3],
-		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\winscw\\\\\\\\(udeb|urel)\\\\\\\\z\\\\\\\\private\\\\\\\\10003a3f\\\\\\\\apps\\\\\\\\helloworld_reg.rsc\'", 2],
+		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\winscw\\\\\\\\(udeb|urel)\\\\\\\\z\\\\\\\\private\\\\\\\\10003a3f\\\\\\\\apps\\\\\\\\HelloWorld_reg.rsc\'", 2],
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\winscw\\\\\\\\(udeb|urel)\\\\\\\\z\\\\\\\\resource\\\\\\\\apps\\\\\\\\helloworld.mbm\'", 2],
-		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\winscw\\\\\\\\(udeb|urel)\\\\\\\\z\\\\\\\\resource\\\\\\\\apps\\\\\\\\helloworld.rsc\'", 2],
+		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\winscw\\\\\\\\(udeb|urel)\\\\\\\\z\\\\\\\\resource\\\\\\\\apps\\\\\\\\HelloWorld.rsc\'", 2],
 		["\$self->{abldcache}->{\'plats\'} =", 1],
 		[".*\'ARMV5\'", 1],
 		[".*\'WINSCW\'", 1]

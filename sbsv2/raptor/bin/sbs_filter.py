@@ -59,9 +59,13 @@ try:
 
 	# Open the requested plugins using the pluginbox
 	the_raptor.out.open(raptor_params, the_raptor.filterList, pbox)
-	
+
+except ValueError, e:
+	sys.stderr.write("error: problem while creating filters: {0}\n".format(str(e)))
+	sys.exit(1)
 except Exception, e:
-	sys.stderr.write("error: problem while creating filters %s\n" % str(e))
+	# Unrecognised exception: print a traceback
+	sys.stderr.write("error: problem while creating filters: {0}\n".format(str(e)))
 	traceback.print_exc()
 	sys.exit(1)
 		

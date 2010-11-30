@@ -1,0 +1,31 @@
+
+# put all files in a specific docs folder
+#
+EPOCDOCS:=$(EPOCROOT)/epoc32/docs
+$(call makepath,$(EPOCDOCS))
+
+# this test produces a text file per component (which lists all the
+# .mmp files in the component).
+#
+# define a macro to create the target name from COMPONENT_META so that
+# the target.flm can use it to work out which target to add dependencies to.
+#
+# use a shorter name for the component (the name of the directory
+# which contains the bld.inf file) for portability of the tests only.
+#
+define component_target
+$(EPOCDOCS)/$(lastword $(subst /, ,$(dir $1))).txt
+endef
+
+DOCTARGET:=$(call component_target,$(COMPONENT_META))
+
+ALL:: $(DOCTARGET)
+
+# Script to generate the per-component file. The special "make" variable $^
+# contains the list of prerequisites.
+#
+SCRIPT:=echo $(DOCTARGET) uses $$(sort $$^) > $(DOCTARGET)
+
+# Create a recipe to execute the script.
+#
+$(call raptor_recipe,doc_component,$(DOCTARGET),,$(SCRIPT))

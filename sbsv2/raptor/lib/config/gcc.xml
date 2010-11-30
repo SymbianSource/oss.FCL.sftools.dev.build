@@ -15,6 +15,7 @@
 
 		<!-- tools and scripts -->
 		<env name='JAVATC' default='$(JAVA_HOME)/bin/java' type='tool'/> <!-- Java used by Trace Compiler -->
+		<env name='JAVA_HOME' default='' type='path'/>		
 
 		<!-- targettypes -->
 		<set name="TARGET_TYPES" value="exe lib"/>
@@ -28,15 +29,11 @@
 		<!-- link to bld.inf and mmp platform names -->
 		<set name='TRADITIONAL_PLATFORM' value='TOOLS2'/>
 
-		<!-- Java used by Trace Compiler -->
 		<set name='CFLAGS' value='-fdefer-pop -fmerge-constants -fthread-jumps -floop-optimize -fif-conversion -fif-conversion2 -fguess-branch-probability -fcprop-registers -foptimize-sibling-calls -fstrength-reduce -fcse-follow-jumps -fcse-skip-blocks -frerun-cse-after-loop -frerun-loop-opt -fgcse -fgcse-lm -fgcse-sm -fgcse-las -fdelete-null-pointer-checks -fexpensive-optimizations -fregmove -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fcaller-saves -fpeephole2 -freorder-blocks -freorder-functions -fstrict-aliasing -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -fcrossjumping -pipe -Wall -Wno-ctor-dtor-privacy -Wno-unknown-pragmas -m32'/>
-		<env name='JAVA_HOME' default='' type='path'/>		
+		
 		<set name='VARIANTPLATFORM' value='tools2'/>
 
-		<!-- msys based programs sometimes don't search the path properly.
-		COMPILER_PATH can be set to tell gcc where to find
-		as.exe (sometimes it doesn't and a build step fails).
-		-->
+		<!-- COMPILER_PATH can be set to tell gcc where to find as.exe (sometimes it doesn't and a build step fails). -->
 		<set name='COMPILER_PATH.WIN32' value='$(SBS_HOME)/win32/mingw/bin'/>
 		<set name='COMPILER_PATH.LINUX' value=''/>
 
@@ -59,10 +56,11 @@
 		<set name='OPT.USERINCLUDE' value='-I '/>
 
 		<!-- always use stlport headers -->
-		<set name='SYSTEMINCLUDE' value='$(EPOCINCLUDE)/tools/stlport'/>
+		<env name='SBS_STLPORTINCDIR' default='$(EPOCINCLUDE)/tools/stlport' type='path'/>
+		<set name='SYSTEMINCLUDE' value='$(SBS_STLPORTINCDIR)'/>
 
 		<set name='LFLAGS' value=''/>
-		<set name='STATICLIBRARY' value='stlport.5.1'/>
+		<set name='STATICLIBRARY' value=''/>
 		<set name='LIBS' value=''/>
 		<set name='LIBS.WIN32' value='$(LIBS)'/>
 		<set name='LIBS.LINUX' value='$(LIBS) pthread'/>
@@ -79,8 +77,13 @@
 		<set name='BLDINF_OUTPUTPATH' value='$(SBS_BUILD_DIR)'/>
 
 		<set name='OUTPUTPATH' value='$(SBS_BUILD_DIR)'/>
-		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2' host='win.*'/>
-		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)' host='lin.*'/>
+		<env name='SBS_STLPORTBINDIR' default='$(EPOCROOT)/epoc32/release/tools2' host='win.*' type='path'/>
+		<env name='SBS_STLPORTBINDIR' default='$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)' host='lin.*' type='path'/>
+		<set name='STLPORTBINDIR' value='$(SBS_STLPORTBINDIR)'/>
+		<set name='STLPORTLIBRARY' value='stlport.5.1'/>
+		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2' host='win.*' type='path'/>
+		<!-- Tools are 32-bit at the moment, so use the 32-bit directory -->
+		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)' host='lin.*' type='path'/>
 	</var>
 
 	<var name="t_deb">
@@ -90,6 +93,7 @@
 		<append name='CFLAGS' value='-g'/>
 		<append name='CDEFS' value='_DEBUG'/>
 		<append name='RELEASEPATH' value='/deb' separator=''/>
+		<append name='STLPORTBINDIR' value='/deb' separator=''/>		
 	</var>
 	<alias name="tools2_deb" meaning="tools2_base.t_deb"/>
 	
@@ -100,6 +104,7 @@
 		<append name='CFLAGS' value='-s'/>
 		<append name='CDEFS' value='NDEBUG'/>
 		<append name='RELEASEPATH' value='/rel' separator=''/>
+		<append name='STLPORTBINDIR' value='/rel' separator=''/>		
 	</var>
 	<alias name="tools2_rel" meaning="tools2_base.t_rel"/>
 	

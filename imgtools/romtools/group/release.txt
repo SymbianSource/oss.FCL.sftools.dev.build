@@ -1,4 +1,4 @@
-Version 2.19.1 (ROMBUILD)
+Version 2.19.3 (ROMBUILD)
 ===============
 Released by Ross Qin, 30/11/2010
 	1) ou1cimx1#653168 - rombuild crashs when create ext-romimage
@@ -6,8 +6,28 @@ Released by Ross Qin, 30/11/2010
 Version 2.2 build(3) (readimage)
 ===============
 Released by Ross Qin, 30/11/2010
-	1) ou1cimx1#651824  - [MCL]readimage crashes on reading wk42 vasco_ui core image 
-	
+	1) ou1cimx1#651824  - [MCL]readimage crashes on reading wk42 vasco_ui core image
+
+Version 2.19.2 (ROMBUILD)
+===============
+Released by Jason Cui, 29/11/2010
+	1) Remove "repeated" file existence checking
+
+Version 2.17.2 (ROFSBUILD)
+===============
+Released by Jason Cui, 29/11/2010
+	1) Remove "repeated" file existence checking
+
+Version 2.19.1 (ROMBUILD)
+===============
+Released by Lorence Wang, 19/11/2010
+	1) ou1cimx1#656196 one line message of ROM tools
+
+Version 2.17.1 (ROFSBUILD)
+===============
+Released by Marvin Shi, 19/11/2010
+	1) ou1cimx1#651819 rofsbiuld fails to generate correct log info when using multi-thread 
+
 Version 2.19.0 (ROMBUILD)
 ===============
 Released by Marvin Shi, 17/11/2010

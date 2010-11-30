@@ -68,7 +68,7 @@ my $enforceFeatureManager = 0; # Flag to make Feature Manager mandatory if SYMBI
 
 my $BuildromMajorVersion = 3 ;
 my $BuildromMinorVersion = 32;
-my $BuildromPatchVersion = 0;
+my $BuildromPatchVersion = 2;
 
 
 sub print_usage
@@ -4869,11 +4869,11 @@ sub process_dlldata
 		my $plat = "armv5";				
 		$plat = &get_abiv2mode() ? $plat."_abiv1" : $plat."_abiv2";		
 
-		foreach my $plat(@platlist) 
+		foreach my $plattmp(@platlist) 
 		{
-			if(($aDllFile =~ /[\/\\]($plat)[\/\\]/i) or ($aDllFile =~ /[\/\\]($plat\.\w+)[\/\\]/i ))
+			if(($aDllFile =~ /[\/\\]($plattmp)[\/\\]/i) or ($aDllFile =~ /[\/\\]($plattmp)\.\w+[\/\\]/i ))
 			{
-				$platName = $1;
+				$platName = uc $1;
 				last;
 			}
 		}		
@@ -4881,7 +4881,7 @@ sub process_dlldata
 		
 		# Map files will be referred for all ARM platforms, 
 		# and for BSF platforms which cutomizes ARM platforms.
-		if($rootPlatName =~ /^armv5|$plat$/i){
+		if($rootPlatName =~ /^(armv5|$plat)$/i){
 			my $mapfile = "${aDllFile}.map";
 			
 			open MAPFILE, "$mapfile" or die "Can't open $mapfile\n";

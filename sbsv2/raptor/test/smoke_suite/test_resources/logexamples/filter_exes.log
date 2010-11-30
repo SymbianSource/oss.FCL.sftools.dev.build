@@ -1,0 +1,6 @@
+<buildlog>
+<recipe name='ignore' target='ignore/this' config='armv5_udeb' layer='ignore'/>
+<recipe name='linkandpostlink' target='ignore/this.dll' config='armv5_urel' layer='ignore'/>
+<recipe name='linkandpostlink' target='target/one.exe' config='armv5_urel' layer='one'/>
+<recipe name='win32simplelink' target='target/two.exe' config='winscw_udeb' layer='two'/>
+</buildlog>

@@ -27,22 +27,23 @@ def run():
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.mbm",
-		"$(EPOCROOT)/epoc32/include/helloworld.rsg",
-		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.rsc",
-		"$(EPOCROOT)/epoc32/data/z/private/10003a3f/apps/helloworld_reg.rsc",
-		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.rsc",
-		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.rsc",
-		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/private/10003a3f/apps/helloworld_reg.rsc",
-		"$(EPOCROOT)/epoc32/release/winscw/urel/z/private/10003a3f/apps/helloworld_reg.rsc"	
+		"$(EPOCROOT)/epoc32/include/HelloWorld.rsg",
+		"$(EPOCROOT)/epoc32/data/z/resource/apps/HelloWorld.rsc",
+		"$(EPOCROOT)/epoc32/data/z/private/10003a3f/apps/HelloWorld_reg.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/HelloWorld.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/HelloWorld.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/private/10003a3f/apps/HelloWorld_reg.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/private/10003a3f/apps/HelloWorld_reg.rsc"	
 		]
 	
 
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
 		"helloworld_exe/helloworld.mbm_bmconvcommands",
-		"helloworld_exe/helloworld_HelloWorld.rsc.rpp",
-		"helloworld_exe/helloworld_HelloWorld.rsc.d",
-		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg.rsc.rpp",
-		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg.rsc.d"])
+		"HelloWorld_exe/HelloWorld_HelloWorld.rsc.rpp",
+		"HelloWorld_exe/HelloWorld_HelloWorld.rsc.d",
+		"HelloWorld_reg_exe/HelloWorld_reg_HelloWorld_reg.rsc.rpp",
+		"HelloWorld_reg_exe/HelloWorld_reg_HelloWorld_reg.rsc.d"
+		])
 
 	t.mustnotmatch = ["HelloWorld.rss.* warning: trigraph"]
 	
@@ -91,7 +92,7 @@ def run():
 		"onelang_/onelang_onelang_sc.rsg.rpp",
 		"testresource_/testresource_testresource.rsc.rpp"])
 
-	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c armv5_urel -c winscw_urel reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c armv5_urel -c  winscw_urel -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.test[^ ]*.rsg' %s && { X=`md5sum $(EPOCROOT)/epoc32/release/winscw/urel/z/resource/anotherresource/testresource.rsc` && Y=`md5sum $(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc` && [ \"${X%% *}\" != \"${Y%% *}\" ] ; }  && wc -l %s " % (res_depfile, res_depfile)
+	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c armv5_urel -c winscw_urel reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c armv5_urel -c winscw_urel -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.test[^ ]*.rsg' %s && { X=`md5sum $(EPOCROOT)/epoc32/release/winscw/urel/z/resource/anotherresource/testresource.rsc` && Y=`md5sum $(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc` && [ \"${X%% *}\" != \"${Y%% *}\" ] ; }  && wc -l %s " % (res_depfile, res_depfile)
 
 
 	t.mustnotmatch = []
@@ -136,6 +137,28 @@ def run():
 	t.mustnotmatch = []
 	t.mustmatch = []
 	t.run()
+
+
+	t.id = "30d"
+	t.name =  "resource_rsg_casefolding_fail"
+	t.command = "sbs -b smoke_suite/test_resources/resource/rsg_casefolding/bld.inf RESOURCE"
+	t.targets = []
+	
+	t.warnings = 1
+	t.errors = 3
+	t.returncode = 1
+	t.run("linux")
+
+	t.id = "30e"
+	t.name =  "resource_rsg_casefolding_pass"
+	t.command = "sbs -b smoke_suite/test_resources/resource/rsg_casefolding/bld.inf --use-rsg-casefolding RESOURCE"
+	t.targets = []
+
+	t.warnings = 0
+	t.errors = 0
+	t.returncode = 0
+	t.run("linux")
+
 
 	t.name = 'resource'
 	t.print_result()

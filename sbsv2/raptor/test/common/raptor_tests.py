@@ -27,7 +27,10 @@ from shutil import rmtree
 sys.path.append(os.environ["SBS_HOME"]+"/python")
 from raptor_meta import BldInfFile
 
-logDir = "$(EPOCROOT)/epoc32/build/smoketestlogs"
+if 'SMOKETESTLOGS' in os.environ:
+	logDir = os.environ['SMOKETESTLOGS']
+else:
+	logDir = "$(EPOCROOT)/epoc32/build/smoketestlogs"
 
 debug_mode_active = False
 

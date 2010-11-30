@@ -35,7 +35,7 @@
 #define __NORETURN_TERMINATOR()		abort()
 #endif
 #define IMPORT_C
-#if !defined __WINS__ && defined _WIN32 /* VC++ Browser Hack */
+#if !defined __WINS__ && defined _WIN32 
 #define EXPORT_C
 /** @internalTechnology */
 #define asm(x)

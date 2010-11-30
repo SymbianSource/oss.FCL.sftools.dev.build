@@ -100,7 +100,7 @@
 		<param name='SYSTEMINCLUDE'/>
 		<param name='USERINCLUDE'/>
 		<param name='TARGET'/>
-		<param name='TARGET_lower'/>
+		<param name='TARGET_var'/>
 		<param name='TARGETPATH' default=''/>
 		<param name='UID1' default="1000007a"/>
 		<param name='UID2' default='00000000'/>

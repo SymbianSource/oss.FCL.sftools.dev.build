@@ -1,0 +1,42 @@
+Use the filter_exes filter to generate a set of files listing the executables
+created in a build.  A separate file will be created for each layer name and
+each configuration containing executable files.  The filter can be run on an
+existing log file as follows:
+
+sbs_filter --filter=filter_exes < logfile
+where 'logfile' is the name of the logfile you want to analyse.
+
+By default it will create the files in the current directory, named
+'<layer>_<config>.txt' e.g. 'layerone_armv5_urel.txt'.  If layers are not in
+use (e.g. the build was not based on a system definition) the layer name used
+will be 'nolayer' - e.g. 'nolayer_armv5_udeb.txt'.
+
+The location for output files can be overridden using the 'output' argument.
+To limit its operation to specified layers or configs, the 'layer' and 'config'
+arguments can be supplied, multiple times if necessary:
+
+sbs_filter --filter=filter_exes[output=mydir,layer=layerone,layer=layertwo,config=armv5_urel] < logfile
+
+This will search for executables generated from either 'layerone' or 'layertwo'
+components which were also build for armv5_urel.  The filter will record an
+executable if it matches any of the layers specified and also was built for any
+of the configs specified.
+
+The files contain a list of filenames with no paths and no other information, 
+for example:
+
+HelloWorld.exe
+Dummy.exe
+epoc.exe
+[...]
+
+A file will only be produced if there are any filenames to go into it.  The
+filter will report on any files that have been created e.g:
+
+Wrote 242 file(s) into layerone_armv5_urel.txt
+Write 45 file(s) into layertwo_armv5_urel.txt
+
+Note that argument names may be abbreviated e.g.
+
+sbs_filter --filter=filter_exes[o=mydir,l=layerone,c=armv5_urel] < logfile
+

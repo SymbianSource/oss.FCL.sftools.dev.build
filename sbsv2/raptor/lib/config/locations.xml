@@ -9,12 +9,14 @@
 	<var name="hostplatform.locations" host='linux.*'>	
 		<env name='SBS_SLASHBIN' default='/bin'/>
 		<env name='SBS_USRBIN' default='/usr/bin'/>
+		<env name='SBS_GCC_BIN' default='$(SBS_USRBIN)'/>
 				
 		<set name='DOTEXE' value=''/>
-		<set name='GCCPREFIX' value='$(SBS_USRBIN)/'/>
+		<set name='GCCPREFIX' value='$(SBS_GCC_BIN)/'/>
 		<set name='GNUPREFIX' value='$(SBS_SLASHBIN)/'/>
 		
 		<env name='HOSTPLATFORM_DIR' default='linux-i386' />
+		<env name='HOSTPLATFORM32_DIR' default='linux-i386' />
 		<env name='HOSTPLATFORM' default='linux i386'/>
 		
 		<env name='SBS_GNUCPP' default='$(SBS_USRBIN)/cpp' type='tool'/>

@@ -1,8 +1,13 @@
-Version 3.32.1 (BUILDROM)
+Version 3.32.2 (BUILDROM)
 ===============
 Released by Ross Qin, 30/11/2010
 	1) ou1cimx1#665657  [MCL]Some cases of PREQ1230 fail because of buildrom issue
-	
+
+Version 3.32.1 (BUILDROM)
+===============
+Released by Lorence Wang, 24/11/2010
+	1) ou1cimx1#657440 [MCL]external tools cannot specify path.
+
 Version 3.32.0 (BUILDROM)
 ===============
 Released by Ross Qin, 18/11/2010

@@ -39,6 +39,9 @@
 
 		<!-- per-configuration default interfaces -->
 		<set name="INTERFACE.config" value="Symbian.config.default"/>
+		
+		<!-- per-component interface: blank by default -->
+		<set name="INTERFACE.component" value=""/>
 	</var>
 
 </build>

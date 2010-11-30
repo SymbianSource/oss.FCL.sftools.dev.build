@@ -1,2 +1,8 @@
 #!/bin/sh
-perl -S buildrom.pl $@
+PRGDIR=`dirname "$0"`
+
+PRGDIR=`cd "$PRGDIR"; pwd`
+
+
+perl "$PRGDIR/buildrom.pl" $@
+

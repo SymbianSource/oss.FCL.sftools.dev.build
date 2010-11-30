@@ -141,7 +141,7 @@ def run():
 	if t.onWindows:
 		t2 = "tools2"
 	else:
-		t2 = raptor_tests.ReplaceEnvs("tools2/$(HOSTPLATFORM_DIR)")
+		t2 = raptor_tests.ReplaceEnvs("tools2/$(HOSTPLATFORM32_DIR)")
 		
 	t.mustmatch_singleline = [
 		"<sbs version='2\.\d+\.\d+'>",

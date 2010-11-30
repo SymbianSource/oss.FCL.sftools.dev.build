@@ -51,27 +51,27 @@ def run():
 
 	if t.result == SmokeTest.SKIP:
 		t.targets = [
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/deb/tool_exe",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/deb/libtool_lib1.a",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/deb/libtool_lib2.a",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/rel/tool_exe",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/rel/libtool_lib1.a",
-			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)/rel/libtool_lib2.a",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/deb/tool_exe",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/deb/libtool_lib1.a",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/deb/libtool_lib2.a",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/rel/tool_exe",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/rel/libtool_lib1.a",
+			"$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM32_DIR)/rel/libtool_lib2.a",
 			"$(EPOCROOT)/epoc32/tools/tool_exe"
 		]
 		t.addbuildtargets("smoke_suite/test_resources/tools2/bld.inf", [
-			"libtool_lib1_a/libtool_lib1_lib/tools2/rel/$(HOSTPLATFORM_DIR)/tool_lib1_b.o",
-			"libtool_lib1_a/libtool_lib1_lib/tools2/rel/$(HOSTPLATFORM_DIR)/tool_lib1_a.o",
-			"libtool_lib2_a/libtool_lib2_lib/tools2/rel/$(HOSTPLATFORM_DIR)/tool_lib2_b.o",
-			"libtool_lib2_a/libtool_lib2_lib/tools2/rel/$(HOSTPLATFORM_DIR)/tool_lib2_a.o",
-			"libtool_lib1_a/libtool_lib1_lib/tools2/deb/$(HOSTPLATFORM_DIR)/tool_lib1_b.o",
-			"libtool_lib1_a/libtool_lib1_lib/tools2/deb/$(HOSTPLATFORM_DIR)/tool_lib1_a.o",
-			"libtool_lib2_a/libtool_lib2_lib/tools2/deb/$(HOSTPLATFORM_DIR)/tool_lib2_a.o",
-			"libtool_lib2_a/libtool_lib2_lib/tools2/deb/$(HOSTPLATFORM_DIR)/tool_lib2_b.o",
-			"tool_exe_exe/tool_exe_exe/tools2/rel/$(HOSTPLATFORM_DIR)/tool_exe_a.o",
-			"tool_exe_exe/tool_exe_exe/tools2/rel/$(HOSTPLATFORM_DIR)/tool_exe_b.o",
-			"tool_exe_exe/tool_exe_exe/tools2/deb/$(HOSTPLATFORM_DIR)/tool_exe_b.o",
-			"tool_exe_exe/tool_exe_exe/tools2/deb/$(HOSTPLATFORM_DIR)/tool_exe_a.o"
+			"libtool_lib1_a/libtool_lib1_lib/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_lib1_b.o",
+			"libtool_lib1_a/libtool_lib1_lib/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_lib1_a.o",
+			"libtool_lib2_a/libtool_lib2_lib/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_lib2_b.o",
+			"libtool_lib2_a/libtool_lib2_lib/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_lib2_a.o",
+			"libtool_lib1_a/libtool_lib1_lib/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_lib1_b.o",
+			"libtool_lib1_a/libtool_lib1_lib/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_lib1_a.o",
+			"libtool_lib2_a/libtool_lib2_lib/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_lib2_a.o",
+			"libtool_lib2_a/libtool_lib2_lib/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_lib2_b.o",
+			"tool_exe_exe/tool_exe_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_exe_a.o",
+			"tool_exe_exe/tool_exe_exe/tools2/rel/$(HOSTPLATFORM32_DIR)/tool_exe_b.o",
+			"tool_exe_exe/tool_exe_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_exe_b.o",
+			"tool_exe_exe/tool_exe_exe/tools2/deb/$(HOSTPLATFORM32_DIR)/tool_exe_a.o"
 			])
 		t.run("linux") # tools2 output is platform dependent
 	
