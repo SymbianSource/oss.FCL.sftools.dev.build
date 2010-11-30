@@ -34,7 +34,7 @@ const TInt KRomLoaderHeaderCOFF=2;
 
 static const TInt RombuildMajorVersion=2;
 static const TInt RombuildMinorVersion=19;
-static const TInt RombuildPatchVersion=0;
+static const TInt RombuildPatchVersion=1;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 static string compareROMName = "";
@@ -589,15 +589,21 @@ int main(int argc, char *argv[])  {
 	}
 	
 	if(gGenInc) {
- 		Print(EAlways,"Generating include file for ROM image post-processors ");
-		if( gPagedRom ) {
- 			Print(EAlways,"Paged ROM");
-			GenerateIncludeFile((char*)mainObeyFile->iRomFileName, kernelRom->iHeader->iPageableRomStart, kernelRom->iHeader->iPageableRomSize);
+ 		
+		if(kernelRom != NULL) {
+			Print(EAlways,"Generating include file for ROM image post-processors ");
+			if( gPagedRom ) {
+ 				Print(EAlways,"Paged ROM");
+				GenerateIncludeFile((char*)mainObeyFile->iRomFileName, kernelRom->iHeader->iPageableRomStart, kernelRom->iHeader->iPageableRomSize);
+			}
+			else {
+ 				Print(EAlways,"Unpaged ROM");
+				int headersize=(kernelRom->iExtensionRomHeader ? sizeof(TExtensionRomHeader) : sizeof(TRomHeader)) - sizeof(TRomLoaderHeader);
+				GenerateIncludeFile((char*)mainObeyFile->iRomFileName, kernelRom->iHeader->iCompressedSize + headersize, kernelRom->iHeader->iPageableRomSize);
+			}
 		}
 		else {
- 			Print(EAlways,"Unpaged ROM");
-			int headersize=(kernelRom->iExtensionRomHeader ? sizeof(TExtensionRomHeader) : sizeof(TRomHeader)) - sizeof(TRomLoaderHeader);
-			GenerateIncludeFile((char*)mainObeyFile->iRomFileName, kernelRom->iHeader->iCompressedSize + headersize, kernelRom->iHeader->iPageableRomSize);
+			Print(EWarning,"Generating include file for ROM image igored because no Core ROM image generated.\n");
 		}
 	}
 	

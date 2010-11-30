@@ -642,7 +642,7 @@ sub processData
 							}	
 						}
 	
-						# create an oby file by traversing through upated prototype data drive directory.
+						# create an oby file by traversing through upated prototype data drive directory. 
 						&datadriveimage::dumpDatadriveObydata( $proDataDriveDirloc,$datadriveobyfile,$size,\@nonsisFilelist,
 											\@renameList,\@aliaslist,\@hideList,\@sisobydata,\@datadrivedata,$opt_k,$opt_v );
 						#reset sisfilepresent flag to zero;
@@ -841,7 +841,8 @@ sub process_cmdline_arguments
 		#Set specific platform supplied from the command option 
 		elsif($arg =~ /^-D_PLAT=(.*)/)
 		{
-		    $tmpBldRomOpts{"ABI_DIR"} = $1;
+		    $tmpBldRomOpts{"ABI_DIR"} = $1; 
+			
 		}
 		# Check for a Feature Variant
 		elsif ($arg =~ /^-DFEATUREVARIANT=(.*)/)
@@ -1223,7 +1224,17 @@ sub process_cmdline_arguments
 				if( $ZDirloc !~ m/:/)
 				{
 					print "drive letter not specified\n";
-					$ZDirloc = $thisdir.$ZDirloc;
+					my $dir = $thisdir ;
+					my $file = $ZDirloc ;
+					while( $file =~ /^(\.+\/)(.+)/) {
+						$file = $2 ; 
+						if( $1 eq "../" ) {
+							if($dir =~ /(.*[\\\/])([^\\\/]+[\\\/]$)/) {
+								$dir = $1 ; 
+							} 
+						}
+					}
+					$ZDirloc = $dir.$file;
 				}
 				print "Z Drive directory location = $ZDirloc\n";
 				#set the location of Z Drive directory.
@@ -3316,39 +3327,70 @@ sub suppress_phase
 		{
 			my $what = $1;
 			my $filename = $2;
-			if ($line =~ /(\S+)\s*=\s*"([^"]+)"/)
-			{
+			if ($line =~ /(\S+)\s*=\s*"([^"]+)"/){
 				$filename = $2;
 			}
-			my $normedFilename = &get_versionedname($filename);
-
-			# find all the alternative file locations
-			my @alternatives = fallback($normedFilename);
-			# test the original location first
-			unshift(@alternatives, $normedFilename);
-
-			# choose the first file location that actually exists
 			my $fileExists = 0;
-			foreach my $altFile (@alternatives)
-			{
-			    my $tmpPath;
-			    my $tmpFile;
-				if($altFile =~ /"?(.*[\/\\]arm\w+_?\w+)[\/\\]([^"]+)/i)
-				{
-					$tmpPath = $1;
-					$tmpFile = $2;
-				}
-				$tmpPath .= "\.$varname";
-				
-				if (-e $tmpPath ."\/$tmpFile"){
-                  # SBSv2 variant binary exists
-				  $fileExists = $tmpPath . "\/$tmpFile";
-				}
+			my $normedFilename = &get_versionedname($filename) ;
+			my @alternatives = ();
+			if( $what =~ /data$/i ) {				
+				if(-e $normedFilename) {
+					$fileExists = $normedFilename ;
+				} 
 				else {
-                  # SBSv1 variant binary or invariant binary
-				  $fileExists = get_BVbinname($altFile, $varname);
+					if($normedFilename =~ /^\s*"?([\\\/]?)([^"]+)"?/i) {
+						if($1) {
+							$normedFilename = $epocroot.$2 ; 
+						}
+						else {
+							$normedFilename = $2 ; 
+						}
+						
+						$fileExists = $normedFilename if(-e $normedFilename);
+					}
+					 
 				}
-				last if $fileExists;
+				push @alternatives, $normedFilename; 
+			}
+			else { 
+				# find all the alternative file locations
+				@alternatives = fallback($normedFilename);
+				# test the original location first
+				unshift(@alternatives, $normedFilename);				 
+
+				# choose the first file location that actually exists
+				
+				foreach my $altFile (@alternatives) { 
+					my $tmpFile = "";
+					
+					next if($altFile eq "");
+					if($altFile =~/^\s*"?([\\\/]?)([^"]+)"?/i ) {
+						if($1) {
+							$altFile = $epocroot.$2 ; 
+						}
+						else {
+							$altFile = $2 ;
+						}
+					}
+					
+					if($altFile =~ /(.*[\/\\]arm\w+_?\w+)[\/\\](.+)/i) {						 
+						$tmpFile = $1."\.$varname\/".$2;
+					}
+					else {
+						$tmpFile = $altFile;
+					}					
+					 
+					if (-e $tmpFile){
+						# SBSv2 variant binary exists
+						$fileExists = $tmpFile;
+					}
+					else {
+						# SBSv1 variant binary or invariant binary
+						$fileExists = get_BVbinname($altFile, $varname);
+					} 
+					last if $fileExists;
+					 
+				}
 			}
 			
 			# edit the OBY line to use the actual file name which we found.

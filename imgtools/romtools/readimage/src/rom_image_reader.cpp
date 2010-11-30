@@ -568,12 +568,18 @@ void RomImageReader::DumpImage(RomImageFileEntry * aEntry) {
 	DumpInHex("Stack size", aRomImgEntry->iStackSize) << endl;
 
 	TDllRefTable *aRefTbl = NULL;
-
-	if( aRomImgEntry->iDllRefTable ) {
-		TUint32 aOff = (TUint32)aRomImgEntry->iDllRefTable - iImageHeader->iRomHdr->iRomBase;
-		aRefTbl = (TDllRefTable*) ((char*)iImageHeader->iRomHdr + aOff);
-		TUint32 aVirtualAddr = (TUint32)aRefTbl->iEntry[0];
-		DumpInHex("Dll ref table", aVirtualAddr) << endl;
+ 
+	 if( aRomImgEntry->iDllRefTable ) {
+		TUint32 aOff = (TUint32)aRomImgEntry->iDllRefTable  - iImageHeader->iRomHdr->iRomBase;
+        if(static_cast<TInt32>(aOff) > 0) { 
+			aRefTbl = (TDllRefTable*) (iRomLayoutData + aOff);		 
+			TUint32 aVirtualAddr = reinterpret_cast<TUint32>(aRefTbl->iEntry[0]);
+			DumpInHex("Dll ref table", aVirtualAddr) << endl;
+			
+        }
+       else {
+            DumpInHex("Error Dll ref table", 0) << endl;
+        }
 	}
 
 	DumpInHex("Export directory", aRomImgEntry->iExportDir) << endl;
@@ -607,11 +613,13 @@ void RomImageReader::DumpImage(RomImageFileEntry * aEntry) {
 		if(stricmp(iE32ImgFileName.c_str(), aEntry->Name()) == 0){
 			TUint aSectionOffset = aRomImgEntry->iCodeAddress - iImageHeader->iRomHdr->iRomBase;
 			TUint* aCodeSection = (TUint*)((char*)iImageHeader->iRomHdr + aSectionOffset);
+			//TUint* aCodeSection = (TUint*)(iRomLayoutData + aSectionOffset);
 			*out << "\nCode (Size=0x" << hex << aRomImgEntry->iCodeSize << ")" << endl;
 			DumpData(aCodeSection, aRomImgEntry->iCodeSize);
 
 			aSectionOffset = aRomImgEntry->iDataAddress - iImageHeader->iRomHdr->iRomBase;
 			TUint* aDataSection = (TUint*)((char*)iImageHeader->iRomHdr + aSectionOffset);
+			//TUint* aDataSection = (TUint*)(iRomLayoutData + aSectionOffset);
 			if( aRomImgEntry->iDataSize){
 				*out << "\nData (Size=0x" << hex << aRomImgEntry->iDataSize << ")" << endl;
 				DumpData(aDataSection, aRomImgEntry->iDataSize);

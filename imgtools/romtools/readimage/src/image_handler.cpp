@@ -26,7 +26,12 @@
 #include "rom_image_reader.h"
 #include "e32_image_reader.h"
 #include "e32rom.h"
-#include "h_ver.h"
+
+const TInt MajorVersion=2;
+const TInt MinorVersion=2;
+const TInt Build=3;
+const char Copyright[]="Copyright (c) 1996-2010 Nokia Corporation.\n\n";
+
 #include "sis2iby.h"
 #include <time.h>
 

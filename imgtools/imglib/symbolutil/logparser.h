@@ -21,16 +21,21 @@
 
 #include "loggingexception.h"
 #include "symbolgenerator.h"
-
+#ifdef _MSC_VER
+#define LOGGINGEXCEPTION ...
+#else
+#define LOGGINGEXCEPTION LoggingException
+#endif
 /**
  * @class LogParser
  */
 class LogParser
 {
 public:
-	static LogParser* GetInstance(TImageType aImageType) throw (LoggingException);
-
-	virtual void ParseSymbol(const char* LogFilename) throw (LoggingException) = 0;
+ 
+	static LogParser* GetInstance(TImageType aImageType) throw (LOGGINGEXCEPTION);
+	virtual void ParseSymbol(const char* LogFilename) throw (LOGGINGEXCEPTION) = 0;
+ 
 
 	void Cleanup(void);
 	virtual ~LogParser() {}
@@ -47,14 +52,14 @@ private:
 class RofsLogParser : public LogParser
 {
 public:
-	virtual void ParseSymbol(const char* LogFilename) throw (LoggingException);
+	virtual void ParseSymbol(const char* LogFilename) throw (LOGGINGEXCEPTION);
 	RofsLogParser(void);
 };
 
 class RomLogParser : public LogParser
 {
 public:
-	virtual void ParseSymbol(const char* LogFilename) throw (LoggingException);
+	virtual void ParseSymbol(const char* LogFilename) throw (LOGGINGEXCEPTION);
 	RomLogParser(void);
 };
 

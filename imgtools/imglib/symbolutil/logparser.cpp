@@ -30,7 +30,8 @@ using namespace std;
 LogParser* LogParser::Only = (LogParser*)0;
 
 
-LogParser* LogParser::GetInstance(TImageType aImageType) throw (LoggingException)
+ 
+LogParser* LogParser::GetInstance(TImageType aImageType) throw (LOGGINGEXCEPTION) 
 {
 	if(! LogParser::Only)
 	{
@@ -69,8 +70,8 @@ RofsLogParser::RofsLogParser()
 {
 	iImageType = ERofsImage;
 }
-
-void RofsLogParser::ParseSymbol(const char* LogFilename) throw (LoggingException)
+ 
+void RofsLogParser::ParseSymbol(const char* LogFilename) throw (LOGGINGEXCEPTION) 
 {
 	string linebuf;
 	SymbolGenerator* symgen = SymbolGenerator::GetInstance();
@@ -124,7 +125,7 @@ RomLogParser::RomLogParser()
 	iImageType = ERomImage;
 }
 
-void RomLogParser::ParseSymbol(const char* LogFilename) throw (LoggingException)
+void RomLogParser::ParseSymbol(const char* LogFilename) throw (LOGGINGEXCEPTION)
 {
 	string linebuf;
 	SymbolGenerator* symgen = SymbolGenerator::GetInstance();
@@ -150,53 +151,53 @@ void RomLogParser::ParseSymbol(const char* LogFilename) throw (LoggingException)
 		while(getline(logfd, tmpline))
 		{
 			TPlacedEntry tmpEntry;
-			if(regex_search(tmpline, what, endFlag))
+			if(regex_search(tmpline.c_str(), what, endFlag))
 			{
 				break;
 			}
-			if(regex_search(tmpline, what, sourceFile))
+			if(regex_search(tmpline.c_str(), what, sourceFile))
 			{
 				tmpEntry.iFileName.assign(what[1].first, what[1].second-what[1].first);
 				tmpaddr.assign(what[2].first, what[2].second-what[2].first);
 				tmpEntry.iDataAddress = strtol(tmpaddr.c_str(), NULL, 16);
 				symgen->AddEntry(tmpEntry);
 			}
-			else if(regex_search(tmpline, what, executableFile))
+			else if(regex_search(tmpline.c_str(), what, executableFile))
 			{
 				tmpEntry.iFileName.assign(what[1].first, what[1].second-what[1].first);
 				while(getline(logfd, tmpline) && tmpline != "")
 				{
-					if(regex_search(tmpline, what, codeStart))
+					if(regex_search(tmpline.c_str(), what, codeStart))
 					{
 						tmpaddr.assign(what[1].first, what[1].second-what[1].first);
 						tmpEntry.iCodeAddress = strtol(tmpaddr.c_str(), NULL, 16);
 					} 
-					else if(regex_search(tmpline, what, dataStart))
+					else if(regex_search(tmpline.c_str(), what, dataStart))
 					{
 						tmpaddr.assign(what[1].first, what[1].second-what[1].first);
 						tmpEntry.iDataAddress = strtol(tmpaddr.c_str(), NULL, 16);
 					}
-					else if(regex_search(tmpline, what, dataBssStart))
+					else if(regex_search(tmpline.c_str(), what, dataBssStart))
 					{
 						tmpaddr.assign(what[1].first, what[1].second-what[1].first);
 						tmpEntry.iDataBssLinearBase = strtol(tmpaddr.c_str(), NULL, 16);
 					}
-					else if(regex_search(tmpline, what, textSize))
+					else if(regex_search(tmpline.c_str(), what, textSize))
 					{
 						tmpaddr.assign(what[1].first, what[1].second-what[1].first);
 						tmpEntry.iTextSize = strtol(tmpaddr.c_str(), NULL, 16);
 					}
-					else if(regex_search(tmpline, what, dataSize))
+					else if(regex_search(tmpline.c_str(), what, dataSize))
 					{
 						tmpaddr.assign(what[1].first, what[1].second-what[1].first);
 						tmpEntry.iDataSize = strtol(tmpaddr.c_str(), NULL, 16);
 					}
-					else if(regex_search(tmpline, what, bssSize))
+					else if(regex_search(tmpline.c_str(), what, bssSize))
 					{
 						tmpaddr.assign(what[1].first, what[1].second-what[1].first);
 						tmpEntry.iBssSize = strtol(tmpaddr.c_str(), NULL, 16);
 					}
-					else if(regex_search(tmpline, what, totalDataSize))
+					else if(regex_search(tmpline.c_str(), what, totalDataSize))
 					{
 						tmpaddr.assign(what[1].first, what[1].second-what[1].first);
 						tmpEntry.iTotalDataSize = strtol(tmpaddr.c_str(), NULL, 16);

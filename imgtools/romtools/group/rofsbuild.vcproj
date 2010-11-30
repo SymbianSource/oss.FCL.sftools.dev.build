@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../imglib/boostlibrary;../../imglib/boostlibrary/boost;../rofsbuild;../rofsbuild/inc;../../imglib/inc;../../imglib/compress;../../imglib/memmap/include;../../imglib/patchdataprocessor/include;../../imglib/parameterfileprocessor/include;../../imglib/uniconv/include"
+				AdditionalIncludeDirectories="../../imglib/boostlibrary;../../imglib/boostlibrary/boost;../rofsbuild;../rofsbuild/inc;../../imglib/inc;../../imglib/compress;../../imglib/memmap/include;../../imglib/patchdataprocessor/include;../../imglib/parameterfileprocessor/include;../../imglib/uniconv/include;../../imglib/symbolutil"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;__MSVCDOTNET__;__TOOLS__ ;__VC32__;_STLP_DEBUG=1;__OPERATOR_NEW_DECLARED__;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -125,7 +125,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../../imglib/boostlibrary;../../imglib/boostlibrary/boost;../rofsbuild;../rofsbuild/inc;../../imglib/inc;../../imglib/compress;../../imglib/memmap/include;../../imglib/patchdataprocessor/include;../../imglib/parameterfileprocessor/include;../../imglib/uniconv/include"
+				AdditionalIncludeDirectories="../../imglib/boostlibrary;../../imglib/boostlibrary/boost;../rofsbuild;../rofsbuild/inc;../../imglib/inc;../../imglib/compress;../../imglib/memmap/include;../../imglib/patchdataprocessor/include;../../imglib/parameterfileprocessor/include;../../imglib/uniconv/include;../../imglib/symbolutil"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;__MSVCDOTNET__;__TOOLS__ ;__VC32__;__OPERATOR_NEW_DECLARED__;"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -227,10 +227,6 @@
 			</File>
 			<File
 				RelativePath="..\rofsbuild\rofsbuild.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\rofsbuild\symbolgenerator.cpp"
 				>
 			</File>
 			<Filter
@@ -370,6 +366,30 @@
 				>
 				<File
 					RelativePath="..\..\imglib\uniconv\source\uniconv.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="symbolutil"
+				>
+				<File
+					RelativePath="..\..\imglib\symbolutil\bsymutil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\imglib\symbolutil\loggingexception.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\imglib\symbolutil\logparser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\imglib\symbolutil\symbolgenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\imglib\symbolutil\symbolprocessunit.cpp"
 					>
 				</File>
 			</Filter>
@@ -536,6 +556,30 @@
 				>
 				<File
 					RelativePath="..\..\imglib\uniconv\include\uniconv.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="symbolutil"
+				>
+				<File
+					RelativePath="..\..\imglib\symbolutil\bsymutil.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\imglib\symbolutil\loggingexception.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\imglib\symbolutil\logparser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\imglib\symbolutil\symbolgenerator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\imglib\symbolutil\symbolprocessunit.h"
 					>
 				</File>
 			</Filter>

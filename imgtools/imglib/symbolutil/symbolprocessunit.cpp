@@ -20,7 +20,9 @@
 #include "symbolgenerator.h"
 #include "h_utl.h"
 
-
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif 
 #define MAX_LINE 65535
 
 #if defined(__LINUX__)
@@ -536,10 +538,10 @@ void CommenRofsSymbolProcessUnit::ProcessExecutableFile(const string& aFile)
 	    boost::regex regARMV5("ARMV5", boost::regex::icase);
 	    boost::regex regGCCEoARMV4("(GCCE|ARMV4)", boost::regex::icase);
 	    boost::cmatch what;
-	    if(regex_search(aFile, what, regARMV5)) {
+	    if(regex_search(aFile.c_str(), what, regARMV5)) {
 	        ProcessArmv5File(aFile, fMap);
 	    }
-	    else if(regex_search(aFile, what, regGCCEoARMV4)) {
+	    else if(regex_search(aFile.c_str(), what, regGCCEoARMV4)) {
 	        ProcessGcceOrArm4File(aFile, fMap);
 	    }
 	    else {
@@ -676,13 +678,13 @@ void CommenRofsSymbolProcessUnit::ProcessGcceOrArm4File( const string& fileName,
                 break;
             else if(regex_search(str, what, reg1)) {
                 sLibFile.assign(what[4].first,what[4].second-what[4].first);
-                if(!regex_search(sLibFile, what1, reg)) {
+                if(!regex_search(sLibFile.c_str(), what1, reg)) {
                     sTmp.assign(what[2].first,what[2].second-what[2].first);
                     addr = strtol(sTmp.c_str(), NULL, 16);
                     sTmp.assign(what[3].first,what[3].second-what[3].first);
                     len = strtol(sTmp.c_str(), NULL, 16);
                     syms[addr+len] = "";
-                    if(regex_search(sLibFile, what, reg3)) {
+                    if(regex_search(sLibFile.c_str(), what, reg3)) {
                         stubhex = addr;
                     }
                 }
@@ -778,10 +780,10 @@ void BsymRofsSymbolProcessUnit::ProcessExecutableFile(const string& aFile)
 	    boost::regex regARMV5("ARMV5", boost::regex::icase);
 	    boost::regex regGCCEoARMV4("(GCCE|ARMV4)", boost::regex::icase);
 	    boost::cmatch what;
-	    if(regex_search(aFile, what, regARMV5)) {
+	    if(regex_search(aFile.c_str(), what, regARMV5)) {
 	        ProcessArmv5File(aFile, fMap);
 	    }
-	    else if(regex_search(aFile, what, regGCCEoARMV4)) {
+	    else if(regex_search(aFile.c_str(), what, regGCCEoARMV4)) {
 	        ProcessGcceOrArm4File(aFile, fMap);
 	    }
 	    else {
@@ -879,7 +881,7 @@ void BsymRofsSymbolProcessUnit::ProcessArmv5File( const string& fileName, ifstre
                 if( (syms.find(k) == syms.end()) || size != 0)
                 {
                 	TSymbolPCEntry tmpEntry;
-                	if(regex_search(sSym, what, regScope))
+                	if(regex_search(sSym.c_str(), what, regScope))
                 	{
                 		scopeName.assign(what[1].first, what[1].second-what[1].first);
                 		symName.assign(what[2].first, what[2].second-what[2].first);
@@ -962,13 +964,13 @@ void BsymRofsSymbolProcessUnit::ProcessGcceOrArm4File( const string& fileName, i
                 break;
             else if(regex_search(str, what, reg1)) {
                 sLibFile.assign(what[4].first,what[4].second-what[4].first);
-                if(!regex_search(sLibFile, what1, reg)) {
+                if(!regex_search(sLibFile.c_str(), what1, reg)) {
                     sTmp.assign(what[2].first,what[2].second-what[2].first);
                     addr = strtol(sTmp.c_str(), NULL, 16);
                     sTmp.assign(what[3].first,what[3].second-what[3].first);
                     len = strtol(sTmp.c_str(), NULL, 16);
                     syms[addr+len] = "";
-                    if(regex_search(sLibFile, what, reg3)) {
+                    if(regex_search(sLibFile.c_str(), what, reg3)) {
                         stubhex = addr;
                     }
                 }
