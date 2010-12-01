@@ -48,7 +48,7 @@ sub loadTools{
 				my $epocroot = $ENV{EPOCROOT};
 				$epocroot =~ s-\\-\/-g;
 				$epocroot .= "\/" unless ($epocroot =~ /\/$/);
-				$path =~ s-^EPOCROOT[\/\\]?-$epocroot-;
+				$path =~ s-^EPOCROOT(##)?[\/\\]?-$epocroot-;
 			}
 			push (@INC, $path);
 		}
